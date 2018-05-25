@@ -3,9 +3,11 @@
 
 {% block page_content %}
 
-<div class="l-entity">
+<div class="l-entry">
   <h1>{{ l }}</h1>
 
+  {% if entity %}
+  
   <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
 
   <h2>Lemmas</h2>
@@ -31,6 +33,13 @@
   
   <h2>Lexeme entity JSON</h2>
   {{ entity }}
+
+  {% else %}
+
+  Not found.
+  
+  {% endif %}
+
   
 </div>
 
