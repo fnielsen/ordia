@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+{% block page_content %}
+
+
+<div class="l-entity">
+  <h1>{{ l }}-{{ f }}</h1>
+
+  {% if form %}
+  
+    {% for representation in form['representations'].values() %}
+
+      {{ representation['value'] }}
+  
+    {% endfor %}
+
+  {% endif %}
+  
+
+  <h2>Lexeme</h2>
+  <a href="{{ l }}">{{ l }}</a>
+
+  <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+
+  
+  <h2>Entity JSON</h2>
+  {{ form }}
+  
+</div>
+
+
+{% endblock %}
+
+{% endblock %}

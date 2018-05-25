@@ -1,0 +1,26 @@
+{% extends "bootstrap-base.html" %}
+
+
+
+{% block navbar %}
+
+<a href="{{ url_for('app.index') }}">Ordia</a>
+<form action="search">
+    <div class="input-group">
+        <input type="text" class="form-control"name="q" id="searchterm" value="{{ query }}"
+               placeholder="Search after lemma or form."/>
+        <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+                Search
+            </button>
+        </span>
+    </div>
+</form>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+{% endblock %}

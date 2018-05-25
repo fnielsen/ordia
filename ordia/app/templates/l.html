@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+{% block page_content %}
+
+
+<div class="l-entity">
+  <h1>{{ l }}</h1>
+
+  <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+
+  <h2>Lemmas</h2>
+  {% for lemma_language, lemma in entity['lemmas'].items() %}
+
+  {{ lemma['value'] }} ({{ lemma['language'] }})
+  
+  {% endfor %}
+  
+  <h2>Forms</h2>
+
+  <ul>
+  {% for form in entity['forms'] %}
+  <li>
+    {% for representation_language, representation in form['representations'].items() %}
+
+    <a href="{{ form['id'] }}">{{ representation['value'] }} ({{ form['id'] }})</a>
+    
+  {% endfor %}
+  
+  {% endfor %}
+  </ul>
+  
+  <h2>Lexeme entity JSON</h2>
+  {{ entity }}
+  
+</div>
+
+
+{% endblock %}
+
+{% endblock %}
