@@ -75,9 +75,7 @@ def show_l(l):
         Wikidata lexeme item identifier
 
     """
-    print(l)
     entity = current_app.base.entities.get(l)
-    print(entity)
     return render_template("l.html", l=l, entity=entity)
 
 
