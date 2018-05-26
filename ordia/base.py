@@ -12,13 +12,15 @@ class Base(object):
         """Initialize attributes."""
         self.entities = {}
         self.keyword_index = defaultdict(list)
+        self.language_index = defaultdict(list)
 
         self.initialize_entities_from_api()
         self.build_keyword_index()
+        self.build_language_index()
 
     def initialize_entities_from_api(self):
         """Initialize entities attributes from Wikidata API."""
-        ids = ['L{}'.format(id_) for id_ in range(1, 10000)]
+        ids = ['L{}'.format(id_) for id_ in range(1, 20000)]
 
         self.entities = wb_get_entities(ids)
 
@@ -34,6 +36,20 @@ class Base(object):
             for form in entity['forms']:
                 for representation in form['representations'].values():
                     self.keyword_index[representation['value']].append(
+                        form['id'])
+
+    def build_language_index(self):
+        """Build language index."""
+        for id_, entity in self.entities.items():
+
+            # Index lemmas
+            for lemma in entity.get('lemmas', {}).values():
+                self.language_index[lemma['language']].append(id_)
+
+            # Forms
+            for form in entity['forms']:
+                for representation in form['representations'].values():
+                    self.language_index[representation['language']].append(
                         form['id'])
 
     def search(self, query):

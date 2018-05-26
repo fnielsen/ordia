@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+
+<div class="language-entries">
+  <h1>{{ language }}</h1>
+
+  <h2>Lexems</h2>
+
+  <ul>
+      {% for id_ in ids %}
+      
+      {% if id_.startswith('L') %}
+
+      <li>
+	  <a href="{{ url_for('app.show_l', l=id_) }}">{{ id_ }}</a>
+
+      </li>
+
+      {% endif %}
+      
+      {% endfor %}
+
+  </ul>
+
+</div>
+
+{% endblock %}
+
+

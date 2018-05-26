@@ -13,7 +13,8 @@
   <h2>Lemmas</h2>
   {% for lemma_language, lemma in entity['lemmas'].items() %}
 
-  {{ lemma['value'] }} ({{ lemma['language'] }})
+  {{ lemma['value'] }}
+  (<a href="{{ url_for('app.show_language', language=lemma['language']) }}">{{ lemma['language'] }}</a>)
   
   {% endfor %}
   

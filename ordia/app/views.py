@@ -45,10 +45,11 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 q_pattern = '<regex("Q[1-9]\d*"):q>'
 l_pattern = '<regex("L[1-9]\d*"):l>'
 f_pattern = '<regex("F[1-9]\d*"):f>'
+p_pattern = '<regex("P[1-9]\d*"):p>'
+language_pattern = '<regex("[a-z]{2,3}(-x-Q[1-9]\d*)?"):language>'
+
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
-
-p_pattern = '<regex("P[1-9]\d*"):p>'
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 
@@ -77,6 +78,20 @@ def show_l(l):
     """
     entity = current_app.base.entities.get(l)
     return render_template("l.html", l=l, entity=entity)
+
+
+@main.route("/language/" + language_pattern)
+def show_language(language):
+    """Render webpage for language.
+
+    Parameters
+    ----------
+    language : str
+        ISO language identifier as string.
+
+    """
+    ids = current_app.base.language_index.get(language, [])
+    return render_template("language.html", language=language, ids=ids)
 
 
 @main.route("/" + l_pattern + "-" + f_pattern)
