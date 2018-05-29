@@ -6,6 +6,8 @@ import re
 from flask import (Blueprint, current_app, render_template, request)
 from werkzeug.routing import BaseConverter
 
+from ..api import wb_search_lexeme_entities
+
 
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
@@ -148,7 +150,12 @@ def show_search():
     """
     query = request.args.get('q', '')
     if query:
-        search_results = current_app.base.search(query)
+        # As the cache in the `base` is not updated currently,
+        # it may be better to search with the API.
+        # Alternatively, the two results could be intertwined.
+        # search_results = current_app.base.search(query)
+        
+        search_results = wb_search_lexeme_entities(query)
     else:
         search_results = []
     return render_template("search.html",

@@ -1,4 +1,13 @@
-"""api."""
+"""api.
+
+Usage:
+  ordia.api wb-search-lexeme-entities [options] <query>
+
+Options:
+  -h | --help      Help message
+  -l | --language  Language [default: en]
+
+"""
 
 
 import requests
@@ -63,3 +72,67 @@ def wb_get_entities(ids):
                 break
 
     return entities
+
+
+def wb_search_lexeme_entities(query, language='en'):
+    """Search lexeme entities on Wikidata.
+
+    Search the Wikidata API for content in the lexeme items.
+
+    Parameters
+    ----------
+    query : str
+        Query string
+    language : en | da | sv, optional
+        Language. Not clear if that affects the search.
+
+    Returns
+    -------
+    search_results : list of dicts.
+        List of individual search results, that is represented as a dict.
+        The format of the dicts are the same as the output from the
+        Wikidata API.
+
+    Notes
+    -----
+    The wikidata API is searched over the Internet with the `wbsearchentities`
+    action method with the `type` set to `lexeme`. This method will search
+    both labels and forms, but it will only return the lexeme pages, - not
+    individual form identifiers.
+
+    """
+    params = {
+        'action': 'wbsearchentities',
+        'format': 'json',
+        'search': query,
+        'language': language,
+        'type': 'lexeme',
+        }
+
+    response_data = requests.get(
+        'https://www.wikidata.org/w/api.php',
+        headers=HEADERS, params=params).json()
+
+    if 'search' in response_data:
+        search_results = response_data['search']
+    else:
+        search_results = []
+    return search_results
+
+
+def main():
+    """Handle command-line input."""
+    from docopt import docopt
+
+    arguments = docopt(__doc__)
+
+    if arguments['wb-search-lexeme-entities']:
+        results = wb_search_lexeme_entities(
+            arguments['<query>'],
+            language=arguments['--language'],
+        )
+        print(results)
+
+
+if __name__ == '__main__':
+    main()

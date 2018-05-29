@@ -4,21 +4,38 @@
 
 <div class="search-results">
 
-  <div class="alert alert-warning" role="alert">
+  <!-- div class="alert alert-warning" role="alert">
     Currently, only a limited set of lexemes and forms are searched,
     so the search results may not be complete.
-  </div>
+  </div -->
   
     <h2>Search results</h2>
 
     <ul class="search-results">
 {% for search_result in search_results %}
         <li class="search-result">
-            <a href="{{ search_result['id'] }}">
-                {{ search_result['label'] }}
-                ({{ search_result['id'] }})</a>
+	    {% if 'match' in search_result %}
+
+	    <a href="{{ search_result['id'] }}">
+                  {{ search_result['label'] }}
+                  ({{ search_result['id'] }})</a>
+            &mdash; {{ search_result['description'] }}
+
+	    <br>
+	    {{ search_result['match']['text'] }}
+	    (<a href='{{ url_for("app.show_language", language=search_result["match"]["language"]) }}'>{{ search_result['match']['language'] }}</a>)
+	    
+	    {% else %}
+	    
+	    <a href="{{ search_result['id'] }}">
+                  {{ search_result['label'] }}
+                  ({{ search_result['id'] }})</a>
             <br/>
-            {{ search_result['description'] }}</li>
+            {{ search_result['description'] }}
+	    
+	    {% endif %}
+	</li>
+	    
 {% endfor %}
     </ul>
     
