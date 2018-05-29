@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+
+<div class="lexical-categories">
+  <h1>Lexical categories</h1>
+
+  <ul>
+      {% for lexical_category, count in lexical_category_counts.items() %}
+      
+      <li>
+	  <a href="{{ url_for('app.show_q', q=lexical_category) }}">
+	      {{ lexical_category }}: {{ count }}</a>
+
+      </li>
+
+      {% endfor %}
+
+  </ul>
+
+</div>
+
+{% endblock %}
+
+

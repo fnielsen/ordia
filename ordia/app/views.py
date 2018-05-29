@@ -104,6 +104,14 @@ def show_language(language):
     return render_template("language.html", language=language, ids=ids)
 
 
+@main.route("/lexical-category/")
+def show_lexical_category_index():
+    """Render webpage for lexical_category index page."""
+    lexical_category_counts = current_app.base.lexical_category_counts
+    return render_template("lexical_category_index.html",
+                           lexical_category_counts=lexical_category_counts)
+
+
 @main.route("/" + l_pattern + "-" + f_pattern)
 def show_lf(l, f):
     """Render webpage for l-f Wikidata item.
@@ -154,7 +162,7 @@ def show_search():
         # it may be better to search with the API.
         # Alternatively, the two results could be intertwined.
         # search_results = current_app.base.search(query)
-        
+
         search_results = wb_search_lexeme_entities(query)
     else:
         search_results = []

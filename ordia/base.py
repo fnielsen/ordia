@@ -11,9 +11,10 @@ class Base(object):
     def __init__(self):
         """Initialize attributes."""
         self.entities = {}
+        self.grammatical_feature_index = defaultdict(list)
         self.keyword_index = defaultdict(list)
         self.language_index = defaultdict(list)
-        self.grammatical_feature_index = defaultdict(list)
+        self.lexical_category_counts = defaultdict(int)
 
         self.initialize_entities_from_api()
         self.build_indices()
@@ -27,6 +28,8 @@ class Base(object):
     def build_indices(self):
         """Build indices."""
         for id_, entity in self.entities.items():
+
+            self.lexical_category_counts[entity['lexicalCategory']] += 1
 
             # Index lemmas
             for lemma in entity.get('lemmas', {}).values():
