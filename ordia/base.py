@@ -13,10 +13,10 @@ class Base(object):
         self.entities = {}
         self.keyword_index = defaultdict(list)
         self.language_index = defaultdict(list)
+        self.grammatical_feature_index = defaultdict(list)
 
         self.initialize_entities_from_api()
-        self.build_keyword_index()
-        self.build_language_index()
+        self.build_indices()
 
     def initialize_entities_from_api(self):
         """Initialize entities attributes from Wikidata API."""
@@ -24,31 +24,24 @@ class Base(object):
 
         self.entities = wb_get_entities(ids)
 
-    def build_keyword_index(self):
-        """Build keyword index."""
-        for id_, entity in self.entities.items():
-
-            # Index lemmas
-            for lemma in entity.get('lemmas', {}).values():
-                self.keyword_index[lemma['value']].append(id_)
-
-            # Forms
-            for form in entity['forms']:
-                for representation in form['representations'].values():
-                    self.keyword_index[representation['value']].append(
-                        form['id'])
-
-    def build_language_index(self):
-        """Build language index."""
+    def build_indices(self):
+        """Build indices."""
         for id_, entity in self.entities.items():
 
             # Index lemmas
             for lemma in entity.get('lemmas', {}).values():
                 self.language_index[lemma['language']].append(id_)
+                self.keyword_index[lemma['value']].append(id_)
 
             # Forms
             for form in entity['forms']:
+                for grammatical_feature in form['grammaticalFeatures']:
+                    self.grammatical_feature_index[grammatical_feature] \
+                        = id_
+
                 for representation in form['representations'].values():
+                    self.keyword_index[representation['value']].append(
+                        form['id'])
                     self.language_index[representation['language']].append(
                         form['id'])
 

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+
+<div class="grammatical-features">
+  <h1>Grammatical features</h1>
+
+  <ul>
+      {% for grammatical_feature in grammatical_features %}
+      
+      <li>
+	  <a href="{{ url_for('app.show_q', q=grammatical_feature) }}">
+	      {{ grammatical_feature }}</a>
+
+      </li>
+
+      {% endfor %}
+
+  </ul>
+
+</div>
+
+{% endblock %}
+
+

@@ -80,6 +80,14 @@ def show_l(l):
     return render_template("l.html", l=l, entity=entity)
 
 
+@main.route("/grammatical-feature/")
+def show_grammatical_feature_index():
+    """Render webpage for grammatical feature index page."""
+    grammatical_features = current_app.base.grammatical_feature_index.keys()
+    return render_template("grammatical_feature_index.html",
+                           grammatical_features=grammatical_features)
+
+
 @main.route("/language/" + language_pattern)
 def show_language(language):
     """Render webpage for language.
