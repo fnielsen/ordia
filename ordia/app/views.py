@@ -128,8 +128,8 @@ def show_lf(l, f):
     for form in entity['forms']:
         if form['id'] == l + '-' + f:
             break
-        else:
-            form = {}
+    else:
+        form = {}
     return render_template("lf.html", l=l, f=f, form=form)
 
 
