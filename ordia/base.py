@@ -78,7 +78,7 @@ class Base(object):
 
     def initialize_entities_from_api(self):
         """Initialize entities attributes from Wikidata API."""
-        ids = ['L{}'.format(id_) for id_ in range(1, 200)]
+        ids = ['L{}'.format(id_) for id_ in range(1, 20000)]
 
         self.entities = Entities(wb_get_entities(ids))
 
