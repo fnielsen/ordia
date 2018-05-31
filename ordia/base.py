@@ -26,8 +26,12 @@ class Entities(dict):
             entity = dict.__getitem__(self, id_)
         except KeyError:
             if id_.startswith('L'):
-                entity = wb_get_entities([id_]).values()[0]
-                dict.__setitem__(self, id_, entity)
+                entities = wb_get_entities([id_])
+                if len(entities) == 1:
+                    entity = list(entities.values())[0]
+                    dict.__setitem__(self, id_, entity)
+                else:
+                    raise KeyError
             else:
                 raise KeyError
         return entity
@@ -53,7 +57,11 @@ class Entities(dict):
         except KeyError:
             try:
                 if id_.startswith('L'):
-                    entity = wb_get_entities([id_]).values()[0]
+                    entities = wb_get_entities([id_])
+                    if len(entities) == 1:
+                        entity = list(entities.values())[0]
+                    else:
+                        return default
                 else:
                     return default
             except IndexError:
