@@ -71,11 +71,19 @@ class Entities(dict):
 
 
 class Base(object):
-    """Database of lexemes from Wikidata."""
+    """Database of lexemes from Wikidata.
+
+    Attributes
+    ----------
+    form_index : defaultdict of defaultdict of list
+        Dictionary by language.
+
+    """
 
     def __init__(self):
         """Initialize attributes."""
         self.entities = Entities()
+        self.form_index = defaultdict(lambda: defaultdict(list))
         self.grammatical_feature_index = defaultdict(list)
         self.keyword_index = defaultdict(list)
         self.language_index = defaultdict(list)
@@ -108,6 +116,9 @@ class Base(object):
                         = id_
 
                 for representation in form['representations'].values():
+                    self.form_index[representation['language']][
+                        representation['value']].append(
+                            form['id'])
                     self.keyword_index[representation['value']].append(
                         form['id'])
                     self.language_index[representation['language']].append(
@@ -134,3 +145,36 @@ class Base(object):
                 'label': query,
             } for id_ in ids]
         return search_results
+
+    def word_to_form_ids(self, word, language):
+        """Search for word and return word identifier.
+
+        Parameters
+        ----------
+        word : str
+           Word to query.
+
+        Returns
+        -------
+        ids : list of str
+            List of strings representing lexeme forms.
+
+        """
+        return self.form_index[language][word]
+
+    def words_to_form_ids(self, words, language):
+        """Search for words and return word identifier.
+
+        Parameters
+        ----------
+        word : lists of str
+           Word to query.
+
+        Returns
+        -------
+        ids : list of str
+            List of strings representing lexeme forms.
+
+        """
+        ids = [self.word_to_form_ids(word, language) for word in words]
+        return ids
