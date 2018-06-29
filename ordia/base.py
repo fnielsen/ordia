@@ -80,7 +80,7 @@ class Base(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, max_ids=None):
         """Initialize attributes."""
         self.entities = Entities()
         self.form_index = defaultdict(lambda: defaultdict(list))
@@ -89,15 +89,17 @@ class Base(object):
         self.language_index = defaultdict(list)
         self.lexical_category_counts = defaultdict(int)
 
-        self.initialize_entities_from_api()
+        self.initialize_entities_from_api(max_ids=max_ids)
         self.build_indices()
 
-    def initialize_entities_from_api(self):
+    def initialize_entities_from_api(self, max_ids=None):
         """Initialize entities attributes from Wikidata API."""
-        ids = ['L{}'.format(id_) for id_ in range(1, 20000)]
+        if max_ids is None:
+            max_ids = 20000
+        ids = ['L{}'.format(id_) for id_ in range(1, max_ids + 1)]
 
         self.entities = Entities(wb_get_entities(ids))
-
+        
     def build_indices(self):
         """Build indices."""
         for id_, entity in self.entities.items():
