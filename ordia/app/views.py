@@ -48,7 +48,7 @@ q_pattern = '<regex("Q[1-9]\d*"):q>'
 l_pattern = '<regex("L[1-9]\d*"):l>'
 f_pattern = '<regex("F[1-9]\d*"):f>'
 p_pattern = '<regex("P[1-9]\d*"):p>'
-language_pattern = '<regex("[a-z]{2,3}(-x-Q[1-9]\d*)?"):language>'
+language_pattern = '<regex("[a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*))?"):language>'
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
@@ -102,6 +102,19 @@ def show_language(language):
     """
     ids = current_app.base.language_index.get(language, [])
     return render_template("language.html", language=language, ids=ids)
+
+
+@main.route("/language/")
+def show_language_index():
+    """Render index webpage for language."""
+    lexeme_count_per_language = {
+        language: len(lexemes)
+        for language, lexemes in
+        current_app.base.language_index.items()
+    }
+    return render_template(
+        "language_index.html",
+        lexeme_count_per_language=lexeme_count_per_language)
 
 
 @main.route("/lexical-category/")

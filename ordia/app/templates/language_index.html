@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+
+  <div class="alert alert-warning" role="alert">
+    Currently, not all languages may be listed 
+    as the list is not automatically updated.
+  </div>
+
+
+<div class="languages">
+  <h1>Languages</h1>
+
+  <ul>
+      {% for language, count in lexeme_count_per_language.items() %}
+      
+      <li>
+	  <a href="{{ url_for('app.show_language', language=language) }}">{{ language }}</a>
+	  ({{ count }} lexemes and forms)
+      </li>
+
+      {% endfor %}
+
+  </ul>
+
+</div>
+
+{% endblock %}
+
+
