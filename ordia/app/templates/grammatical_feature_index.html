@@ -6,6 +6,11 @@
 <div class="grammatical-features">
   <h1>Grammatical features</h1>
 
+  <div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fchild%20%3FchildLabel%20%3Fparent%20%3FparentLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Ffeature%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Ffeature%20%7B%20%0A%20%20%0A%20%20%20%20{% for grammatical_feature in grammatical_features %} wd:{{ grammatical_feature }} {% endfor %}%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25features%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%28%3Ffeature%20AS%20%3Fchild%29%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results1%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fchild%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fchild%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results2%20%20%20%0AWHERE%20%7B%0A%20%20%7B%20INCLUDE%20%25results1%20%7D%20UNION%20%7B%20INCLUDE%20%25results2%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D"></iframe>
+</div>
+  
+  <h2>List</h2>
   <ul>
       {% for grammatical_feature in grammatical_features %}
       
