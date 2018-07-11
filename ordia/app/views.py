@@ -48,7 +48,8 @@ q_pattern = '<regex("Q[1-9]\d*"):q>'
 l_pattern = '<regex("L[1-9]\d*"):l>'
 f_pattern = '<regex("F[1-9]\d*"):f>'
 p_pattern = '<regex("P[1-9]\d*"):p>'
-language_pattern = '<regex("[a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*))?"):language>'
+language_pattern = """\
+<regex("[a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*))?"):language>"""
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
@@ -101,7 +102,8 @@ def show_language(language):
 
     """
     ids = current_app.base.language_index.get(language, [])
-    return render_template("language.html", language=language, ids=ids)
+    return render_template("language.html", language=language,
+                           ids=ids, base=current_app.base)
 
 
 @main.route("/language/")

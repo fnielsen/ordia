@@ -21,7 +21,9 @@
 
       <li>
 	  <a href="{{ url_for('app.show_l', l=id_) }}">{{ id_ }}</a>
-
+	  {% for lemma in base.id_to_lemmas(id_) %}
+	      {{ lemma }}
+	  {% endfor %}
       </li>
 
       {% endif %}

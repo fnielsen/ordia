@@ -99,7 +99,7 @@ class Base(object):
         ids = ['L{}'.format(id_) for id_ in range(1, max_ids + 1)]
 
         self.entities = Entities(wb_get_entities(ids))
-        
+
     def build_indices(self):
         """Build indices."""
         for id_, entity in self.entities.items():
@@ -125,6 +125,28 @@ class Base(object):
                         form['id'])
                     self.language_index[representation['language']].append(
                         form['id'])
+
+    def id_to_lemmas(self, id_):
+        """Return lemmas for a Wikidata identifier.
+
+        Parameters
+        ----------
+        id_ : str
+            Wikidata lexeme or form identifier.
+
+        Returns
+        -------
+        lemmas : list of str
+            List of strings.
+
+        """
+        entity = self.entities.get(id_)
+        if entity:
+            lemmas = [value['value']
+                      for value in entity.get('lemmas', {}).values()]
+            return lemmas
+        else:
+            return []
 
     def search(self, query):
         """Search for keyword in index.
