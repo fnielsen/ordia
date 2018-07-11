@@ -41,4 +41,14 @@
     
 </div>
 
+
+<div class="new-lexeme">
+  {% if query %}
+
+  <a href="https://www.wikidata.org/wiki/Special:NewLexeme?lemma={{ query }}"><button type="button" class="btn btn-primary">Create new lexeme in Wikidata</button></a>
+  
+  {% endif %}
+</div>
+
+
 {% endblock %}
