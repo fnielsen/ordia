@@ -7,7 +7,7 @@ filename = os.path.join(os.path.dirname(__file__), 'requirements.txt')
 requirements = open(filename).read().splitlines()
 
 setup(
-    name='scholia',
+    name='ordia',
     author='Finn Aarup Nielsen',
     author_email='faan@dtu.dk',
     cmdclass=versioneer.get_cmdclass(),
