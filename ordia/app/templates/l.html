@@ -4,11 +4,9 @@
 {% block page_content %}
 
 <div class="l-entry">
-  <h1>{{ l }}</h1>
-
   {% if entity %}
   
-  <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+  <h1><a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">{{ l }}</a></h1>
 
   <h2>Lemmas</h2>
   {% for lemma_language, lemma in entity['lemmas'].items() %}
@@ -36,6 +34,8 @@
   {{ entity }}
 
   {% else %}
+
+  <h1>{{ l }}</h1>
 
   Not found.
   
