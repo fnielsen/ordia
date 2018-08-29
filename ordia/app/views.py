@@ -1,6 +1,7 @@
 """views."""
 
 
+import json
 import re
 
 from flask import (Blueprint, current_app, render_template, request)
@@ -80,7 +81,9 @@ def show_l(l):
 
     """
     entity = current_app.base.entities.get(l)
-    return render_template("l.html", l=l, entity=entity)
+    formatted_entity = json.dumps(entity, indent=2)
+    return render_template("l.html", l=l, entity=entity,
+                           formatted_entity=formatted_entity)
 
 
 @main.route("/grammatical-feature/")

@@ -31,8 +31,15 @@
   </ul>
   
   <h2>Lexeme entity JSON</h2>
-  {{ entity }}
 
+  {% if formatted_entity %}
+
+  <pre>
+{{ formatted_entity }}
+  </pre>
+
+  {% endif %}
+  
   {% else %}
 
   <h1>{{ l }}</h1>
