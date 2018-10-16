@@ -1,5 +1,32 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    longestWordsAndPhrasesSparql = `
+# List of longest words for a language
+# https://lists.wikimedia.org/pipermail/wikidata/2018-October/012545.html
+SELECT DISTINCT ?length ?lexeme ?lexemeLabel WHERE {
+  ?language wdt:P218 "{{ language }}" .
+  ?lexeme a ontolex:LexicalEntry ;
+          dct:language ?language ; 
+          (ontolex:lexicalForm / ontolex:representation) | wikibase:lemma ?lexemeLabel .
+  BIND(STRLEN(?lexemeLabel) AS ?length)  
+} 
+ORDER BY DESC(?length) 
+LIMIT 200
+  `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(longestWordsAndPhrasesSparql, "#longest-words-and-phrases");
+ });
+
+</script>
+
+{% endblock %}
+
 
 {% block page_content %}
 
@@ -33,6 +60,12 @@
   </ul>
 
 </div>
+
+
+<h2>Longest words and phrases</h2>
+
+<table class="table table-hover" id="longest-words-and-phrases"></table>
+
 
 {% endblock %}
 

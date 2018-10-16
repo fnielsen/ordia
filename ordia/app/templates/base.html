@@ -1,5 +1,27 @@
 {% extends "bootstrap-base.html" %}
 
+{% block head %}
+{{super()}}
+
+<meta name="robots" content="index, nofollow">
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.dataTables.min.css') }}">
+
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='ordia.js') }}"></script>
+
+</script>
+
+{% endblock %}
+
+
 
 {% block navbar %}
 
