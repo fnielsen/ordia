@@ -4,10 +4,12 @@
 import json
 import re
 
-from flask import (Blueprint, current_app, render_template, request)
+from flask import (Blueprint, current_app, redirect, render_template, request,
+                   url_for)
 from werkzeug.routing import BaseConverter
 
 from ..api import wb_search_lexeme_entities
+from ..query import iso639_to_q
 
 
 class RegexConverter(BaseConverter):
@@ -49,8 +51,10 @@ q_pattern = '<regex("Q[1-9]\d*"):q>'
 l_pattern = '<regex("L[1-9]\d*"):l>'
 f_pattern = '<regex("F[1-9]\d*"):f>'
 p_pattern = '<regex("P[1-9]\d*"):p>'
-language_pattern = """\
-<regex("[a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*))?"):language>"""
+iso_language_pattern = """\
+<regex("[a-z]{2,3}"):language>"""
+q_language_pattern = """\
+<regex("(Q[1-9]\d*)|([a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*)))"):q>"""
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
@@ -80,6 +84,7 @@ def show_l(l):
         Wikidata lexeme item identifier
 
     """
+    print('Hallo')
     entity = current_app.base.entities.get(l)
     formatted_entity = json.dumps(entity, indent=2)
     return render_template("l.html", l=l, entity=entity,
@@ -94,32 +99,49 @@ def show_grammatical_feature_index():
                            grammatical_features=grammatical_features)
 
 
-@main.route("/language/" + language_pattern)
-def show_language(language):
-    """Render webpage for language.
+@main.route("/language/" + iso_language_pattern)
+def redirect_language(language):
+    """Redirect from ISO language code.
 
     Parameters
     ----------
     language : str
-        ISO language identifier as string.
+        ISO language identifier as a string
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
 
     """
-    ids = current_app.base.language_index.get(language, [])
-    return render_template("language.html", language=language,
-                           ids=ids, base=current_app.base)
+    q = iso639_to_q(language)
+    if q:
+        return redirect(url_for('app.show_language', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route("/language/" + q_language_pattern)
+def show_language(q):
+    """Render webpage for language.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item for the language.
+
+    """
+    print('show_language')
+    if q.startswith('Q'):
+        return render_template("language.html", q=q)
+    else:
+        q = q.split('-')[-1]
+        return redirect(url_for('app.show_language', q=q), code=302)
 
 
 @main.route("/language/")
 def show_language_index():
     """Render index webpage for language."""
-    lexeme_count_per_language = {
-        language: len(lexemes)
-        for language, lexemes in
-        current_app.base.language_index.items()
-    }
-    return render_template(
-        "language_index.html",
-        lexeme_count_per_language=lexeme_count_per_language)
+    return render_template("language_index.html")
 
 
 @main.route("/lexical-category/")

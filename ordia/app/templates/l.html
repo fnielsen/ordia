@@ -12,7 +12,7 @@
   {% for lemma_language, lemma in entity['lemmas'].items() %}
 
   {{ lemma['value'] }}
-  (<a href="{{ url_for('app.show_language', language=lemma['language']) }}">{{ lemma['language'] }}</a>)
+  (<a href="{{ url_for('app.show_language', q=lemma['language']) }}">{{ lemma['language'] }}</a>)
   
   {% endfor %}
   

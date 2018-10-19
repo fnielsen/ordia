@@ -4,15 +4,43 @@
 {{super()}}
 
 <script type="text/javascript">
-    longestWordsAndPhrasesSparql = `
+    lexemesSparql = `
+# List of lexemes for a language
+SELECT
+  ?lexeme ?lexemeLabel
+  ?lexical_category ?lexical_categoryLabel
+WITH {
+  SELECT ?lexeme ?lexemeLabel ?lexical_category WHERE {
+    ?lexeme a ontolex:LexicalEntry ;
+            dct:language wd:{{ q }} ; 
+            wikibase:lemma ?lexemeLabel .
+    OPTIONAL {
+      ?lexeme wikibase:lexicalCategory ?lexical_category .
+    }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results
+  OPTIONAL {        
+    ?lexical_category rdfs:label ?lexical_categoryLabel .
+    FILTER (LANG(?lexical_categoryLabel) = "en")
+  }
+  # SERVICE does not work!?
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+}
+  `
+
+
+longestWordsAndPhrasesSparql = `
 # List of longest words for a language
 # https://lists.wikimedia.org/pipermail/wikidata/2018-October/012545.html
-SELECT DISTINCT ?length ?lexeme ?lexemeLabel WHERE {
-  ?language wdt:P218 "{{ language }}" .
+SELECT DISTINCT ?length ?form ?formLabel ?lexeme ?lexemeLabel WHERE {
   ?lexeme a ontolex:LexicalEntry ;
-          dct:language ?language ; 
-          (ontolex:lexicalForm / ontolex:representation) | wikibase:lemma ?lexemeLabel .
-  BIND(STRLEN(?lexemeLabel) AS ?length)  
+          dct:language wd:{{ q }} ;
+          wikibase:lemma ?lexemeLabel .
+  ?lexeme ontolex:lexicalForm ?form .
+  ?form ontolex:representation ?formLabel
+  BIND(STRLEN(?formLabel) AS ?length)  
 } 
 ORDER BY DESC(?length) 
 LIMIT 200
@@ -20,7 +48,9 @@ LIMIT 200
 
 
  $(document).ready(function() {
-     sparqlToDataTable(longestWordsAndPhrasesSparql, "#longest-words-and-phrases");
+     sparqlToDataTable(lexemesSparql, "#lexemes");
+     sparqlToDataTable(longestWordsAndPhrasesSparql,
+		       "#longest-words-and-phrases");
  });
 
 </script>
@@ -30,34 +60,13 @@ LIMIT 200
 
 {% block page_content %}
 
-  <div class="alert alert-warning" role="alert">
-    Currently, only a limited set of lexemes and forms are listed
-    as the list is not automatically updated.
-  </div>
-
 
 <div class="language-entries">
-  <h1>{{ language }}</h1>
+  <h1>{{ q }}</h1>
 
-  <h2>Lexems</h2>
+  <h2>Lexemes</h2>
 
-  <ul>
-      {% for id_ in ids %}
-      
-      {% if id_.startswith('L') %}
-
-      <li>
-	  <a href="{{ url_for('app.show_l', l=id_) }}">{{ id_ }}</a>
-	  {% for lemma in base.id_to_lemmas(id_) %}
-	      {{ lemma }}
-	  {% endfor %}
-      </li>
-
-      {% endif %}
-      
-      {% endfor %}
-
-  </ul>
+  <table class="table table-hover" id="lexemes"></table>
 
 </div>
 
