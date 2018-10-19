@@ -23,7 +23,7 @@
 
 	    <br>
 	    {{ search_result['match']['text'] }}
-	    (<a href='{{ url_for("app.show_language", language=search_result["match"]["language"]) }}'>{{ search_result['match']['language'] }}</a>)
+	    (<a href='{{ url_for("app.redirect_language", language=search_result["match"]["language"]) }}'>{{ search_result['match']['language'] }}</a>)
 	    
 	    {% else %}
 	    
