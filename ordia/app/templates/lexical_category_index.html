@@ -1,23 +1,46 @@
 {% extends "base.html" %}
 
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ lexicalCategoriesSparql = `
+# List with counts of lexical categories
+SELECT ?count ?lexical_category ?lexical_categoryLabel 
+WITH {
+  SELECT (COUNT(*) AS ?count) ?lexical_category WHERE {
+    [] wikibase:lexicalCategory ?lexical_category .
+  }
+  GROUP BY ?lexical_category
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+ `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(lexicalCategoriesSparql, "#lexical-categories",
+		       {'linkPrefixes': {
+			   'lexical_category': '../'}});
+ });
+
+</script>
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
+<h1>Lexical categories</h1>
+
 <div class="lexical-categories">
-  <h1>Lexical categories</h1>
 
-  <ul>
-      {% for lexical_category, count in lexical_category_counts.items() %}
-      
-      <li>
-	  <a href="{{ url_for('app.show_q', q=lexical_category) }}">
-	      {{ lexical_category }}: {{ count }}</a>
-
-      </li>
-
-      {% endfor %}
-
-  </ul>
+    <table class="table table-hover" id="lexical-categories"></table>
 
 </div>
 

@@ -26,41 +26,44 @@
 {% block navbar %}
 
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-     <a class="navbar-brand" href="{{ url_for('app.index') }}">Ordia</a>
-     <form class="form-inline" action="{{ url_for('app.show_search') }}">
-       <div class="input-group">
-         <input type="text" class="form-control"
-		name="q" id="searchterm" value="{{ query }}"
-		placeholder="Search after lemma or form"/>
-         <span class="input-group-btn">
-           <button class="btn btn-primary" type="submit">
-             Search
-           </button>
-         </span>
-       </div>
-   
-     </form>
-     
-     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToogle">
-       <span class="navbar-toggler-icon"></span>
-     </button>
+    <a class="navbar-brand" href="{{ url_for('app.index') }}">Ordia</a>
+    <form class="form-inline" action="{{ url_for('app.show_search') }}">
+	<div class="input-group">
+            <input type="text" class="form-control"
+name="q" id="searchterm" value="{{ query }}"
+placeholder="Search after lemma or form"/>
+            <span class="input-group-btn">
+		<button class="btn btn-primary" type="submit">
+		    Search
+		</button>
+            </span>
+	</div>
+	
+    </form>
+    
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToogle">
+	<span class="navbar-toggler-icon"></span>
+    </button>
 
-     <div class="collapse navbar-collapse" id="navbarToogle">
-       <ul class="navbar-nav">
-	 <li class="nav-item">
-	   <a class="nav-link" href="{{ url_for('app.show_language_index') }}">Languages</a>
-	 </li>
-	 <li class="nav-item">
-	   <a class="nav-link" href="{{ url_for('app.show_grammatical_feature_index') }}">Grammatical features</a>
-	 </li>
-	 <li class="nav-item">
-           <a class="nav-link" href="{{ url_for('app.show_l', l='L99') }}">Example lemma L99 (Luftballon)</a>
-	 </li>
-	 <li class="nav-item">
-           <a class="nav-link" href="{{ url_for('app.show_l', l='L128-F4') }}">Example form L128-F4 (vovsernes)</a>
-	 </li>
-       </ul>
-     </div>
+    <div class="collapse navbar-collapse" id="navbarToogle">
+	<ul class="navbar-nav">
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_language_index') }}">Languages</a>
+	    </li>
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_lexical_category_index') }}">Lexical categories</a>
+	    </li>
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_grammatical_feature_index') }}">Grammatical features</a>
+	    </li>
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_l', l='L99') }}">Example lemma L99 (Luftballon)</a>
+	    </li>
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_l', l='L128-F4') }}">Example form L128-F4 (vovsernes)</a>
+	    </li>
+	</ul>
+    </div>
 </nav>
 
 {% endblock %}
@@ -69,22 +72,22 @@
 {% block content %}
 
 <div class="container">
-  {% block page_content %}{% endblock %}
+    {% block page_content %}{% endblock %}
 </div>
 
 <div class="container">
-  <hr>
-  Data from <a href="https://www.wikidata.org">Wikidata</a>
-  |
-  Code from
-  <a href="https://github.com/fnielsen/ordia">GitHub repository</a>
-  |
-  Hosted on   <a href="https://tools.wmflabs.org/">Wikimedia Toolforge</a>,
-  a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
-  |
-  License for content: CC0 for data, CC-BY-SA for text and media
-  |
-  Report technical problems at Ordia's
+    <hr>
+    Data from <a href="https://www.wikidata.org">Wikidata</a>
+    |
+    Code from
+    <a href="https://github.com/fnielsen/ordia">GitHub repository</a>
+    |
+    Hosted on   <a href="https://tools.wmflabs.org/">Wikimedia Toolforge</a>,
+    a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
+    |
+    License for content: CC0 for data, CC-BY-SA for text and media
+    |
+    Report technical problems at Ordia's
   <a href="https://github.com/fnielsen/ordia/issues">Issues</a> GitHub page.
 </div>
 

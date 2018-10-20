@@ -4,7 +4,7 @@
 {{super()}}
 
 <script type="text/javascript">
-    lexemesSparql = `
+ lexemesSparql = `
 # List of lexemes for a language
 SELECT
   ?lexeme ?lexemeLabel
@@ -31,7 +31,7 @@ WHERE {
   `
 
 
-longestWordsAndPhrasesSparql = `
+ longestWordsAndPhrasesSparql = `
 # List of longest words for a language
 # https://lists.wikimedia.org/pipermail/wikidata/2018-October/012545.html
 SELECT DISTINCT ?length ?form ?formLabel ?lexeme ?lexemeLabel WHERE {
@@ -48,9 +48,15 @@ LIMIT 200
 
 
  $(document).ready(function() {
-     sparqlToDataTable(lexemesSparql, "#lexemes");
+     sparqlToDataTable(lexemesSparql, "#lexemes", {
+	 'linkPrefixes': {
+	     'lexeme': '../',
+	     'lexical_category': '../'}});
      sparqlToDataTable(longestWordsAndPhrasesSparql,
-		       "#longest-words-and-phrases");
+		       "#longest-words-and-phrases", {
+			   'linkPrefixes': {
+			       'form': '../',
+			       'lexeme': '../'}});
  });
 
 </script>

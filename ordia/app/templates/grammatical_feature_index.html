@@ -1,30 +1,57 @@
 {% extends "base.html" %}
 
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ grammaticalFeaturesSparql = `
+# List with counts of grammatical features
+SELECT ?count ?grammatical_feature ?grammatical_featureLabel 
+WITH {
+  SELECT (COUNT(*) AS ?count) ?grammatical_feature WHERE {
+    [] wikibase:grammaticalFeature ?grammatical_feature .
+  }
+  GROUP BY ?grammatical_feature
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+ `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(grammaticalFeaturesSparql, "#grammatical-features",
+		       {'linkPrefixes': {
+			   'grammatical_feature': '../'}});
+ });
+
+</script>
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
-<div class="grammatical-features">
-  <h1>Grammatical features</h1>
 
-  <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fchild%20%3FchildLabel%20%3Fparent%20%3FparentLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Ffeature%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Ffeature%20%7B%20%0A%20%20%0A%20%20%20%20{% for grammatical_feature in grammatical_features %} wd:{{ grammatical_feature }} {% endfor %}%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25features%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%28%3Ffeature%20AS%20%3Fchild%29%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results1%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fchild%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fchild%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results2%20%20%20%0AWHERE%20%7B%0A%20%20%7B%20INCLUDE%20%25results1%20%7D%20UNION%20%7B%20INCLUDE%20%25results2%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D"></iframe>
+<h1>Grammatical Features</h1>
+
+<table class="table table-hover" id="grammatical-features"></table>
+
+
+
+<div class="grammatical-features-graph">
+    <h2>Graph</h2>
+
+    <div class="embed-responsive embed-responsive-4by3">
+	<iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fchild%20%3FchildLabel%20%3Fparent%20%3FparentLabel%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Ffeature%20WHERE%20%7B%0A%20%20%20%20%5B%5D%20wikibase%3AgrammaticalFeature%20%3Ffeature%20.%0A%20%20%7D%0A%7D%20AS%20%25features%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%28%3Ffeature%20AS%20%3Fchild%29%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results1%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fchild%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25features%0A%20%20%20%20%3Ffeature%20wdt%3AP279%20%3Fchild%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results2%20%20%20%0AWHERE%20%7B%0A%20%20%7B%20INCLUDE%20%25results1%20%7D%20UNION%20%7B%20INCLUDE%20%25results2%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D"></iframe>
+    </div>
+
 </div>
   
-  <h2>List</h2>
-  <ul>
-      {% for grammatical_feature in grammatical_features %}
-      
-      <li>
-	  <a href="{{ url_for('app.show_q', q=grammatical_feature) }}">
-	      {{ grammatical_feature }}</a>
-
-      </li>
-
-      {% endfor %}
-
-  </ul>
-
-</div>
 
 {% endblock %}
 

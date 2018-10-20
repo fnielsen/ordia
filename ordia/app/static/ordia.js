@@ -31,7 +31,7 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 
 	    } else if (key + 'Label' in data[i]) {
 		convertedRow[key] = '<a href="' +
-		    (linkPrefixes[key] || "../") + 
+		    (linkPrefixes[key] || "") + 
 		    data[i][key].substr(31) +
 		    '">' + data[i][key + 'Label'] + '</a>';
 	    } else if (key.substr(-5) == 'Label') {
