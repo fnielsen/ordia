@@ -23,7 +23,11 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
 
 
  $(document).ready(function() {
-     sparqlToDataTable(lexemesSparql, "#lexemes");
+     sparqlToDataTable(lexemesSparql, "#lexemes", {
+	 'linkPrefixes': {
+	     'language': '/language/'
+	 }
+     });
  });
 
 </script>
