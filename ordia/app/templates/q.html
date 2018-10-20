@@ -1,12 +1,48 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ lexemesSparql = `
+SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
+  ?lexeme ontolex:sense ?sense .
+  ?lexeme dct:language ?language .
+  OPTIONAL {
+    ?language rdfs:label ?languageLabel .
+    FILTER (LANG(?languageLabel) = "en")
+  }
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?sense wdt:P5137 wd:{{ q }} .
+  OPTIONAL {
+    ?sense skos:definition ?senseLabel .
+    # FILTER (LANG(?senseLabel) = "en")
+  }
+} 
+  `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(lexemesSparql, "#lexemes");
+ });
+
+</script>
+
+{% endblock %}
+
+
 
 {% block page_content %}
 
 <div class="q-entry">
-  <h1>{{ q }}</h1>
+    <h1>{{ q }} - <a href="https://www.wikidata.org/wiki/{{ q }}">Wikidata 🔗</a></h1>
 
-  <a href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
+    <h2>Lexemes</h2>
+
+    <table class="table table-hover" id="lexemes"></table>
+
+
+
 </div>
 
 {% endblock %}
