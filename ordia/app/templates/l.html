@@ -8,7 +8,7 @@
  lexemeSparql = `
 # Data for a specific lexeme
 SELECT
-  ?order ?value ?valueLabel ?description 
+  ?value ?valueLabel ?description 
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
@@ -91,10 +91,17 @@ ORDER BY ?order
  ORDER BY (STR(?form))
  `
 
+ compoundsSparql = `
+SELECT ?lexeme ?lexemeLabel WHERE {
+  ?lexeme wdt:P5238 wd:{{ l }} .
+  ?lexeme wikibase:lemma ?lexemeLabel .
+}
+`
 
  $(document).ready(function() {
      sparqlToDataTable(lexemeSparql, "#lexeme");
      sparqlToDataTable(formsSparql, "#forms", options={paging: false});
+     sparqlToDataTable(compoundsSparql, "#compounds", options={paging: false});
  });
 
 </script>
@@ -107,15 +114,26 @@ ORDER BY ?order
 <div class="l-entry">
     {% if entity %}
     
-    <h1><a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">{{ l }}</a></h1>
+    <h1>Lexeme: {{ l }} - <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a></h1>
+
+    <hr>
 
     <table class="table table-hover" id="lexeme"></table>
    
-    
+    <hr>
+
     <h2>Forms</h2>
 
     <table class="table table-hover" id="forms"></table>
   
+    <hr>
+
+    <h2>Compounds</h2>
+
+    <table class="table table-hover" id="compounds"></table>
+    
+    <hr>
+
   <h2>Lexeme entity JSON</h2>
 
   {% if formatted_entity %}
