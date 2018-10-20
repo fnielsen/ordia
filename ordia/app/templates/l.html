@@ -5,31 +5,72 @@
 {{super()}}
 
 <script type="text/javascript">
- formsSparql = `
-# List of forms for a specific lexeme
+ lexemeSparql = `
+# Data for a specific lexeme
 SELECT
-  ?form ?formLabel
-  (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
-  (GROUP_CONCAT(DISTINCT ?hyphenation; separator=" // ") AS ?hyphenations)
+  ?order ?description ?p ?value ?valueLabel
 WHERE {
-  wd:{{ l }} ontolex:lexicalForm ?form .
-  ?form ontolex:representation ?formLabel .
-  OPTIONAL {
-    ?form wikibase:grammaticalFeature ?feature .
-    ?feature rdfs:label ?featureLabel .
-    FILTER (LANG(?featureLabel) = "en")
+  VALUES ?lexeme { wd:{{ l }} }
+  {
+    BIND(1 AS ?order)
+    BIND("Lemma" AS ?description)
+    ?lexeme wikibase:lemma ?value .
   }
-  OPTIONAL {
-    ?form wdt:P5279 ?hyphenation
+  UNION 
+  {
+    BIND(2 AS ?order)
+    BIND("Language" AS ?description)
+    ?lexeme dct:language ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+  }
+  UNION 
+  {
+    BIND(3 AS ?order)
+    BIND("Lexical category" AS ?description)
+    ?lexeme wikibase:lexicalCategory ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+  }
+  UNION 
+  {
+    BIND(4 AS ?order)
+    BIND("Instance of" AS ?description)
+    ?lexeme wdt:P31 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
   }
 }
-GROUP BY ?form ?formLabel
-ORDER BY (STR(?form))
+ORDER BY ?order
 `
 
 
+ formsSparql = `
+ # List of forms for a specific lexeme
+ SELECT
+	       ?form ?formLabel
+ (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
+ (GROUP_CONCAT(DISTINCT ?hyphenation; separator=" // ") AS ?hyphenations)
+ WHERE {
+     wd:{{ l }} ontolex:lexicalForm ?form .
+      ?form ontolex:representation ?formLabel .
+					    OPTIONAL {
+    ?form wikibase:grammaticalFeature ?feature .
+	?feature rdfs:label ?featureLabel .
+				      FILTER (LANG(?featureLabel) = "en")
+					    }
+     OPTIONAL {
+    ?form wdt:P5279 ?hyphenation
+     }
+ }
+ GROUP BY ?form ?formLabel
+ ORDER BY (STR(?form))
+ `
+
+
  $(document).ready(function() {
-     sparqlToDataTable(formsSparql, "#forms");
+     sparqlToDataTable(lexemeSparql, "#lexeme");
+     sparqlToDataTable(formsSparql, "#forms", options={paging: false});
  });
 
 </script>
@@ -44,13 +85,8 @@ ORDER BY (STR(?form))
     
     <h1><a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">{{ l }}</a></h1>
 
-    <h2>Lemmas</h2>
-    {% for lemma_language, lemma in entity['lemmas'].items() %}
-
-    {{ lemma['value'] }}
-    (<a href="{{ url_for('app.show_language', q=lemma['language']) }}">{{ lemma['language'] }}</a>)
-    
-    {% endfor %}
+    <table class="table table-hover" id="lexeme"></table>
+   
     
     <h2>Forms</h2>
 
