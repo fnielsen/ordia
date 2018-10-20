@@ -1,34 +1,60 @@
 {% extends "base.html" %}
 
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ formsSparql = `
+# List of forms for a specific lexeme
+SELECT
+  ?form ?formLabel
+  (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
+  (GROUP_CONCAT(DISTINCT ?hyphenation; separator=" // ") AS ?hyphenations)
+WHERE {
+  wd:{{ l }} ontolex:lexicalForm ?form .
+  ?form ontolex:representation ?formLabel .
+  OPTIONAL {
+    ?form wikibase:grammaticalFeature ?feature .
+    ?feature rdfs:label ?featureLabel .
+    FILTER (LANG(?featureLabel) = "en")
+  }
+  OPTIONAL {
+    ?form wdt:P5279 ?hyphenation
+  }
+}
+GROUP BY ?form ?formLabel
+ORDER BY (STR(?form))
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(formsSparql, "#forms");
+ });
+
+</script>
+
+{% endblock %}
+
+
 {% block page_content %}
 
 <div class="l-entry">
-  {% if entity %}
-  
-  <h1><a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">{{ l }}</a></h1>
-
-  <h2>Lemmas</h2>
-  {% for lemma_language, lemma in entity['lemmas'].items() %}
-
-  {{ lemma['value'] }}
-  (<a href="{{ url_for('app.show_language', q=lemma['language']) }}">{{ lemma['language'] }}</a>)
-  
-  {% endfor %}
-  
-  <h2>Forms</h2>
-
-  <ul>
-  {% for form in entity['forms'] %}
-  <li>
-    {% for representation_language, representation in form['representations'].items() %}
-
-    <a href="{{ form['id'] }}">{{ representation['value'] }} ({{ form['id'] }})</a>
+    {% if entity %}
     
-  {% endfor %}
-  
-  {% endfor %}
-  </ul>
+    <h1><a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">{{ l }}</a></h1>
+
+    <h2>Lemmas</h2>
+    {% for lemma_language, lemma in entity['lemmas'].items() %}
+
+    {{ lemma['value'] }}
+    (<a href="{{ url_for('app.show_language', q=lemma['language']) }}">{{ lemma['language'] }}</a>)
+    
+    {% endfor %}
+    
+    <h2>Forms</h2>
+
+    <table class="table table-hover" id="forms"></table>
   
   <h2>Lexeme entity JSON</h2>
 
