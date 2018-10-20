@@ -8,18 +8,18 @@
  lexemeSparql = `
 # Data for a specific lexeme
 SELECT
-  ?order ?description ?p ?value ?valueLabel
+  ?order ?value ?valueLabel ?description 
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
     BIND(1 AS ?order)
-    BIND("Lemma" AS ?description)
+    BIND("lemma" AS ?description)
     ?lexeme wikibase:lemma ?value .
   }
   UNION 
   {
     BIND(2 AS ?order)
-    BIND("Language" AS ?description)
+    BIND("language" AS ?description)
     ?lexeme dct:language ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
@@ -27,7 +27,7 @@ WHERE {
   UNION 
   {
     BIND(3 AS ?order)
-    BIND("Lexical category" AS ?description)
+    BIND("lexical category" AS ?description)
     ?lexeme wikibase:lexicalCategory ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
@@ -35,8 +35,32 @@ WHERE {
   UNION 
   {
     BIND(4 AS ?order)
-    BIND("Instance of" AS ?description)
+    BIND("instance of" AS ?description)
     ?lexeme wdt:P31 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+  }
+  UNION 
+  {
+    BIND(10 AS ?order)
+    BIND("grammatical gender" AS ?description)
+    ?lexeme wdt:P5185 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+  }
+  UNION 
+  {
+    BIND(10 AS ?order)
+    BIND("conjugation class" AS ?description)
+    ?lexeme wdt:P5186 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+  }
+  UNION 
+  {
+    BIND(20 AS ?order)
+    BIND("description" AS ?description)
+    ?lexeme wdt:P1343 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
   }
