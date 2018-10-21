@@ -50,6 +50,7 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 q_pattern = '<regex("Q[1-9]\d*"):q>'
 l_pattern = '<regex("L[1-9]\d*"):l>'
 f_pattern = '<regex("F[1-9]\d*"):f>'
+s_pattern = '<regex("S[1-9]\d*"):s>'
 p_pattern = '<regex("P[1-9]\d*"):p>'
 iso_language_pattern = """\
 <regex("[a-z]{2,3}"):language>"""
@@ -58,6 +59,7 @@ q_language_pattern = """\
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
+S_PATTERN = re.compile(r'S[1-9]\d*')
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 
@@ -171,6 +173,21 @@ def show_lf(l, f):
     else:
         form = {}
     return render_template("lf.html", l=l, f=f, form=form)
+
+
+@main.route("/" + l_pattern + "-" + s_pattern)
+def show_ls(l, s):
+    """Render webpage for l-s Wikidata item.
+
+    Parameters
+    ----------
+    l : str
+        Wikidata lexeme form item identifier
+    s : str
+        Wikidata lexeme sense identifier
+
+    """
+    return render_template("ls.html", l=l, s=s)
 
 
 @main.route("/" + q_pattern)
