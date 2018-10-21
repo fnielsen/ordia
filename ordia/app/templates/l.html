@@ -91,6 +91,18 @@ ORDER BY ?order
  ORDER BY (STR(?form))
  `
 
+ sensesSparql = `
+ # List of senses for a specific lexeme
+ SELECT
+  ?sense ?senseLabel
+ WHERE {
+   wd:{{ l }} ontolex:sense ?sense .
+   ?sense skos:definition ?senseLabel .
+ }
+ GROUP BY ?sense ?senseLabel
+ ORDER BY (STR(?sense))
+ `
+
  compoundsSparql = `
 SELECT ?lexeme ?lexemeLabel WHERE {
   ?lexeme wdt:P5238 wd:{{ l }} .
@@ -99,8 +111,9 @@ SELECT ?lexeme ?lexemeLabel WHERE {
 `
 
  $(document).ready(function() {
-     sparqlToDataTable(lexemeSparql, "#lexeme");
+     sparqlToDataTable(lexemeSparql, "#lexeme", options={paging: false});
      sparqlToDataTable(formsSparql, "#forms", options={paging: false});
+     sparqlToDataTable(sensesSparql, "#senses", options={paging: false});
      sparqlToDataTable(compoundsSparql, "#compounds", options={paging: false});
  });
 
@@ -119,13 +132,19 @@ SELECT ?lexeme ?lexemeLabel WHERE {
     <hr>
 
     <table class="table table-hover" id="lexeme"></table>
-   
+    
     <hr>
 
     <h2>Forms</h2>
 
     <table class="table table-hover" id="forms"></table>
-  
+    
+    <hr>
+
+    <h2>Senses</h2>
+
+    <table class="table table-hover" id="senses"></table>
+    
     <hr>
 
     <h2>Compounds</h2>
@@ -134,17 +153,17 @@ SELECT ?lexeme ?lexemeLabel WHERE {
     
     <hr>
 
-  <h2>Lexeme entity JSON</h2>
+    <h2>Lexeme entity JSON</h2>
 
-  {% if formatted_entity %}
+    {% if formatted_entity %}
 
-  <pre>
+    <pre>
 {{ formatted_entity }}
-  </pre>
+    </pre>
 
-  {% endif %}
-  
-  {% else %}
+    {% endif %}
+    
+    {% else %}
 
   <h1>{{ l }}</h1>
 
