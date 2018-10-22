@@ -5,8 +5,25 @@
 {{super()}}
 
 <script type="text/javascript">
-    translationsSparql = `
+    senseDataSparql = `
+# Data for a specific sense
 SELECT
+  ?description 
+  ?value ?valueLabel 
+WHERE {
+  VALUES ?sense { wd:{{ l }}-{{ s }} }
+  {
+    BIND(1 AS ?order)
+    BIND("lexeme" AS ?description)
+    ?value ontolex:sense ?sense .
+    ?value wikibase:lemma ?valueLabel .
+  }
+}
+ORDER BY ?order
+`
+
+  translationsSparql = `
+SELECT DISTINCT
   ?sense ?senseLabel
   ?gloss
   ?lexeme ?lexemeLabel ?language ?languageLabel
@@ -40,6 +57,10 @@ ORDER BY ?languageLabel
 `
 
  $(document).ready(function() {
+     sparqlToDataTable(senseDataSparql, "#sense-data",
+		       options={
+			   paging: false
+		       });
      sparqlToDataTable(translationsSparql, "#translations",
 		       options={
 			   linkPrefixes: {
@@ -58,10 +79,16 @@ ORDER BY ?languageLabel
 {% block page_content %}
 
 <div class="ls-entity">
-    <h1>Sense: {{ l }}-{{ s }}</h1>
+  <h1>Sense: {{ l }}-{{ s }}</h1>
+
+
+  
 
     <a href="{{ l }}">{{ l }}</a> - <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>🔗
 
+    <table class="table table-hover" id="sense-data"></table>
+
+    
     <hr/>
     
     <h2>Translations</h2>
