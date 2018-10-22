@@ -8,7 +8,8 @@
  lexemeSparql = `
 # Data for a specific lexeme
 SELECT
-  ?value ?valueLabel ?description 
+  ?description 
+  ?value ?valueLabel 
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
@@ -53,16 +54,20 @@ WHERE {
     BIND(10 AS ?order)
     BIND("conjugation class" AS ?description)
     ?lexeme wdt:P5186 ?value .
+  }
+  UNION 
+  {
+    BIND(20 AS ?order)
+    BIND("described in" AS ?description)
+    ?lexeme wdt:P1343 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
   }
   UNION 
   {
-    BIND(20 AS ?order)
-    BIND("description" AS ?description)
-    ?lexeme wdt:P1343 ?value .
-    ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'en')
+    BIND(30 AS ?order)
+    BIND("example" AS ?description)
+    ?lexeme wdt:P5831 ?value .
   }
 }
 ORDER BY ?order
@@ -125,7 +130,6 @@ SELECT ?lexeme ?lexemeLabel WHERE {
 {% block page_content %}
 
 <div class="l-entry">
-    {% if entity %}
     
     <h1>Lexeme: {{ l }} - <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a></h1>
 
@@ -151,27 +155,6 @@ SELECT ?lexeme ?lexemeLabel WHERE {
 
     <table class="table table-hover" id="compounds"></table>
     
-    <hr>
-
-    <h2>Lexeme entity JSON</h2>
-
-    {% if formatted_entity %}
-
-    <pre>
-{{ formatted_entity }}
-    </pre>
-
-    {% endif %}
-    
-    {% else %}
-
-  <h1>{{ l }}</h1>
-
-  Not found.
-  
-  {% endif %}
-
-  
 </div>
 
 {% endblock %}
