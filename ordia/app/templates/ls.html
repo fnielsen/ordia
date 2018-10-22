@@ -1,6 +1,60 @@
 {% extends "base.html" %}
 
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    translationsSparql = `
+SELECT
+  ?sense ?senseLabel
+  ?gloss
+  ?lexeme ?lexemeLabel ?language ?languageLabel
+  ?item ?itemLabel
+WHERE {
+  { wd:{{ l }}-{{ s }} wdt:P5137 / ^wdt:P5137 ?sense . }
+  UNION
+  { wd:{{ l }}-{{ s }} wdt:P5972 | ^wdt:P5972 ?sense . }
+
+  BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
+    
+  ?lexeme ontolex:sense ?sense .
+  FILTER (wd:{{ l }}-{{ s }} != ?sense)
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?lexeme dct:language ?language .
+  ?language rdfs:label ?languageLabel . 
+  FILTER (LANG(?languageLabel) = 'en')
+
+  OPTIONAL {
+    ?sense skos:definition ?gloss .
+    FILTER (LANG(?gloss) = 'en')
+  }
+
+  OPTIONAL {
+    wd:{{ l }}-{{ s }} wdt:P5137 ?item .
+    ?item rdfs:label ?itemLabel .
+    FILTER (LANG(?itemLabel) = 'en')
+  }
+}
+ORDER BY ?languageLabel
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(translationsSparql, "#translations",
+		       options={
+			   linkPrefixes: {
+			       'language': 'language/'
+			   },
+			   paging: false,
+			   
+		       });
+ });
+
+</script>
+
+{% endblock %}
+
+
 {% block page_content %}
 
 <div class="ls-entity">
@@ -8,6 +62,13 @@
 
     <a href="{{ l }}">{{ l }}</a> - <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>🔗
 
+    <hr/>
+    
+    <h2>Translations</h2>
+
+    <table class="table table-hover" id="translations"></table>
+    
+    
 </div>
 
 {% endblock %}
