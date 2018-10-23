@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    listOfUsesSparql = `
+SELECT 
+  ?lexeme ?lexemeLabel
+  ?form ?formLabel
+  ?use
+WHERE {
+  ?lexeme p:P5831 ?use_statement . 
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?use_statement ps:P5831 ?use .
+  OPTIONAL {	
+    ?use_statement pq:P5830 ?form .
+    ?form ontolex:representation ?formLabel .
+  }
+  ?use_statement prov:wasDerivedFrom / pr:P248 wd:{{ q }} .
+}
+`
+  
+  $(document).ready(function() {
+      sparqlToDataTable(listOfUsesSparql, "#list-of-uses",
+			options={
+			    'linkPrefixes': {
+				'lexeme': '../',
+				'form': '../', 
+			    }});
+  });
+  
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<div class="reference-entry">
+  
+  <h1>Reference: {{ q }}</h1>
+  
+  [
+  <a href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
+  |
+  <a href="https://tools.wmflabs.org/scholia/work/{{ q }}">Scholia</a>
+  ]
+  
+  <hr>
+
+  <h2>Use</h2>
+
+  <table class="table table-hover" id="list-of-uses"></table>
+    
+    
+</div>
+
+{% endblock %}
+
+

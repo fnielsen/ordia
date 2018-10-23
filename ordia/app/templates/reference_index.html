@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    listOfReferencesSparql = `
+SELECT 
+  ?count 
+  ?reference ?referenceLabel ?referenceDescription
+WITH {
+  SELECT 
+    (COUNT(*) AS ?count)
+    ?reference
+  WHERE {
+    [] p:P5831 / prov:wasDerivedFrom / pr:P248 ?reference .
+  }
+  GROUP BY ?reference
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+`
+  
+  $(document).ready(function() {
+      sparqlToDataTable(listOfReferencesSparql, "#list-of-references",
+			options={
+			    'linkPrefixes': {
+				'reference': 'reference/'
+			    }});
+  });
+  
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<div class="reference-entry">
+  
+  <h1>References</h1>
+  
+  <h2>Use</h2>
+
+  <table class="table table-hover" id="list-of-references"></table>
+    
+    
+</div>
+
+{% endblock %}
+
+

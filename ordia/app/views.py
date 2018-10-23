@@ -203,6 +203,27 @@ def show_q(q):
     return render_template("q.html", q=q)
 
 
+@main.route("/reference")
+def show_reference_index():
+    """Render webpage for reference index page
+
+    """
+    return render_template("reference_index.html")
+
+
+@main.route("/reference/" + q_pattern)
+def show_reference(q):
+    """Render webpage for reference Wikidata item.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier for reference
+
+    """
+    return render_template("reference.html", q=q)
+
+
 @main.route("/search")
 def show_search():
     """Render webpage for q Wikidata item.
