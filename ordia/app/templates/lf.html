@@ -1,30 +1,73 @@
 {% extends "base.html" %}
 
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    formDataSparql = `
+# Data for a specific sense
+SELECT
+  ?description 
+  ?value ?valueLabel 
+WHERE {
+  VALUES ?form { wd:{{ l }}-{{ f }} }
+  {
+    BIND(1 AS ?order)
+    ?form ontolex:representation ?value .
+    BIND("form" AS ?description)
+  }
+  UNION
+  {
+    BIND(2 AS ?order)
+    ?value ontolex:lexicalForm ?form .
+    ?value wikibase:lemma ?valueLabel .
+    BIND("lexeme" AS ?description)
+  }
+  UNION
+  {
+    # Language	
+    BIND(3 AS ?order)
+    ?form ^ontolex:lexicalForm / dct:language ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = "en")
+    BIND("language" AS ?description)
+  }
+  UNION
+  {
+    # Language	
+    BIND(10 AS ?order)
+    ?form wdt:P5279 ?value .
+    BIND("hyphenation" AS ?description)
+  }
+}
+ORDER BY ?order
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(formDataSparql, "#form-data",
+		       options={
+			   paging: false
+		       });
+ });
+
+</script>
+
+{% endblock %}
+
+
 {% block page_content %}
 
 <div class="l-entity">
-  <h1>{{ l }}-{{ f }}</h1>
+  <h1>Form: {{ l }}-{{ f }}</h1>
 
-  {% if form %}
-  
-    {% for representation in form['representations'].values() %}
-
-      {{ representation['value'] }}
-  
-    {% endfor %}
-
-  {% endif %}
-  
-
-  <h2>Lexeme</h2>
-  <a href="{{ l }}">{{ l }}</a>
-
+  [
   <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
-
+  ]
   
-  <h2>Entity JSON</h2>
-  {{ form }}
+  <table class="table table-hover" id="form-data"></table>
+
   
 </div>
 
