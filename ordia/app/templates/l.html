@@ -59,6 +59,18 @@ WHERE {
   }
   UNION 
   {
+    BIND(15 AS ?order)
+    BIND("compounds" AS ?description)
+    {
+      SELECT
+        (GROUP_CONCAT(?compound; separator=" // ") AS ?value)
+      WHERE {
+        wd:{{ l }} wdt:P5238 / wikibase:lemma ?compound .
+      } GROUP BY ?lexeme
+    }
+  }
+  UNION 
+  {
     BIND(20 AS ?order)
     BIND("described in" AS ?description)
     ?lexeme wdt:P1343 ?value .
