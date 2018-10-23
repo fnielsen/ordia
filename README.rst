@@ -7,6 +7,10 @@ runs from:
 
 https://tools.wmflabs.org/ordia/
 
+To start the local webserver go to the `ordia` directly::
+
+    python app.py
+
 License
 -------
 The license for Ordia is Apache License 2.0 except for included third-party packages which 
