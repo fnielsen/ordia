@@ -54,6 +54,8 @@ WHERE {
     BIND(10 AS ?order)
     BIND("conjugation class" AS ?description)
     ?lexeme wdt:P5186 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = "en")
   }
   UNION 
   {
