@@ -86,19 +86,13 @@ def show_l(l):
         Wikidata lexeme item identifier
 
     """
-    print('Hallo')
-    entity = current_app.base.entities.get(l)
-    formatted_entity = json.dumps(entity, indent=2)
-    return render_template("l.html", l=l, entity=entity,
-                           formatted_entity=formatted_entity)
+    return render_template("l.html", l=l)
 
 
 @main.route("/grammatical-feature/")
 def show_grammatical_feature_index():
     """Render webpage for grammatical feature index page."""
-    grammatical_features = current_app.base.grammatical_feature_index.keys()
-    return render_template("grammatical_feature_index.html",
-                           grammatical_features=grammatical_features)
+    return render_template("grammatical_feature_index.html"),
 
 
 @main.route("/language/" + iso_language_pattern)
@@ -132,7 +126,6 @@ def show_language(q):
         Wikidata item for the language.
 
     """
-    print('show_language')
     if q.startswith('Q'):
         return render_template("language.html", q=q)
     else:
@@ -149,9 +142,7 @@ def show_language_index():
 @main.route("/lexical-category/")
 def show_lexical_category_index():
     """Render webpage for lexical_category index page."""
-    lexical_category_counts = current_app.base.lexical_category_counts
-    return render_template("lexical_category_index.html",
-                           lexical_category_counts=lexical_category_counts)
+    return render_template("lexical_category_index.html")
 
 
 @main.route("/" + l_pattern + "-" + f_pattern)
@@ -166,13 +157,7 @@ def show_lf(l, f):
         Wikidata lexeme form identifier
 
     """
-    entity = current_app.base.entities.get(l)
-    for form in entity['forms']:
-        if form['id'] == l + '-' + f:
-            break
-    else:
-        form = {}
-    return render_template("lf.html", l=l, f=f, form=form)
+    return render_template("lf.html", l=l, f=f)
 
 
 @main.route("/" + l_pattern + "-" + s_pattern)
@@ -236,11 +221,6 @@ def show_search():
     """
     query = request.args.get('q', '')
     if query:
-        # As the cache in the `base` is not updated currently,
-        # it may be better to search with the API.
-        # Alternatively, the two results could be intertwined.
-        # search_results = current_app.base.search(query)
-
         search_results = wb_search_lexeme_entities(query)
     else:
         search_results = []

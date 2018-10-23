@@ -8,7 +8,7 @@ from flask import Flask
 from ..base import Base
 
 
-def create_app(max_ids=None):
+def create_app():
     """Create webapp.
 
     Factory for webapp.
@@ -23,7 +23,5 @@ def create_app(max_ids=None):
 
     from .views import main as main_blueprint
     app.register_blueprint(main_blueprint)
-
-    app.base = Base(max_ids=max_ids)
 
     return app
