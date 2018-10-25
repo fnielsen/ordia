@@ -42,11 +42,17 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
   <h1>{{ q }}</h1>
 
   [
-  <a href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
+  <a title="View and edit the item in Wikidata"
+     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
   |
-  <a href="https://tools.wmflabs.org/reasonator/?q={{ q }}">Reasonator</a>
+  <a title="View the item in the SQID class and property browser"
+     href="https://tools.wmflabs.org/sqid/#/view?id={{ q }}">SQID</a>
   |
-  <a href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia</a>
+  <a title="Magnus Manske's Reasonator with pretty display of the Wikidata item"
+     href="https://tools.wmflabs.org/reasonator/?q={{ q }}">Reasonator</a>
+  |
+  <a title="View the Wikidata item with Scholia - Scholarly profiles from Wikidata data"
+     href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia</a>
   ]
   
     <h2>Lexemes</h2>
