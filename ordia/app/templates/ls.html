@@ -18,6 +18,13 @@ WHERE {
     ?value ontolex:sense ?sense .
     ?value wikibase:lemma ?valueLabel .
   }
+  UNION
+  {
+    BIND(2 AS ?order)
+    BIND("item" AS ?description)
+    ?sense wdt:P5137 ?value .
+    ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
+  }  
 }
 ORDER BY ?order
 `
