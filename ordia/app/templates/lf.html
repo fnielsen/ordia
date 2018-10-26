@@ -35,10 +35,19 @@ WHERE {
   }
   UNION
   {
-    # Language	
+    # Hyphenation
     BIND(10 AS ?order)
     ?form wdt:P5279 ?value .
     BIND("hyphenation" AS ?description)
+  }
+  UNION  
+  {   
+    BIND(20 AS ?order)
+    ?lexeme ontolex:lexicalForm ?form .
+    ?lexeme p:P5831 ?value_statement .
+    ?value_statement ps:P5831 ?value .
+    ?value_statement pq:P5830 ?form .
+    BIND("example use" AS ?description)
   }
 }
 ORDER BY ?order
