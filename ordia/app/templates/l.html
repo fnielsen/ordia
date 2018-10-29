@@ -10,6 +10,7 @@
 SELECT
   ?description 
   ?value ?valueLabel 
+  ?source ?sourceLabel
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
@@ -81,7 +82,12 @@ WHERE {
   {
     BIND(30 AS ?order)
     BIND("example" AS ?description)
-    ?lexeme wdt:P5831 ?value .
+    ?lexeme p:P5831 ?value_statement .
+    ?value_statement ps:P5831 ?value .
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P248 ?source . 
+      ?source wdt:P1476 ?sourceLabel .
+    }   
   }
 }
 ORDER BY ?order
@@ -130,7 +136,13 @@ SELECT ?lexeme ?lexemeLabel WHERE {
 `
 
  $(document).ready(function() {
-     sparqlToDataTable(lexemeSparql, "#lexeme", options={paging: false});
+     sparqlToDataTable(lexemeSparql, "#lexeme",
+		       options={
+			   paging: false,
+			   linkPrefixes: {
+			       source: 'reference/'
+			   }
+		       });
      sparqlToDataTable(formsSparql, "#forms", options={paging: false});
      sparqlToDataTable(sensesSparql, "#senses", options={paging: false});
      sparqlToDataTable(compoundsSparql, "#compounds", options={paging: false});
