@@ -1,3 +1,4 @@
+docopt
 flask
 requests
 werkzeug>=0.9

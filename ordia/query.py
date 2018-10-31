@@ -1,7 +1,7 @@
 """ordia.query
 
 Usage:
-  scholia.query iso639-to-q <iso639>
+  ordia.query iso639-to-q <iso639>
 
 Description:
   Functions in this module query the Wikidata Query Service and
