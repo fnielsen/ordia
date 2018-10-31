@@ -26,15 +26,14 @@
 {% block navbar %}
 
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="{{ url_for('app.index') }}">Ordia</a>
     <form class="form-inline" action="{{ url_for('app.show_search') }}">
 	<div class="input-group">
             <input type="text" class="form-control"
-name="q" id="searchterm" value="{{ query }}"
-placeholder="Search after lemma or form"/>
+		   name="q" id="searchterm" value="{{ query }}"
+		   placeholder="Search after lemma or form"/>
             <span class="input-group-btn">
 		<button class="btn btn-primary" type="submit">
-		    Search
+		    Ordia
 		</button>
             </span>
 	</div>
@@ -47,7 +46,10 @@ placeholder="Search after lemma or form"/>
 
     <div class="collapse navbar-collapse" id="navbarToogle">
 	<ul class="navbar-nav">
-	    <li class="nav-item">
+	  <li class="nav-item">
+	    <a class="navbar-brand" href="{{ url_for('app.index') }}">Ordia</a>
+	  </li>
+	  <li class="nav-item">
 		<a class="nav-link" href="{{ url_for('app.show_language_index') }}">Languages</a>
 	    </li>
 	    <li class="nav-item">
@@ -55,6 +57,9 @@ placeholder="Search after lemma or form"/>
 	    </li>
 	    <li class="nav-item">
 		<a class="nav-link" href="{{ url_for('app.show_grammatical_feature_index') }}">Grammatical features</a>
+	    </li>
+	    <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('app.show_property_index') }}">Properties</a>
 	    </li>
 	    <li class="nav-item">
 		<a class="nav-link" href="{{ url_for('app.show_reference_index') }}">References</a>

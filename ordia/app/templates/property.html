@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ lexemesSparql = `
+SELECT
+  ?lexeme ?lexemeLabel ?value ?valueLabel
+WHERE {
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?lexeme a ontolex:LexicalEntry .
+  ?lexeme wdt:{{ p }} ?value .
+  OPTIONAL {
+    { ?value wikibase:lemma ?valueLabel1 . }
+    UNION
+    { ?value rdfs:label ?valueLabel2 . FILTER (LANG(?valueLabel2) = 'en') }
+    BIND(COALESCE(?valueLabel1, ?valueLabel2) AS ?valueLabel)
+  }
+}
+LIMIT 1000
+  `
+
+ $(document).ready(function() {
+     sparqlToDataTable(lexemesSparql, "#lexemes", {
+	 linkPrefixes: {
+	     lexeme: '../',
+	     value: '../'}});
+ });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+
+<div class="property-entries">
+  <h1>Property: {{ p }}</h1>
+
+  [
+  <a href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata</a>
+  |
+  <a href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia</a>
+  ]
+
+  <hr/>
+
+  <h2>Lexemes</h2>
+
+  <table class="table table-hover" id="lexemes"></table>
+
+  <!-- hr/>
+  
+  <h2>Forms</h2>
+  
+  <table class="table table-hover" id="forms"></table>
+
+  <hr/>
+  
+  <h2>Senses</h2>
+  
+  <table class="table table-hover" id="senses"></table -->
+  
+</div>
+
+
+
+
+{% endblock %}
+
+

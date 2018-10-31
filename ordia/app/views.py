@@ -1,11 +1,9 @@
 """views."""
 
 
-import json
 import re
 
-from flask import (Blueprint, current_app, redirect, render_template, request,
-                   url_for)
+from flask import (Blueprint, redirect, render_template, request, url_for)
 from werkzeug.routing import BaseConverter
 
 from ..api import wb_search_lexeme_entities
@@ -173,6 +171,25 @@ def show_ls(l, s):
 
     """
     return render_template("ls.html", l=l, s=s)
+
+
+@main.route("/property/" + p_pattern)
+def show_property(p):
+    """Render webpage for a property.
+
+    Parameters
+    ----------
+    p : str
+        Wikidata item for the language.
+
+    """
+    return render_template("property.html", p=p)
+
+
+@main.route("/property/")
+def show_property_index():
+    """Render index webpage for property."""
+    return render_template("property_index.html")
 
 
 @main.route("/" + q_pattern)

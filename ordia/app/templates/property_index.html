@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    propertiesForLexemesSparql = `
+# Properties of lexemes sorted by count of usage
+SELECT ?count ?property ?propertyLabel
+WITH {
+  SELECT ?property (COUNT(*) AS ?count) WHERE {
+    hint:Query hint:optimizer "None".
+    ?lexeme a ontolex:LexicalEntry .
+    ?lexeme ?direct_property [] .
+    ?property wikibase:directClaim ?direct_property .
+  }
+  GROUP BY ?property
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+  `
+
+    propertiesForFormsSparql = `
+# Properties of forms sorted by count of usage
+SELECT ?count ?property ?propertyLabel
+WITH {
+  SELECT ?property (COUNT(*) AS ?count) WHERE {
+    hint:Query hint:optimizer "None".
+    [] ontolex:lexicalForm ?form .
+    ?form ?direct_property [] .
+    ?property wikibase:directClaim ?direct_property .
+  }
+  GROUP BY ?property
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+  `
+
+    propertiesForSensesSparql = `
+# Properties of senses sorted by count of usage
+SELECT ?count ?property ?propertyLabel
+WITH {
+  SELECT ?property (COUNT(*) AS ?count) WHERE {
+    hint:Query hint:optimizer "None".
+    [] ontolex:sense ?sense .
+    ?sense ?direct_property [] .
+    ?property wikibase:directClaim ?direct_property .
+  }
+  GROUP BY ?property
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+  `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(propertiesForLexemesSparql, "#properties-for-lexemes");
+     sparqlToDataTable(propertiesForFormsSparql, "#properties-for-forms");
+     sparqlToDataTable(propertiesForSensesSparql, "#properties-for-senses");
+ });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<div class="property">
+  <h1>Properties</h1>
+
+  <hr/>
+
+  <h2>For lexemes</h2>
+  
+  <table class="table table-hover" id="properties-for-lexemes"></table>
+
+  <hr/>
+  
+  <h2>For forms</h2>
+  
+  <table class="table table-hover" id="properties-for-forms"></table>
+
+  <hr/>
+  
+  <h2>For senses</h2>
+  
+  <table class="table table-hover" id="properties-for-senses"></table>
+
+  
+</div>
+
+{% endblock %}
+
+

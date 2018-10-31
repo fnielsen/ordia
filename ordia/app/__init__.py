@@ -5,8 +5,6 @@ from __future__ import absolute_import, division, print_function
 
 from flask import Flask
 
-from ..base import Base
-
 
 def create_app():
     """Create webapp.
