@@ -280,9 +280,10 @@ def show_text_to_lexemes():
     if not language:
         language = 'da'
 
-    text = lowercase_first_sentence_letters(text.strip())
-    list_of_words = text_to_words(text)
+    lowercased_text = lowercase_first_sentence_letters(text.strip())
+    list_of_words = text_to_words(lowercased_text)
 
+    # Build list of monolingual strings
     words = ''
     for word in list_of_words:
         if words != '':

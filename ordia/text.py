@@ -5,7 +5,7 @@ import re
 
 
 sentence_split_pattern = re.compile("(?<=[\.!?:]) ", flags=re.UNICODE)
-word_pattern = re.compile(r"[^\W\d_]+(?:-[^\W\d_])*", flags=re.UNICODE)
+word_pattern = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*", flags=re.UNICODE)
 
 
 def lowercase_first_sentence_letters(text):
@@ -86,6 +86,10 @@ def text_to_words(text):
     True
     >>> words[1] == 'there'
     True
+
+    >>> text = "Scholia creates on-the-fly profiles"
+    >>> len(text_to_words(text))
+    4
 
     """
     words = word_pattern.findall(text)
