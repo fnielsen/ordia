@@ -15,13 +15,13 @@ WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
     BIND(1 AS ?order)
-    BIND("lemma" AS ?description)
+    BIND("Lemma" AS ?description)
     ?lexeme wikibase:lemma ?value .
   }
   UNION 
   {
     BIND(2 AS ?order)
-    BIND("language" AS ?description)
+    BIND("Language" AS ?description)
     ?lexeme dct:language ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
@@ -29,7 +29,7 @@ WHERE {
   UNION 
   {
     BIND(3 AS ?order)
-    BIND("lexical category" AS ?description)
+    BIND("Lexical category" AS ?description)
     ?lexeme wikibase:lexicalCategory ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
@@ -37,31 +37,57 @@ WHERE {
   UNION 
   {
     BIND(4 AS ?order)
-    BIND("instance of" AS ?description)
+    BIND("Instance of" AS ?description)
     ?lexeme wdt:P31 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
   }
   UNION 
   {
+    BIND(6 AS ?order)
+    BIND("Word stem" AS ?description)
+    OPTIONAL {
+      ?lexeme wdt:P5187 ?value .
+    }
+  }
+  UNION 
+  {
     BIND(10 AS ?order)
-    BIND("grammatical gender" AS ?description)
+    BIND("Grammatical gender" AS ?description)
     ?lexeme wdt:P5185 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
   }
   UNION 
   {
-    BIND(10 AS ?order)
-    BIND("conjugation class" AS ?description)
+    BIND(11 AS ?order)
+    BIND("Conjugation class" AS ?description)
     ?lexeme wdt:P5186 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = "en")
   }
   UNION 
   {
+    # Derived from
+    BIND(12 AS ?order)
+    BIND("Derived from" AS ?description)
+    OPTIONAL {
+     ?lexeme wdt:P5191 ?value .
+     ?value wikibase:lemma ?valueLabel .	  
+    }
+  }
+  UNION 
+  {
+    # Homographs
+    BIND(14 AS ?order)
+    BIND("Homographs" AS ?description)
+    wd:{{ l }} wdt:P5402 ?value .
+    ?value wikibase:lemma ?valueLabel .
+  }
+  UNION 
+  {
     BIND(15 AS ?order)
-    BIND("compounds" AS ?description)
+    BIND("Compounds" AS ?description)
     {
       SELECT
         (GROUP_CONCAT(?compound; separator=" // ") AS ?value)
@@ -73,7 +99,7 @@ WHERE {
   UNION 
   {
     BIND(20 AS ?order)
-    BIND("described in" AS ?description)
+    BIND("Described in" AS ?description)
     ?lexeme wdt:P1343 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
@@ -81,7 +107,7 @@ WHERE {
   UNION 
   {
     BIND(30 AS ?order)
-    BIND("example" AS ?description)
+    BIND("Usage example" AS ?description)
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
     OPTIONAL {
