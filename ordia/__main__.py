@@ -1,4 +1,5 @@
-"""
+"""Ordia.
+
 Usage:
   ordia
 
@@ -12,4 +13,9 @@ Description:
 from docopt import docopt
 
 
-arguments = docopt(__doc__)
+def main():
+    docopt(__doc__)
+
+
+if __name__ == '__main__':
+    main()
