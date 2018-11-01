@@ -6,8 +6,11 @@ import re
 from flask import (Blueprint, redirect, render_template, request, url_for)
 from werkzeug.routing import BaseConverter
 
+from six import u
+
 from ..api import wb_search_lexeme_entities
 from ..query import iso639_to_q
+from ..text import lowercase_first_sentence_letters, text_to_words
 
 
 class RegexConverter(BaseConverter):
@@ -243,3 +246,47 @@ def show_search():
         search_results = []
     return render_template("search.html",
                            query=query, search_results=search_results)
+
+
+@main.route('/text-to-lexemes', methods=['POST', 'GET'])
+def show_text_to_lexemes():
+    """Return HTML page for text-to-lexemes query.
+
+    Return HTML page with form for text-to-lexemes query or if the text field
+    is set, extract Wikidata identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    if request.method == 'GET':
+        text = request.args.get('text')
+        language = request.args.get('language')
+    elif request.method == 'POST':
+        text = request.form.get('text')
+        language = request.form.get('language')
+    else:
+        assert False
+
+    # Sanitize language
+    if language not in ['da', 'en']:
+        language = 'da'
+
+    if not text:
+        return render_template('text_to_lexemes.html')
+
+    if not language:
+        language = 'da'
+
+    text = lowercase_first_sentence_letters(text.strip())
+    list_of_words = text_to_words(text)
+
+    words = ''
+    for word in list_of_words:
+        if words != '':
+            words += ' '
+        words += u('"{word}"@{language}').format(word=word, language=language)
+
+    return render_template('text_to_lexemes.html', text=text, words=words)

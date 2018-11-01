@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    extractionSparql = `
+SELECT
+  ?word
+  ?form ?formLabel
+  ?lexeme ?lexemeLabel
+  ?lexical_category ?lexical_categoryLabel
+  (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
+WHERE {
+  VALUES ?word { {{ words | safe }} }
+  OPTIONAL {
+    ?form ontolex:representation ?word . 
+    OPTIONAL {
+      ?form wikibase:grammaticalFeature ?feature . 
+      ?feature rdfs:label ?featureLabel .
+      FILTER (LANG(?featureLabel) = "en")
+    }
+    ?lexeme wikibase:lexicalCategory ?lexical_category .
+    ?lexical_category rdfs:label ?lexical_categoryLabel .
+    FILTER (LANG(?lexical_categoryLabel) = 'en')    
+    ?lexeme ontolex:lexicalForm ?form .
+    ?form ontolex:representation ?formLabel .
+    ?lexeme wikibase:lemma ?lexemeLabel . 
+  }
+}
+GROUP BY ?word ?form ?formLabel ?lexeme ?lexemeLabel ?lexical_category ?lexical_categoryLabel
+ORDER BY ?word
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(extractionSparql, "#extraction",
+		       options={
+			   paging: false,
+			   linkPrefixes: {
+			       source: 'reference/'
+			   }
+		       });
+ });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Text to lexemes</h1>
+
+<form action="" id="form" method="POST" class="form-horizontal">
+  <div class="form-group">
+    <textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">{{ text }}
+    </textarea>
+  </div>
+  <div class="form-group">
+    <label for="language">Language:</label>
+    <select class="form-control" id="language-selector" name="language">
+      <option value="da">Dansk</option>
+      <option value="en">English</option>
+    </select>
+    </div>
+  <div class="form-group">
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</form>
+
+<h2>Extraction</h2>
+
+<table class="table table-hover" id="extraction"></table>
+
+{% endblock %}
