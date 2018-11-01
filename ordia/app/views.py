@@ -263,22 +263,20 @@ def show_text_to_lexemes():
     """
     if request.method == 'GET':
         text = request.args.get('text')
-        language = request.args.get('language')
+        text_language = request.args.get('text-language')
     elif request.method == 'POST':
         text = request.form.get('text')
-        language = request.form.get('language')
+        text_language = request.form.get('text-language')
     else:
         assert False
 
     # Sanitize language
-    if language not in ['da', 'en']:
-        language = 'da'
+    if text_language not in ['da', 'en', 'pl', 'sv']:
+        text_language = 'da'
 
     if not text:
-        return render_template('text_to_lexemes.html')
-
-    if not language:
-        language = 'da'
+        return render_template('text_to_lexemes.html',
+                               text_language=text_language)
 
     lowercased_text = lowercase_first_sentence_letters(text.strip())
     list_of_words = text_to_words(lowercased_text)
@@ -288,6 +286,8 @@ def show_text_to_lexemes():
     for word in list_of_words:
         if words != '':
             words += ' '
-        words += u('"{word}"@{language}').format(word=word, language=language)
+        words += u('"{word}"@{language}').format(
+            word=word, language=text_language)
 
-    return render_template('text_to_lexemes.html', text=text, words=words)
+    return render_template('text_to_lexemes.html', text=text, words=words,
+                           text_language=text_language)
