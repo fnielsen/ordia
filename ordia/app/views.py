@@ -93,7 +93,7 @@ def show_l(l):
 @main.route("/grammatical-feature/")
 def show_grammatical_feature_index():
     """Render webpage for grammatical feature index page."""
-    return render_template("grammatical_feature_index.html"),
+    return render_template("grammatical_feature_index.html")
 
 
 @main.route("/language/" + iso_language_pattern)
