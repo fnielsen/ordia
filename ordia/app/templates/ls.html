@@ -14,16 +14,30 @@ WHERE {
   VALUES ?sense { wd:{{ l }}-{{ s }} }
   {
     BIND(1 AS ?order)
-    BIND("lexeme" AS ?description)
+    BIND("Lexeme" AS ?description)
     ?value ontolex:sense ?sense .
     ?value wikibase:lemma ?valueLabel .
   }
   UNION
   {
     BIND(2 AS ?order)
-    BIND("item" AS ?description)
+    BIND("Concept" AS ?description)
     ?sense wdt:P5137 ?value .
     ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
+  }  
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("Synonym" AS ?description)
+    ?sense wdt:PP5973 ?value .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+  }  
+  UNION
+  {
+    BIND(11 AS ?order)
+    BIND("Antonym" AS ?description)
+    ?sense wdt:P5974 ?value .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
 }
 ORDER BY ?order
