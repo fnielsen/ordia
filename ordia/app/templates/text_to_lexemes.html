@@ -5,7 +5,7 @@
 {{super()}}
 
 <script type="text/javascript">
-    extractionSparql = `
+ extractionSparql = `
 SELECT DISTINCT
   ?word
   ?form ?formLabel
@@ -53,22 +53,25 @@ ORDER BY ?word
 <h1>Text to lexemes</h1>
 
 <form action="" id="form" method="POST" class="form-horizontal">
-  <div class="form-group">
-    <textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">{{ text }}
-    </textarea>
-  </div>
-  <div class="form-group">
-    <label for="language">Language:</label>
-    <select class="form-control" id="language-selector" name="text-language">
-      <option value="da"{% if text_language == 'da' %} selected="selected"{% endif %}>Dansk</option>
-      <option value="en"{% if text_language == 'en' %} selected="selected"{% endif %}>English</option>
-      <option value="pl"{% if text_language == 'pl' %} selected="selected"{% endif %}>Polska</option>
-      <option value="sv"{% if text_language == 'sv' %} selected="selected"{% endif %}>Svenska</option>
-    </select>
+    <div class="form-group">
+	<textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">{{ text }}
+	</textarea>
     </div>
-  <div class="form-group">
-    <button class="btn btn-primary" type="submit">Submit</button>
-  </div>
+    <div class="form-group">
+	<label for="language">Language:</label>
+	<select class="form-control" id="language-selector" name="text-language">
+	    <option value="br"{% if text_language == 'br' %} selected="selected"{% endif %}>Brezhoneg</option>
+	    <option value="da"{% if text_language == 'da' %} selected="selected"{% endif %}>Dansk</option>
+	    <option value="de"{% if text_language == 'de' %} selected="selected"{% endif %}>Deutsch</option>
+	    <option value="en"{% if text_language == 'en' %} selected="selected"{% endif %}>English</option>
+	    <option value="fr"{% if text_language == 'fr' %} selected="selected"{% endif %}>Français</option>
+	    <option value="pl"{% if text_language == 'pl' %} selected="selected"{% endif %}>Polski</option>
+	    <option value="sv"{% if text_language == 'sv' %} selected="selected"{% endif %}>Svenska</option>
+	</select>
+    </div>
+    <div class="form-group">
+	<button class="btn btn-primary" type="submit">Submit</button>
+    </div>
 </form>
 
 <h2>Extraction</h2>

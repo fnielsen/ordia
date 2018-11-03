@@ -271,7 +271,7 @@ def show_text_to_lexemes():
         assert False
 
     # Sanitize language
-    if text_language not in ['da', 'en', 'pl', 'sv']:
+    if text_language not in ['da', 'br', 'de', 'fr', 'en', 'nl', 'pl', 'sv']:
         text_language = 'da'
 
     if not text:
@@ -280,6 +280,9 @@ def show_text_to_lexemes():
 
     lowercased_text = lowercase_first_sentence_letters(text.strip())
     list_of_words = text_to_words(lowercased_text)
+
+    # Make the list only consists of unique words
+    list_of_words = list(set(list_of_words))
 
     # Build list of monolingual strings
     words = ''
