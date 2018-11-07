@@ -39,11 +39,14 @@ LIMIT 1000
 <div class="property-entries">
   <h1>Property: {{ p }}</h1>
 
-  [
-  <a href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata</a>
-  |
-  <a href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia</a>
-  ]
+  <a title="View and edit property on Wikidata"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata</a>
+  <a title="View property in Scholia"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia</a>
 
   <hr/>
 
