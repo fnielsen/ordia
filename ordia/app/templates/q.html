@@ -40,26 +40,39 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
 
 <div class="q-entry">
   <h1>{{ q }}</h1>
+ 
 
-  [
   <a title="View and edit the item in Wikidata"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
      href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
-  |
   <a title="View the item in the SQID class and property browser"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
      href="https://tools.wmflabs.org/sqid/#/view?id={{ q }}">SQID</a>
-  |
   <a title="Magnus Manske's Reasonator with pretty display of the Wikidata item"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
      href="https://tools.wmflabs.org/reasonator/?q={{ q }}">Reasonator</a>
-  |
   <a title="View the Wikidata item with Scholia - Scholarly profiles from Wikidata data"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
      href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia</a>
-  ]
+
   
     <h2>Lexemes</h2>
 
     <table class="table table-hover" id="lexemes"></table>
 
 
+    <h2>Images for associated senses</h2>
+
+      <div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%0A%20%20%3Fimage%0A%20%20%3Flexeme%20%3FlexemeLabel%0A%20%20%3Flanguage%20%3FlanguageLabel%0A%20%20%3Fsense%20%3FsenseLabel%0AWHERE%20%7B%0A%20%20%3Flexeme%20ontolex%3Asense%20%3Fsense%20.%0A%20%20%3Flexeme%20dct%3Alanguage%20%3Flanguage%20.%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Flanguage%20rdfs%3Alabel%20%3FlanguageLabel%20.%0A%20%20%20%20FILTER%20%28LANG%28%3FlanguageLabel%29%20%3D%20%22en%22%29%0A%20%20%7D%0A%20%20%3Flexeme%20wikibase%3Alemma%20%3FlexemeLabel%20.%0A%20%20%3Fsense%20wdt%3AP5137%20wd%3A{{ q }}%20.%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fsense%20skos%3Adefinition%20%3FsenseLabel%20.%0A%20%20%20%20%23%20FILTER%20%28LANG%28%3FsenseLabel%29%20%3D%20%22en%22%29%0A%20%20%7D%0A%20%20%3Fsense%20wdt%3AP18%20%3Fimage%20.%0A%7D%20%0A%20%20"></iframe>
+  </div>
+
+
+    
 
 </div>
 
