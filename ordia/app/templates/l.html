@@ -185,9 +185,12 @@ SELECT ?lexeme ?lexemeLabel WHERE {
     
   <h1>Lexeme: {{ l }}</h1>
 
-  [
-  <a href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
-  ]
+
+  <a title="View and edit lexeme in Wikidata"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+
 
     <hr>
 
