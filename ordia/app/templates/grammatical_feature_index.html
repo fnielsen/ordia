@@ -22,11 +22,9 @@ ORDER BY DESC(?count)
  `
 
 
- $(document).ready(function() {
-     sparqlToDataTable(grammaticalFeaturesSparql, "#grammatical-features",
-		       {'linkPrefixes': {
-			   'grammatical_feature': '../'}});
- });
+  $(document).ready(function() {
+      sparqlToDataTable(grammaticalFeaturesSparql, "#grammatical-features");
+  });
 
 </script>
 
@@ -38,6 +36,8 @@ ORDER BY DESC(?count)
 
 
 <h1>Grammatical Features</h1>
+
+<hr/>
 
 <table class="table table-hover" id="grammatical-features"></table>
 

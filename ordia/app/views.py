@@ -96,6 +96,19 @@ def show_grammatical_feature_index():
     return render_template("grammatical_feature_index.html")
 
 
+@main.route("/grammatical-feature/" + q_pattern)
+def show_grammatical_feature(q):
+    """Render webpage for grammatical feature.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item representing a grammatical feature.
+
+    """
+    return render_template("grammatical_feature.html", q=q)
+
+
 @main.route("/language/" + iso_language_pattern)
 def redirect_language(language):
     """Redirect from ISO language code.

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ formsSparql = `
+# List forms wrt. specific grammatical feature
+SELECT
+  ?form ?formLabel
+  ?lexeme ?lexemeLabel
+  ?language ?languageLabel
+WHERE {
+  ?form wikibase:grammaticalFeature wd:{{ q }} .
+  ?form ontolex:representation ?formLabel .
+  ?lexeme ontolex:lexicalForm ?form .
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?lexeme dct:language ?language .
+  OPTIONAL {
+    ?language rdfs:label ?languageLabel .
+    FILTER (LANG(?languageLabel) = 'en')
+  }
+}
+ORDER BY ?formLabel
+ `
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(formsSparql, "#forms", {
+	 linkPrefixes: {
+	     form: '../',
+	     lexeme: '../',
+	     language: '../language/',
+	 }});
+ });
+
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+
+<h1>Grammatical Feature: {{ q }}</h1>
+
+  <a title="View and edit reference on Wikidata"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
+  <a title="View reference in Scholia"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://tools.wmflabs.org/scholia/work/{{ q }}">Scholia</a>
+
+<hr/>
+
+<table class="table table-hover" id="forms"></table>
+
+
+
+<div class="grammatical-features-graph">
+    <h2>Graph</h2>
+
+    <div class="embed-responsive embed-responsive-4by3">
+	<iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20DISTINCT%0A%20%20%3Fchild%20%3FchildLabel%20%3Frgb%0A%20%20%3Fparent%20%3FparentLabel%20%0A%20%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fchild%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20%5B%5D%20wikibase%3AgrammaticalFeature%20%3Fchild%20.%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP279%2B%20%3Fparent%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results1%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fchild%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20%5B%5D%20wikibase%3AgrammaticalFeature%20%3Fchild%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%2B%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fchild%20wdt%3AP279%20%3Fparent%20.%0A%20%20%7D%0A%7D%20AS%20%25results2%20%20%20%0AWHERE%20%7B%0A%20%20%7B%20INCLUDE%20%25results1%20%7D%20UNION%20%7B%20INCLUDE%20%25results2%20%7D%0A%20%20BIND%28IF%28%3Fchild%20%3D%20wd%3A{{ q }}%2C%20%22000000%22%2C%20%22FFFFFFF%22%29%20AS%20%3Frgb%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D"></iframe>
+    </div>
+
+</div>
+  
+
+{% endblock %}
+
+
