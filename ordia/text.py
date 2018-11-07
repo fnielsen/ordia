@@ -9,7 +9,7 @@ word_pattern = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*", flags=re.UNICODE)
 
 
 def lowercase_first_sentence_letters(text):
-    """lower case the first letter in sentences.
+    """Lowercase the first letter in sentences.
 
     Parameters
     ----------

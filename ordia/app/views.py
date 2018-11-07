@@ -84,7 +84,7 @@ def show_l(l):
     Parameters
     ----------
     l : str
-        Wikidata lexeme item identifier
+        Wikidata lexeme item identifier.
 
     """
     return render_template("l.html", l=l)
@@ -210,9 +210,7 @@ def show_q(q):
 
 @main.route("/reference")
 def show_reference_index():
-    """Render webpage for reference index page
-
-    """
+    """Render webpage for reference index page."""
     return render_template("reference_index.html")
 
 

@@ -1,4 +1,4 @@
-"""ordia.query
+"""ordia.query.
 
 Usage:
   ordia.query iso639-to-q <iso639>

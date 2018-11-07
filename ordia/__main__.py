@@ -14,6 +14,7 @@ from docopt import docopt
 
 
 def main():
+    """Handle command-line interface."""
     docopt(__doc__)
 
 
