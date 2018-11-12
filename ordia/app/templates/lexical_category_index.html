@@ -23,9 +23,11 @@ ORDER BY DESC(?count)
 
 
  $(document).ready(function() {
-     sparqlToDataTable(lexicalCategoriesSparql, "#lexical-categories",
-		       {'linkPrefixes': {
-			   'lexical_category': '../'}});
+     sparqlToDataTable(lexicalCategoriesSparql, "#lexical-categories", {
+	 linkPrefixes: {
+	     lexical_category: '../lexical-category/'
+	 }
+     });
  });
 
 </script>
@@ -37,6 +39,9 @@ ORDER BY DESC(?count)
 {% block page_content %}
 
 <h1>Lexical categories</h1>
+
+<hr/>
+
 
 <div class="lexical-categories">
 

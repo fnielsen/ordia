@@ -153,6 +153,24 @@ def show_language_index():
     return render_template("language_index.html")
 
 
+@main.route("/lexical-category/" + q_pattern)
+def show_lexical_category(q):
+    """Render webpage for lexical category item.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("lexical_category.html", q=q)
+
+
 @main.route("/lexical-category/")
 def show_lexical_category_index():
     """Render webpage for lexical_category index page."""
