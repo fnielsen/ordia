@@ -6,11 +6,18 @@
 <script type="text/javascript">
  lexemesSparql = `
 SELECT
-  ?lexeme ?lexemeLabel ?value ?valueLabel
+  ?lexeme ?lexemeLabel
+  ?language ?languageLabel
+  ?value ?valueLabel
 WHERE {
   ?lexeme wikibase:lemma ?lexemeLabel .
   ?lexeme a ontolex:LexicalEntry .
   ?lexeme wdt:{{ p }} ?value .
+  ?lexeme dct:language ?language
+  OPTIONAL {
+    ?language rdfs:label ?languageLabel .
+    FILTER (LANG(?languageLabel) = 'en')
+  }
   OPTIONAL {
     { ?value wikibase:lemma ?valueLabel1 . }
     UNION
