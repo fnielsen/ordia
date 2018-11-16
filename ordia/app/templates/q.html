@@ -21,6 +21,34 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
 } 
   `
 
+  var wembedderSparql = `
+  SELECT
+    ((ROUND(1000 * ?similarity) / 1000) AS ?similarity)
+    ?concept ?conceptLabel
+    (GROUP_CONCAT(?lemmaLabel; separator=" // ") AS ?lexemes)
+  WHERE {
+    VALUES (?concept ?similarity) {
+      #VALUES
+    }
+    OPTIONAL {
+      ?concept rdfs:label ?conceptLabel .
+      FILTER (LANG(?conceptLabel) = "en")
+    }
+      
+    OPTIONAL {
+      ?sense wdt:P5137 ?concept .
+      ?lemma ontolex:sense ?sense .
+	    ?lemma wikibase:lemma ?lemmaLabel .
+	    ?lemma dct:language ?language .
+
+	    # Filter British sign language
+	FILTER (wd:Q33000 != ?language)
+    }
+  }
+  GROUP BY ?concept ?conceptLabel ?similarity
+  ORDER BY DESC(?similarity)
+  `
+
 
  $(document).ready(function() {
      sparqlToDataTable(lexemesSparql, "#lexemes", {
@@ -28,6 +56,7 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
 	     'language': 'language/'
 	 }
      });
+     qToWembedderToDataTable("{{ q }}", wembedderSparql, "#most-similar", options={})
  });
 
 </script>
@@ -41,6 +70,7 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
 <div class="q-entry">
   <h1>{{ q }}</h1>
  
+  <hr/>
 
   <a title="View and edit the item in Wikidata"
      role="button"
@@ -65,6 +95,12 @@ SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
     <table class="table table-hover" id="lexemes"></table>
 
 
+    <h2 title="Most similar items based on Wembedder knowledge graph embedding"   
+       >Most similar items</h2>
+
+    <table class="table table-hover" id="most-similar"></table>
+
+    
     <h2>Images for associated senses</h2>
 
       <div class="embed-responsive embed-responsive-4by3">

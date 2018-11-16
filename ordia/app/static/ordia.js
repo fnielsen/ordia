@@ -112,7 +112,7 @@ function sparqlToDataTable(sparql, element, options={}) {
 	for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
 	    var column = {
 		data: convertedData.columns[i],
-		title: capitalizeFirstLetter(convertedData.columns[i]).replace("_", "&nbsp;").replace("_", "&nbsp;"),
+		title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
 		defaultContent: "",
 	    }
 	    columns.push(column)
@@ -131,5 +131,24 @@ function sparqlToDataTable(sparql, element, options={}) {
 	    '<caption><a href="https://query.wikidata.org/#' + 
 		encodeURIComponent(sparql) +	
 		'">Edit on query.Wikidata.org</a></caption>');
+    });
+}
+
+function qToWembedderToDataTable(q, sparql, element, options={}) {
+    var wembedderUrl = "https://tools.wmflabs.org/wembedder/api/most-similar/" + q;
+    $.ajax({
+	url: wembedderUrl,
+	error: function(xhr, status, error) { $(element).append('Error'); },
+	success: function (data) {
+	    
+	    var values = "";
+	    data.most_similar.forEach(function(entry, idx, array) {
+		values += "(wd:" + entry.item + " " + entry.similarity + ") ";
+	    });
+	    
+	    var interpolated_sparql = sparql.replace(/#VALUES/g, values); 
+	    
+	    sparqlToDataTable(interpolated_sparql, element, options={}); 
+	},
     });
 }
