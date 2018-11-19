@@ -17,16 +17,28 @@ WHERE {
   OPTIONAL {
     ?form ontolex:representation ?word . 
     OPTIONAL {
-      ?form wikibase:grammaticalFeature ?feature . 
-      ?feature rdfs:label ?featureLabel .
-      FILTER (LANG(?featureLabel) = "en")
+      ?form wikibase:grammaticalFeature ?feature .
+      BIND(STR(?feature) AS ?default_featureLabel)
+      OPTIONAL {
+        ?feature rdfs:label ?featureLabel_ .
+        FILTER (LANG(?featureLabel_) = "en")
+      }
+      BIND(COALESCE(?featureLabel_, ?default_featureLabel) AS ?featureLabel)
     }
+      
     ?lexeme wikibase:lexicalCategory ?lexical_category .
-    ?lexical_category rdfs:label ?lexical_categoryLabel .
-    FILTER (LANG(?lexical_categoryLabel) = 'en')    
+    BIND(STR(?lexical_category) AS ?default_lexical_categoryLabel)
+    OPTIONAL {
+      ?lexical_category rdfs:label ?lexical_categoryLabel_ .
+      FILTER (LANG(?lexical_categoryLabel_) = 'en')
+    }
+    BIND(COALESCE(?lexical_categoryLabel_, ?default_lexical_categoryLabel) AS
+	 ?lexical_categoryLabel)
+      
     ?lexeme ontolex:lexicalForm ?form .
     ?form ontolex:representation ?formLabel .
-    ?lexeme wikibase:lemma ?lexemeLabel . 
+	  
+    ?lexeme wikibase:lemma ?lexemeLabel .
   }
 }
 GROUP BY ?word ?form ?formLabel ?lexeme ?lexemeLabel ?lexical_category ?lexical_categoryLabel
