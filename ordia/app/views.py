@@ -262,13 +262,21 @@ def show_reference(q):
 def show_search():
     """Render webpage for q Wikidata item.
 
+    Show search interface and search results if anything has been typed in.
+    Redirect of search string matches a Q identifier.
+
     Parameters
     ----------
     q : str
         Wikidata item identifier
 
     """
-    query = request.args.get('q', '')
+    query = request.args.get('q', '').strip()
+
+    if Q_PATTERN.match(query):
+        q = Q_PATTERN.findall(query)[0]
+        return redirect(url_for("app.show_q", q=q), code=302)
+
     if query:
         search_results = wb_search_lexeme_entities(query)
     else:
