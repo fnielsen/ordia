@@ -12,6 +12,9 @@ SELECT DISTINCT
   ?lexeme ?lexemeLabel
   ?lexical_category ?lexical_categoryLabel
   (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
+  ?sense ?senseLabel
+  (IRI(CONCAT("https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file&width=200&wpvalue=", 
+          SUBSTR(STR(SAMPLE(?images)), 52))) AS ?sense_image)
 WHERE {
   VALUES ?word { {{ words | safe }} }
   OPTIONAL {
@@ -39,9 +42,19 @@ WHERE {
     ?form ontolex:representation ?formLabel .
 	  
     ?lexeme wikibase:lemma ?lexemeLabel .
+
+    OPTIONAL {
+      ?lexeme ontolex:sense ?sense .
+      BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
+      OPTIONAL {
+        ?sense wdt:P18 ?images .
+      }
+    }
   }
 }
-GROUP BY ?word ?form ?formLabel ?lexeme ?lexemeLabel ?lexical_category ?lexical_categoryLabel
+GROUP BY ?word ?form ?formLabel
+  ?lexeme ?lexemeLabel ?lexical_category ?lexical_categoryLabel
+  ?sense ?senseLabel
 ORDER BY ?word
 `
 
