@@ -29,6 +29,9 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 	    if (key.substr(-11) == 'Description') {
 		convertedRow['description'] = data[i][key];
 
+	    } else if (key.substr(-5) == 'image') {
+		convertedRow[key] = '<img src="' + data[i][key] + '">';
+
 	    } else if (key + 'Label' in data[i]) {
 		convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "") + 
@@ -41,7 +44,7 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		convertedRow[key] = '<a href="' +
 		    data[i][key + 'Url'] +
 		    '">' + data[i][key] + '</a>';
-		console.log(convertedRow[key]);
+
 	    } else if (key.substr(-3) == 'Url') {
 		// pass
 

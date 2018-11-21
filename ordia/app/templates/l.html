@@ -125,7 +125,7 @@ ORDER BY ?order
  SELECT
   ?form ?formLabel
    (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
-   (GROUP_CONCAT(DISTINCT ?hyphenation; separator=" // ") AS ?hyphenations)
+   # (GROUP_CONCAT(DISTINCT ?hyphenation; separator=" // ") AS ?hyphenations)
  WHERE {
    wd:{{ l }} ontolex:lexicalForm ?form .
    ?form ontolex:representation ?formLabel .
@@ -143,22 +143,22 @@ ORDER BY ?order
  `
 
  sensesSparql = `
- # List of senses for a specific lexeme
+# List of senses for a specific lexeme
  SELECT
   ?sense ?senseLabel
+  (GROUP_CONCAT(?gloss; separator=" // ") AS ?glosses)
+  (IRI(CONCAT("https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file&width=200&wpvalue=", 
+          SUBSTR(STR(SAMPLE(?images)), 52))) AS ?sense_image)
  WHERE {
    wd:{{ l }} ontolex:sense ?sense .
-   ?sense skos:definition ?senseLabel .
+   BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
+   ?sense skos:definition ?gloss .
+   OPTIONAL {
+     ?sense wdt:P18 ?images
+   }
  }
  GROUP BY ?sense ?senseLabel
  ORDER BY (STR(?sense))
- `
-
- compoundsSparql = `
-SELECT ?lexeme ?lexemeLabel WHERE {
-  ?lexeme wdt:P5238 wd:{{ l }} .
-  ?lexeme wikibase:lemma ?lexemeLabel .
-}
 `
 
  $(document).ready(function() {
@@ -196,20 +196,30 @@ SELECT ?lexeme ?lexemeLabel WHERE {
 
     <table class="table table-hover" id="lexeme"></table>
     
-    <hr>
+    <div class="card-deck">
 
-    <h2>Forms</h2>
+      <div class="card mb-6 box-shadow">
+	<div class="card-header">
+	  <h2>Forms</h2>
+	</div>
+	<div class="card-body">
+	  <table class="table table-hover" id="forms"></table>
+	</div>
+      </div>
+      
+      <div class="card mb-6 box-shadow">
+	<div class="card-header">
+	  <h2>Senses</h2>
+	</div>
+	<div class="card-body">
+	  <table class="table table-hover" id="senses"></table>
+	</div>
+      </div>
 
-    <table class="table table-hover" id="forms"></table>
+    </div>
+
+    <hr/>
     
-    <hr>
-
-    <h2>Senses</h2>
-
-    <table class="table table-hover" id="senses"></table>
-    
-    <hr>
-
     <h2>Compounds</h2>
 
     <table class="table table-hover" id="compounds"></table>
