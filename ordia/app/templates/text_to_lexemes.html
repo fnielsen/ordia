@@ -13,7 +13,7 @@ SELECT DISTINCT
   ?lexical_category ?lexical_categoryLabel
   (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
   ?sense ?senseLabel
-  (IRI(CONCAT("https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file&width=200&wpvalue=", 
+  (IRI(CONCAT("https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file&width=100&wpvalue=", 
           SUBSTR(STR(SAMPLE(?images)), 52))) AS ?sense_image)
 WHERE {
   VALUES ?word { {{ words | safe }} }
