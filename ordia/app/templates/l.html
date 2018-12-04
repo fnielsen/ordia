@@ -161,6 +161,36 @@ ORDER BY ?order
  ORDER BY (STR(?sense))
 `
 
+ compoundsSparql = `
+SELECT
+  ?lexeme ?lexemeLabel
+  ?lexical_category ?lexical_categoryLabel
+  ?other_compounds
+WHERE {
+  {
+    SELECT
+      ?lexeme
+      (GROUP_CONCAT(?compoundLabel; separator=" // ") AS ?other_compounds)
+    WHERE {
+      ?lexeme wdt:P5238 wd:{{ l }} .
+      OPTIONAL {
+        ?lexeme wdt:P5238 ?compound .
+        ?compound wikibase:lemma ?compoundLabel .
+        FILTER (?compound != wd:{{ l }})
+      }
+    }
+    GROUP BY ?lexeme
+  }    
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  OPTIONAL {
+    ?lexeme wikibase:lexicalCategory ?lexical_category .
+    ?lexical_category rdfs:label ?lexical_categoryLabel .
+    FILTER (LANG(?lexical_categoryLabel) = 'en')
+  }
+}
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(lexemeSparql, "#lexeme",
 		       options={
