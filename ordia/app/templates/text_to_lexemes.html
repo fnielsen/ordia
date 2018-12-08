@@ -7,7 +7,7 @@
 <script type="text/javascript">
  extractionSparql = `
 SELECT DISTINCT
-  ?word
+  ?word ?wordUrl
   ?form ?formLabel
   ?lexeme ?lexemeLabel
   ?lexical_category ?lexical_categoryLabel
@@ -51,8 +51,10 @@ WHERE {
       }
     }
   }
+  BIND(IF(BOUND(?form), "", CONCAT("../search?q=", ?word)) AS ?wordUrl)
 }
-GROUP BY ?word ?form ?formLabel
+GROUP BY
+  ?word ?wordUrl ?form ?formLabel
   ?lexeme ?lexemeLabel ?lexical_category ?lexical_categoryLabel
   ?sense ?senseLabel
 ORDER BY ?word

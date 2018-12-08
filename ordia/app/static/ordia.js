@@ -41,10 +41,15 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		// pass
 		
 	    } else if (key + 'Url' in data[i]) {
-		convertedRow[key] = '<a href="' +
-		    data[i][key + 'Url'] +
-		    '">' + data[i][key] + '</a>';
-
+		if (data[i][key + 'Url']) {
+		    convertedRow[key] = '<a href="' +
+			data[i][key + 'Url'] +
+			'">' + data[i][key] + '</a>';
+		}
+		else {
+		    // If the URL is empty we do not create a link
+		    convertedRow[key] = data[i][key];
+		}
 	    } else if (key.substr(-3) == 'Url') {
 		// pass
 
