@@ -51,7 +51,7 @@ WHERE {
       }
     }
   }
-  BIND(IF(BOUND(?form), "", CONCAT("../search?q=", ?word)) AS ?wordUrl)
+  BIND(IF(BOUND(?form), "", CONCAT("search?q=", ?word)) AS ?wordUrl)
 }
 GROUP BY
   ?word ?wordUrl ?form ?formLabel
