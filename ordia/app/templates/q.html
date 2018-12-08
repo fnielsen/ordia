@@ -5,20 +5,31 @@
 
 <script type="text/javascript">
  lexemesSparql = `
-SELECT ?lexeme ?lexemeLabel ?language ?languageLabel ?sense ?senseLabel WHERE {
+SELECT
+  ?lexeme ?lexemeLabel
+  ?language ?languageLabel
+  ?sense ?senseLabel
+  (GROUP_CONCAT(?gloss; separator=" // ") AS ?glosses)
+WHERE {
   ?lexeme ontolex:sense ?sense .
+	
   ?lexeme dct:language ?language .
   OPTIONAL {
     ?language rdfs:label ?languageLabel .
     FILTER (LANG(?languageLabel) = "en")
   }
+  # Exclude British sign language
+  FILTER (?language != wd:Q33000) 
+    
   ?lexeme wikibase:lemma ?lexemeLabel .
   ?sense wdt:P5137 wd:{{ q }} .
-  OPTIONAL {
-    ?sense skos:definition ?senseLabel .
-    # FILTER (LANG(?senseLabel) = "en")
-  }
-} 
+  BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
+  ?sense skos:definition ?gloss .
+}
+GROUP BY
+  ?lexeme ?lexemeLabel
+  ?language ?languageLabel
+  ?sense ?senseLabel
   `
 
   var wembedderSparql = `
