@@ -34,6 +34,13 @@ WHERE {
   }  
   UNION
   {
+    BIND(5 AS ?order)
+    BIND("Usage style" AS ?description)
+    ?sense wdt:P6191 ?value .
+    ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
+  }  
+  UNION
+  {
     BIND(10 AS ?order)
     BIND("Synonym" AS ?description)
     { ?sense wdt:P5973 ?value . }
