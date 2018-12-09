@@ -62,6 +62,14 @@ WHERE {
     ?sense wdt:P5974 ?value .
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
+  UNION
+  {
+    BIND(20 AS ?order)
+    BIND("Usage example" AS ?description)
+    ?sense ^ontolex:sense / p:P5831 ?value_statement .
+    ?value_statement ps:P5831 ?value .
+    ?value_statement pq:P6072 ?sense .
+  }  
 }
 ORDER BY ?order
 `
