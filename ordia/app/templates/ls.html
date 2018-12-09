@@ -5,9 +5,9 @@
 {{super()}}
 
 <script type="text/javascript">
-    senseDataSparql = `
+ senseDataSparql = `
 # Data for a specific sense
-SELECT
+SELECT DISTINCT 
   ?description 
   ?value ?valueLabel 
 WHERE {
@@ -21,6 +21,13 @@ WHERE {
   UNION
   {
     BIND(2 AS ?order)
+    BIND("Language" AS ?description)
+    ?sense ^ontolex:sense / dct:language ?value .
+    ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
+  }  
+  UNION
+  {
+    BIND(3 AS ?order)
     BIND("Concept" AS ?description)
     ?sense wdt:P5137 ?value .
     ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
@@ -29,8 +36,17 @@ WHERE {
   {
     BIND(10 AS ?order)
     BIND("Synonym" AS ?description)
-    ?sense wdt:PP5973 ?value .
-    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+    { ?sense wdt:P5973 ?value . }
+    UNION 
+    {
+      ?sense wdt:P5137 / ^wdt:P5137 ?value .
+      FILTER (?value != ?sense)
+    }
+    ?sense ^ontolex:sense / dct:language ?language .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel .
+    ?value ^ontolex:sense / dct:language ?synonym_language .
+    FILTER (?synonym_language = ?language)
+     
   }  
   UNION
   {
@@ -43,16 +59,21 @@ WHERE {
 ORDER BY ?order
 `
 
-  translationsSparql = `
+ translationsSparql = `
 SELECT DISTINCT
   ?sense ?senseLabel
   ?gloss
   ?lexeme ?lexemeLabel ?language ?languageLabel
   ?item ?itemLabel
 WHERE {
-  { wd:{{ l }}-{{ s }} wdt:P5137 / ^wdt:P5137 ?sense . }
+  VALUES ?query_sense { wd:{{ l }}-{{ s }} }
+  { ?query_sense wdt:P5137 / ^wdt:P5137 ?sense . }
   UNION
-  { wd:{{ l }}-{{ s }} wdt:P5972 | ^wdt:P5972 ?sense . }
+  { ?query_sense wdt:P5972 | ^wdt:P5972 ?sense . }
+
+  # Do not show senses from the query language
+  ?query_sense ^ontolex:sense / dct:language ?query_language .
+  FILTER (?query_language != ?language)
 
   BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
     
