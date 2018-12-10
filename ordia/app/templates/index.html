@@ -1,52 +1,5 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
- statisticsSparql = `
-SELECT
-  ?description 
-  ?value
-WHERE {
-  {
-    { SELECT (COUNT(*) AS ?value) { [] a ontolex:LexicalEntry . } }
-    BIND("Number of lexemes" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?value) { [] dct:language [] . } }
-    BIND("Number of language links (dct:language)" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?value) { [] a ontolex:Form . } }
-    BIND("Number of forms" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?value) { [] a ontolex:LexicalSense . } }
-    BIND("Number of senses (a ontolex:LexicalSense)" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?value) { [] ontolex:sense [] . } }
-    BIND("Number of sense links (ontolex:sense)" AS ?description)
-  }
-}
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(statisticsSparql, "#statistics",
-		       options={
-			   paging: false,
-		       });
-  });
-
-</script>
-
-{% endblock %}
-
 
 {% block page_content %}
 
@@ -55,9 +8,58 @@ WHERE {
 
   <h1>Ordia</h1>
 
-  <h2>Statistics</h2>
 
-  <table class="table table-hover" id="statistics"></table>
+
+<div class="container">
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+	    
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Examples</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="L99">Luftballon</a></dt>
+		    <dd>
+			German lexeme.
+		    </dd>
+
+		    <dt><a href="L128-F3">Vovserne</a></dt>
+		    <dd>
+			Danish form.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Tools</h4>
+	    </div>
+	    <div class="card-body">
+		<dl>
+		    <dt><a href="text-to-lexemes">Text-to-lexemes</a></dt>
+		    <dd>Convert a text to a list of lexemes.</dd>
+		</dl>
+	    </div>
+        </div>
+	
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Other</h4>
+	    </div>
+	    <div class="card-body">
+		<dl>
+		    <dt><a href="statistics/">Statistics</a></dt>
+		    <dd>Count of the content Wikidata lexemes.</dd>
+		</dl>
+
+	    </div>
+        </div>
+    </div>
+</div>
   
     
 </div>

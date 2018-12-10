@@ -285,6 +285,19 @@ def show_search():
                            query=query, search_results=search_results)
 
 
+@main.route("/statistics/")
+def show_statistics():
+    """Render webpage for statistics.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("statistics.html")
+
+
 @main.route('/text-to-lexemes', methods=['POST', 'GET'])
 def show_text_to_lexemes():
     """Return HTML page for text-to-lexemes query.

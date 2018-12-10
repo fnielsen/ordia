@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ statisticsSparql = `
+
+SELECT
+  ?count
+  ?description 
+  ?query
+WHERE {
+  {
+    { SELECT (COUNT(*) AS ?count) { [] a ontolex:LexicalEntry . } }
+    BIND("Number of lexemes" AS ?description)
+    BIND("[] a ontolex:LexicalEntry" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] dct:language [] . } }
+    BIND("Number of language links" AS ?description)
+    BIND("[] dct:language []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] a ontolex:Form . } }
+    BIND("Number of forms" AS ?description)
+    BIND("[] a ontolex:Form" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] a ontolex:LexicalSense . } }
+    BIND("Number of senses" AS ?description)
+    BIND("[] a ontolex:LexicalSense" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] ontolex:sense [] . } }
+    BIND("Number of sense links" AS ?description)
+    BIND("[] ontolex:sense []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wikibase:lexicalCategory [] . } }
+    BIND("Number of lexical category links" AS ?description)
+    BIND("[] wikibase:lexicalCategory []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wikibase:grammaticalFeature [] . } }
+    BIND("Number of grammatical feature links" AS ?description)
+    BIND("[] wikibase:grammaticalFeature []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5137 [] . } }
+    BIND("Number of sense to item links" AS ?description)
+    BIND("[] wdt:P5137 []" AS ?query)
+  }
+}
+ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(statisticsSparql, "#statistics",
+		       options={
+			   paging: false,
+		       });
+  });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+
+<div>
+
+  <h1>Statistics</h1>
+
+  <table class="table table-hover" id="statistics"></table>
+  
+    
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
