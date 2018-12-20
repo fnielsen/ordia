@@ -8,6 +8,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.dataTables.min.css') }}">
 
+
 {% endblock %}
 
 
@@ -36,13 +37,15 @@
 		    Ordia
 		</button>
             </span>
+
+	    <button class="navbar-toggler" type="button"
+		    data-toggle="collapse" data-target="#navbarToogle">
+		<span class="navbar-toggler-icon"></span>
+	    </button>
 	</div>
 	
     </form>
     
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToogle">
-	<span class="navbar-toggler-icon"></span>
-    </button>
 
     <div class="collapse navbar-collapse" id="navbarToogle">
 	<ul class="navbar-nav">
@@ -99,7 +102,7 @@
     License for content: CC0 for data, CC-BY-SA for text and media
     |
     Report technical problems at Ordia's
-  <a href="https://github.com/fnielsen/ordia/issues">Issues</a> GitHub page.
+    <a href="https://github.com/fnielsen/ordia/issues">Issues</a> GitHub page.
 </div>
 
 {% endblock %}
