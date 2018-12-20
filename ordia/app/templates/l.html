@@ -194,59 +194,51 @@ WHERE {
  $(document).ready(function() {
      sparqlToDataTable(lexemeSparql, "#lexeme",
 		       options={
-			   paging: false,
 			   linkPrefixes: {
 			       source: 'reference/'
-			   }
-		       });
-     sparqlToDataTable(formsSparql, "#forms", options={paging: false});
-     sparqlToDataTable(sensesSparql, "#senses", options={paging: false});
-     sparqlToDataTable(compoundsSparql, "#compounds", options={paging: false});
- });
+			   },
+			    paging: false,
+			    sDom: 'rt',
+			});
+      sparqlToDataTable(formsSparql, "#forms",
+			options={paging: false, sDom: 'rt',});
+      sparqlToDataTable(sensesSparql, "#senses",
+			options={paging: false, sDom: 'rt',});
+      sparqlToDataTable(compoundsSparql, "#compounds",
+			options={paging: false, sDom: 'rt',});
+  });
 
-</script>
+ </script>
 
-{% endblock %}
-
-
-{% block page_content %}
-
-<div class="l-entry">
-    
-  <h1>Lexeme: {{ l }}</h1>
+ {% endblock %}
 
 
-  <a title="View and edit lexeme in Wikidata"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+ {% block page_content %}
 
+ <div class="l-entry">
 
-    <hr>
-
-    <table class="table table-hover" id="lexeme"></table>
-    
-    <div class="card-deck">
-
-      <div class="card mb-6 box-shadow">
-	<div class="card-header">
-	  <h2>Forms</h2>
-	</div>
-	<div class="card-body">
-	  <table class="table table-hover" id="forms"></table>
-	</div>
-      </div>
-      
-      <div class="card mb-6 box-shadow">
-	<div class="card-header">
-	  <h2>Senses</h2>
-	</div>
-	<div class="card-body">
-	  <table class="table table-hover" id="senses"></table>
-	</div>
-      </div>
-
-    </div>
+     <h1>Lexeme: {{ l }}</h1>
+     
+     
+     <p>
+	 <a title="View and edit lexeme in Wikidata"
+	    role="button"
+	    class="btn btn-outline-dark btn-sm"
+	    href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+     </p>
+     
+     <table class="table table-hover" id="lexeme"></table>
+     
+     <div class="container">
+	 <div class="row">
+	      <div class="col-12 col-lg-6">
+		  <table class="table table-hover" id="forms"></table>
+	      </div>
+	      <div class="col-12 col-lg-6">
+		  <table class="table table-hover" id="senses"></table>
+	      </div>
+	 </div>
+     </div>
 
     <hr/>
     

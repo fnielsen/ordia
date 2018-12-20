@@ -65,9 +65,10 @@ ORDER BY DESC(?count)
  $(document).ready(function() {
      sparqlToDataTable(statisticsSparql, "#statistics",
 		       options={
+			   sDom: 'rt',
 			   paging: false,
 		       });
-  });
+ });
 
 </script>
 
