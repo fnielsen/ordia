@@ -214,7 +214,7 @@ def show_property(p):
     Parameters
     ----------
     p : str
-        Wikidata item for the language.
+        Wikidata property.
 
     """
     return render_template("property.html", p=p)
@@ -224,6 +224,26 @@ def show_property(p):
 def show_property_index():
     """Render index webpage for property."""
     return render_template("property_index.html")
+
+
+@main.route("/property/" + p_pattern + "/value/" + q_pattern)
+def show_property_value(p, q):
+    """Render webpage for a property.
+
+    Parameters
+    ----------
+    p : str
+        Wikidata property
+    q : str
+        Wikidata item 
+
+    Returns
+    -------
+    html : str
+        Rederende HTML for index page.
+
+    """
+    return render_template("property_value.html", p=p, q=q)
 
 
 @main.route("/" + q_pattern)

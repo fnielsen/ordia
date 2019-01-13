@@ -9,9 +9,8 @@ SELECT
   ?lexeme ?lexemeLabel
   ?language ?languageLabel
   ?value ?valueLabel
-  ("→" AS ?zoom)
-  (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
 WHERE {
+  BIND(wd:{{ q }} AS ?value)
   ?lexeme wikibase:lemma ?lexemeLabel .
   ?lexeme a ontolex:LexicalEntry .
   ?lexeme wdt:{{ p }} ?value .
@@ -33,9 +32,9 @@ LIMIT 1000
  $(document).ready(function() {
      sparqlToDataTable(lexemesSparql, "#lexemes", {
 	 linkPrefixes: {
-	     lexeme: '../',
-	     language: '../language/', 
-	     value: '../'}});
+	     lexeme: '../../../',
+	     language: '../../../language/', 
+	     value: '../../../'}});
  });
 
 </script>
@@ -47,16 +46,34 @@ LIMIT 1000
 
 
 <div class="property-entries">
-  <h1>Property: {{ p }}</h1>
+    <h1>Property: {{ p }}</h1>
 
-  <a title="View and edit property on Wikidata"
+    <a title="Back"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="../../{{ p }}">←</a>
+
+    <a title="View and edit property on Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata for property</a>
+    <a title="View and edit property on Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata for property</a>
+  <a title="View and edit item on Wikidata"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata</a>
+     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata for value</a>
+
   <a title="View property in Scholia"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia</a>
+     href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia for property</a>
+  <a title="View item in Scholia"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia for value</a>
 
   <hr/>
 
