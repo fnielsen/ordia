@@ -13,6 +13,12 @@ from ..query import iso639_to_q
 from ..text import lowercase_first_sentence_letters, text_to_words
 
 
+ALLOWED_LANGUAGES = [
+    'da', 'br', 'de', 'en', 'es', 'fr', 'hi', 'it', 'jp', 'ml',
+    'nl', 'nn', 'no', 'pl', 'ru', 'sv', 'zh',
+]
+
+
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
 
@@ -341,7 +347,7 @@ def show_text_to_lexemes():
         assert False
 
     # Sanitize language
-    if text_language not in ['da', 'br', 'de', 'fr', 'en', 'nl', 'pl', 'sv']:
+    if text_language not in ALLOWED_LANGUAGES:
         text_language = 'da'
 
     if not text:
