@@ -87,14 +87,9 @@ WHERE {
   UNION 
   {
     BIND(15 AS ?order)
-    BIND("Compounds" AS ?description)
-    {
-      SELECT
-        (GROUP_CONCAT(?compound; separator=" // ") AS ?value)
-      WHERE {
-        wd:{{ l }} wdt:P5238 / wikibase:lemma ?compound .
-      } GROUP BY ?lexeme
-    }
+    BIND("Compound" AS ?description)
+    wd:{{ l }} wdt:P5238+ ?value .
+    ?value wikibase:lemma ?valueLabel .
   }
   UNION 
   {
@@ -161,6 +156,7 @@ ORDER BY ?order
  ORDER BY (STR(?sense))
 `
 
+
  compoundsSparql = `
 SELECT
   ?lexeme ?lexemeLabel
@@ -172,7 +168,7 @@ WHERE {
       ?lexeme
       (GROUP_CONCAT(?compoundLabel; separator=" // ") AS ?other_compounds)
     WHERE {
-      ?lexeme wdt:P5238 wd:{{ l }} .
+      ?lexeme wdt:P5238+ wd:{{ l }} .
       OPTIONAL {
         ?lexeme wdt:P5238 ?compound .
         ?compound wikibase:lemma ?compoundLabel .
