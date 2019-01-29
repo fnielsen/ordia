@@ -1,5 +1,6 @@
 docopt
 flask
+regex
 requests
 six
 werkzeug>=0.9

@@ -1,11 +1,13 @@
 """text."""
 
 
-import re
+# Import of regex instead of re to get better Unicode matching support
+import regex
 
 
-sentence_split_pattern = re.compile("(?<=[\.!?:]) ", flags=re.UNICODE)
-word_pattern = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*", flags=re.UNICODE)
+sentence_split_pattern = regex.compile("(?<=[\.!?:]) ", flags=regex.UNICODE)
+word_pattern = regex.compile(r"((?:\p{L}\p{M}?)+(?:-(?:\p{L}\p{M}?)+)*)",
+                             flags=regex.UNICODE)
 
 
 def lowercase_first_sentence_letters(text):
