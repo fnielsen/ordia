@@ -60,7 +60,7 @@ def text_to_sentences(text):
     sentences : list of str
         List with sentences as strings.
 
-    See also
+    See Also
     --------
     text_to_words : Split text to words.
 
