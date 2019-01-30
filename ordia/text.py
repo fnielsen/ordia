@@ -5,7 +5,8 @@
 import regex
 
 
-sentence_split_pattern = regex.compile("(?<=[\.!?:]) ", flags=regex.UNICODE)
+sentence_split_pattern = regex.compile("(?<=[\.!?:])\s",
+                                       flags=regex.UNICODE | regex.DOTALL)
 word_pattern = regex.compile(r"((?:\p{L}\p{M}?)+(?:-(?:\p{L}\p{M}?)+)*)",
                              flags=regex.UNICODE)
 
@@ -34,6 +35,7 @@ def lowercase_first_sentence_letters(text):
     sentences = text_to_sentences(text)
     lowercased_text = ''
     for sentence in sentences:
+        sentence = sentence.strip()
         if not lowercased_text == '':
             lowercased_text += ' '
         if len(sentence) > 0:
@@ -46,6 +48,8 @@ def lowercase_first_sentence_letters(text):
 def text_to_sentences(text):
     """Split text to sentences.
 
+    Return sentences in a text as a list of strings splitting at punctuations.
+
     Parameters
     ----------
     text : str
@@ -55,6 +59,10 @@ def text_to_sentences(text):
     ------
     sentences : list of str
         List with sentences as strings.
+
+    See also
+    --------
+    text_to_words : Split text to words.
 
     Examples
     --------
@@ -70,6 +78,9 @@ def text_to_sentences(text):
 def text_to_words(text):
     """Split text to words.
 
+    Split a text into words with a word defined as a sequence of letters and
+    markings followed by one or more groups of dash and letter and markings.
+
     Parameters
     ----------
     text : str
@@ -79,6 +90,12 @@ def text_to_words(text):
     ------
     tokens : list of str
         List with tokens.
+
+    Notes
+    -----
+    Words are defined as Unicode letters and markings followed by zero or more
+    groups, each consisting of a dash `-` and one or more letters and markings.
+    Markings are added to accommodate, e.g., Hindi words.
 
     Examples
     --------
