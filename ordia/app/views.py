@@ -70,6 +70,13 @@ S_PATTERN = re.compile(r'S[1-9]\d*')
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 
+@main.route("/guess-image-from-word")
+def show_guess_image_from_word():
+    """Render webpage for guess-image-from-word page."""
+    return render_template("guess_image_from_word.html")
+
+
+
 @main.route("/")
 def index():
     """Return rendered index page.

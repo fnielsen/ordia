@@ -1,9 +1,8 @@
-<html>
-    <head>
-	<link rel="stylesheet" href="/home/fnielsen/projects/ordia/ordia/app/static/bootstrap.min.css">
-	<script src="/home/fnielsen/projects/ordia/ordia/app/static/jquery.min.js"></script>
-	<script src="/home/fnielsen/projects/ordia/ordia/app/static/bootstrap.min.js"></script>
+{% extends "base.html" %}
 
+
+{% block scripts %}
+{{super()}}
 
 	<script type="text/javascript">
 	 function sparqlDataToSimpleData(response) {
@@ -72,9 +71,10 @@
 	 });
 	</script>
 
-    </head>
+ {% endblock %}
 
-    <body>
+ {% block page_content %}
+	
 	<h1>Guess image from word</h1>
 
 	<div class="container">
@@ -130,6 +130,5 @@
 		</div>
 	    </div>
 	</div>
-    </body>
 
-</html>
+{% endblock %}
