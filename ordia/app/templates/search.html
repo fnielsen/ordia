@@ -9,7 +9,7 @@
     so the search results may not be complete.
   </div -->
   
-    <h2>Search results</h2>
+    <h2>{{_("Search results")}}</h2>
 
     <ul class="search-results">
 {% for search_result in search_results %}
@@ -45,7 +45,7 @@
 <div class="new-lexeme">
   {% if query %}
 
-  <a href="https://www.wikidata.org/wiki/Special:NewLexeme?lemma={{ query }}"><button type="button" class="btn btn-primary">Create new lexeme in Wikidata</button></a>
+  <a href="https://www.wikidata.org/wiki/Special:NewLexeme?lemma={{ query }}"><button type="button" class="btn btn-primary">{{_("Create new lexeme in Wikidata")}}</button></a>
   
   {% endif %}
 </div>
