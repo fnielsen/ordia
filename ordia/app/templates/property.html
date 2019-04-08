@@ -9,8 +9,8 @@ SELECT
   ?lexeme ?lexemeLabel
   ?language ?languageLabel
   ?value ?valueLabel
-  ("→" AS ?zoom)
-  (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
+  # ("→" AS ?zoom)
+  # (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
 WHERE {
   ?lexeme wikibase:lemma ?lexemeLabel .
   ?lexeme a ontolex:LexicalEntry .
@@ -30,10 +30,46 @@ WHERE {
 LIMIT 1000
   `
 
+  formSparql = `
+SELECT
+  ?lexeme ?lexemeLabel
+  ?form ?formLabel
+  ?language ?languageLabel
+  ?value ?valueLabel
+  # ("→" AS ?zoom)
+  # (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
+WHERE {
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?lexeme ontolex:lexicalForm ?form .
+  ?form ontolex:representation ?formLabel .
+  ?form wdt:{{ p }} ?value .
+  ?lexeme dct:language ?language
+  OPTIONAL {
+    ?language rdfs:label ?languageLabel .
+    FILTER (LANG(?languageLabel) = 'en')
+  }
+  OPTIONAL {
+    { ?value wikibase:lemma ?valueLabel1 . }
+    UNION
+    { ?value rdfs:label ?valueLabel2 . FILTER (LANG(?valueLabel2) = 'en') }
+    BIND(COALESCE(?valueLabel1, ?valueLabel2) AS ?valueLabel)
+  }
+}
+LIMIT 10000
+`
+
+
+
  $(document).ready(function() {
      sparqlToDataTable(lexemesSparql, "#lexemes", {
 	 linkPrefixes: {
 	     lexeme: '../',
+	     language: '../language/', 
+	     value: '../'}});
+     sparqlToDataTable(formSparql, "#forms", {
+	 linkPrefixes: {
+	     lexeme: '../',
+	     form: '../',
 	     language: '../language/', 
 	     value: '../'}});
  });
@@ -64,7 +100,7 @@ LIMIT 1000
 
   <table class="table table-hover" id="lexemes"></table>
 
-  <!-- hr/>
+  <hr/>
   
   <h2>Forms</h2>
   
@@ -74,7 +110,7 @@ LIMIT 1000
   
   <h2>Senses</h2>
   
-  <table class="table table-hover" id="senses"></table -->
+  <table class="table table-hover" id="senses"></table>
   
 </div>
 
