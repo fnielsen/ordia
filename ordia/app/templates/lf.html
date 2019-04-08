@@ -42,6 +42,12 @@ WHERE {
   }
   UNION  
   {   
+    BIND(11 AS ?order)
+    ?form wdt:P2859 ?value .
+    BIND("X-SAMPA" AS ?description)
+  }
+  UNION  
+  {   
     BIND(20 AS ?order)
     ?lexeme ontolex:lexicalForm ?form .
     ?lexeme p:P5831 ?value_statement .
