@@ -96,6 +96,13 @@ LIMIT 200
 <table class="table table-hover" id="longest-words-and-phrases"></table>
 
 
+<h2>Lexical categories</h2>
+
+  <div class="embed-responsive embed-responsive-4by3">
+    <iframe loading="lazy" class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0A%23%20Count%20of%20lexemes%20wrt.%20lexical%20category%20for%20a%20language%0ASELECT%0A%20%20%3Fcount%0A%20%20%3Flexical_category%20%3Flexical_categoryLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Flexeme%29%20AS%20%3Fcount%29%0A%20%20%20%20%3Flexical_category%20%0A%20%20%20WHERE%20%7B%0A%20%20%20%20%3Flexeme%20a%20ontolex%3ALexicalEntry%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20dct%3Alanguage%20wd%3A{{ q }}%20%3B%20%0A%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Alemma%20%3FlexemeLabel%20.%0A%20%20%20%20%3Flexeme%20wikibase%3AlexicalCategory%20%3Flexical_category%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Flexical_category%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20OPTIONAL%20%7B%20%20%20%20%20%20%20%20%0A%20%20%20%20%3Flexical_category%20rdfs%3Alabel%20%3Flexical_categoryLabel%20.%0A%20%20%20%20FILTER%20%28LANG%28%3Flexical_categoryLabel%29%20%3D%20%22en%22%29%0A%20%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
+  </div>
+
+
 {% endblock %}
 
 
