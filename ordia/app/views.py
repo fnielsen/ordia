@@ -241,7 +241,7 @@ def show_property_value(p, q):
     p : str
         Wikidata property
     q : str
-        Wikidata item 
+        Wikidata item
 
     Returns
     -------
@@ -304,7 +304,11 @@ def show_search():
         return redirect(url_for("app.show_q", q=q), code=302)
 
     if query:
-        search_results = wb_search_lexeme_entities(query)
+        try:
+            search_results = wb_search_lexeme_entities(query)
+        except Exception as exception:
+            return render_template("error.html",
+                                   message=exception.message)
     else:
         search_results = []
     return render_template("search.html",

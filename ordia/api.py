@@ -18,6 +18,12 @@ HEADERS = {
 }
 
 
+class WikidataAPIException(Exception):
+    """Exception for Wikidata API."""
+
+    pass
+
+
 def wb_get_entities(ids):
     """Get entities from Wikidata.
 
@@ -93,12 +99,18 @@ def wb_search_lexeme_entities(query, language='en'):
         The format of the dicts are the same as the output from the
         Wikidata API.
 
+    Raises
+    ------
+    WikidataAPIException
+        If an error occurs while communicating with the Wikidata API
+        and conversion of the result.
+
     Notes
     -----
-    The wikidata API is searched over the Internet with the `wbsearchentities`
-    action method with the `type` set to `lexeme`. This method will search
-    both labels and forms, but it will only return the lexeme pages, - not
-    individual form identifiers.
+    The MediaWiki API of Wikidata.org is searched over the Internet with the
+    `wbsearchentities` action method with the `type` set to `lexeme`. This
+    method will search both labels and forms, but it will only return the
+    lexeme pages, - not individual form identifiers.
 
     """
     params = {
@@ -109,9 +121,22 @@ def wb_search_lexeme_entities(query, language='en'):
         'type': 'lexeme',
         }
 
-    response_data = requests.get(
+    response = requests.get(
         'https://www.wikidata.org/w/api.php',
-        headers=HEADERS, params=params).json()
+        headers=HEADERS, params=params)
+
+    # The search interface may return status code 500. In that case
+    # it might be better to return an error code.
+    # For now, an empty result is returned...
+    if not response.ok:
+        raise WikidataAPIException((
+            "Response from Wikidata API returned with status code "
+            "{status_code} with reason '{reason}'"
+        ).format(
+            status_code=response.status_code,
+            reason=response.reason))
+
+    response_data = response.json()
 
     if 'search' in response_data:
         search_results = response_data['search']
