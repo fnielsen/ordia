@@ -308,7 +308,7 @@ def show_search():
             search_results = wb_search_lexeme_entities(query)
         except Exception as exception:
             return render_template("error.html",
-                                   message=exception.message)
+                                   message=str(exception))
     else:
         search_results = []
     return render_template("search.html",
