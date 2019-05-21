@@ -8,8 +8,8 @@
  lexemeSparql = `
 # Data for a specific lexeme
 SELECT
-  ?description 
-  ?value ?valueLabel 
+  ?description
+  (?valueLabel AS ?value_) ?value_Url
   ?source ?sourceLabel
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
@@ -17,6 +17,7 @@ WHERE {
     BIND(1 AS ?order)
     BIND("Lemma" AS ?description)
     ?lexeme wikibase:lemma ?value .
+    BIND(?value AS ?valueLabel)
   }
   UNION 
   {
@@ -25,6 +26,7 @@ WHERE {
     ?lexeme dct:language ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("language/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
   {
@@ -33,6 +35,7 @@ WHERE {
     ?lexeme wikibase:lexicalCategory ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("lexical-category/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
   {
@@ -41,6 +44,7 @@ WHERE {
     ?lexeme wdt:P31 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("property/P31/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
   {
@@ -49,6 +53,7 @@ WHERE {
     OPTIONAL {
       ?lexeme wdt:P5187 ?value .
     }
+    BIND(?value AS ?valueLabel)
   }
   UNION 
   {
@@ -75,6 +80,7 @@ WHERE {
      ?lexeme wdt:P5191 ?value .
      ?value wikibase:lemma ?valueLabel .	  
     }
+    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
   }
   UNION 
   {
@@ -83,6 +89,7 @@ WHERE {
     BIND("Homographs" AS ?description)
     wd:{{ l }} wdt:P5402 ?value .
     ?value wikibase:lemma ?valueLabel .
+    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
   }
   UNION 
   {
@@ -90,6 +97,7 @@ WHERE {
     BIND("Compound" AS ?description)
     wd:{{ l }} wdt:P5238+ ?value .
     ?value wikibase:lemma ?valueLabel .
+    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
   }
   UNION 
   {
@@ -98,6 +106,7 @@ WHERE {
     ?lexeme wdt:P1343 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
   {
