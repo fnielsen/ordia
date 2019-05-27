@@ -11,14 +11,25 @@ SELECT
   ?form ?formLabel
   ?use
 WHERE {
-  ?lexeme p:P5831 ?use_statement . 
-  ?lexeme wikibase:lemma ?lexemeLabel .
-  ?use_statement ps:P5831 ?use .
-  OPTIONAL {	
-    ?use_statement pq:P5830 ?form .
-    ?form ontolex:representation ?formLabel .
+  VALUES ?reference { wd:{{ q }} }
+  {
+    ?lexeme p:P5831 ?use_statement . 
+    ?lexeme wikibase:lemma ?lexemeLabel .
+    ?use_statement ps:P5831 ?use .
+    OPTIONAL {	
+      ?use_statement pq:P5830 ?form .
+      ?form ontolex:representation ?formLabel .
+    }
+    ?use_statement prov:wasDerivedFrom / pr:P248 ?reference .
   }
-  ?use_statement prov:wasDerivedFrom / pr:P248 wd:{{ q }} .
+  UNION
+  {
+    ?lexeme p:P5323 ?attested_statement . 
+    ?lexeme wikibase:lemma ?lexemeLabel .
+    ?attested_statement ps:P5323  ?reference .
+    BIND("-" AS ?use)
+    BIND("-" AS ?form)
+  }
 }
 `
   
