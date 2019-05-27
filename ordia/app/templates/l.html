@@ -10,7 +10,7 @@
 SELECT
   ?description
   (?valueLabel AS ?value_) ?value_Url
-  ?source ?sourceLabel
+  ?source ?sourceUrl
 WHERE {
   VALUES ?lexeme { wd:{{ l }} }
   {
@@ -117,6 +117,13 @@ WHERE {
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = "en")
     BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      OPTIONAL { ?value_statement pq:P577 ?date }
+      BIND(COALESCE(
+        CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date))),
+        "🔗") AS ?source)
+    }
   }
   UNION 
   {
@@ -126,8 +133,13 @@ WHERE {
     ?value_statement ps:P5831 ?value .
     BIND(?value AS ?valueLabel)
     OPTIONAL {
-      ?value_statement prov:wasDerivedFrom / pr:P248 ?source . 
-      ?source wdt:P1476 ?sourceLabel .
+      ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ . 
+      OPTIONAL {
+        ?source_ rdfs:label ?title .
+        FILTER (LANG(?title) = "en")     
+      }
+      BIND(COALESCE(?title, "Ref.") AS ?source)
+      BIND(CONCAT("reference/", SUBSTR(STR(?source_), 32)) AS ?sourceUrl)
     }   
   }
 }
