@@ -111,6 +111,16 @@ WHERE {
   UNION 
   {
     BIND(30 AS ?order)
+    BIND("Attested in" AS ?description)
+    ?lexeme p:P5323 ?value_statement .
+    ?value_statement ps:P5323 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = "en")
+    BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+  }
+  UNION 
+  {
+    BIND(31 AS ?order)
     BIND("Usage example" AS ?description)
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
@@ -203,18 +213,18 @@ WHERE {
 			   linkPrefixes: {
 			       source: 'reference/'
 			   },
-			    paging: false,
-			    sDom: 'rt',
-			});
-      sparqlToDataTable(formsSparql, "#forms",
-			options={paging: false, sDom: 'rt',});
-      sparqlToDataTable(sensesSparql, "#senses",
-			options={paging: false, sDom: 'rt',});
-      sparqlToDataTable(compoundsSparql, "#compounds",
-			options={paging: false, sDom: 'rt',});
-  });
+			   paging: false,
+			   sDom: 'rt',
+		       });
+     sparqlToDataTable(formsSparql, "#forms",
+		       options={paging: false, sDom: 'rt',});
+     sparqlToDataTable(sensesSparql, "#senses",
+		       options={paging: false, sDom: 'rt',});
+     sparqlToDataTable(compoundsSparql, "#compounds",
+		       options={paging: false, sDom: 'rt',});
+ });
 
- </script>
+</script>
 
  {% endblock %}
 
