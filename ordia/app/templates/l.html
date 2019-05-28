@@ -111,6 +111,23 @@ WHERE {
   UNION 
   {
     BIND(30 AS ?order)
+    BIND("First attested from" AS ?description)
+    ?lexeme p:P6684 ?value_statement .
+    ?value_statement ps:P6684 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = "en")
+    BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      OPTIONAL { ?value_statement pq:P577 ?date }
+      BIND(COALESCE(
+        CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date))),
+        "🔗") AS ?source)
+    }
+  }
+  UNION 
+  {
+    BIND(31 AS ?order)
     BIND("Attested in" AS ?description)
     ?lexeme p:P5323 ?value_statement .
     ?value_statement ps:P5323 ?value .
@@ -127,7 +144,7 @@ WHERE {
   }
   UNION 
   {
-    BIND(31 AS ?order)
+    BIND(32 AS ?order)
     BIND("Usage example" AS ?description)
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
