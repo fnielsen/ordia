@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    languagesSparql = `
+SELECT ?count ?language ?languageLabel ?languageDescription ?hyphenation_example {
+  {
+    SELECT ?language (COUNT(*) AS ?count) (SAMPLE(?hyphenation) AS ?hyphenation_example) {
+      [] dct:language ?language ; ontolex:lexicalForm / wdt:P5279 ?hyphenation ;
+    }
+    GROUP BY ?language
+    ORDER BY DESC(?count)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+`
+
+  hyphenationPointsSparql = `
+SELECT  ?hyphenation_points  ?lexeme (?hyphenation AS ?lexemeLabel) ?language ?languageLabel {
+  ?lexeme dct:language ?language ;
+          ontolex:lexicalForm / wdt:P5279 ?hyphenation .
+  BIND(STRLEN(?hyphenation) - STRLEN(REPLACE(?hyphenation, '‧', '')) AS ?hyphenation_points)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?hyphenation_points)
+LIMIT 500
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(languagesSparql, "#languages",
+		       {'linkPrefixes': {'language': '../language/'}});
+     sparqlToDataTable(hyphenationPointsSparql, "#hyphenation-points",
+		       {'linkPrefixes': {
+			   'lexeme': '../',
+			   'language': '../language/'}});
+  });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<div class="languages">
+  <h1>Hyphenation</h1>
+
+  <hr/>
+
+  <h2>Languages</h2>
+  
+  <table class="table table-hover" id="languages"></table>
+
+  <h2>Hyphenation points</h2>
+  
+  <table class="table table-hover" id="hyphenation-points"></table>
+
+  
+
+</div>
+
+{% endblock %}
+
+

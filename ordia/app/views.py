@@ -116,6 +116,12 @@ def show_grammatical_feature(q):
     return render_template("grammatical_feature.html", q=q)
 
 
+@main.route("/hyphenation/")
+def show_hyphenation_index():
+    """Render index webpage for hyphenation."""
+    return render_template("hyphenation_index.html")
+
+
 @main.route("/language/" + iso_language_pattern)
 def redirect_language(language):
     """Redirect from ISO language code.
