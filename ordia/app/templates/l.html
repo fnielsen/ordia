@@ -70,6 +70,8 @@ WHERE {
     ?lexeme wdt:P5186 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = "en")
+    BIND(CONCAT("property/P5186/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+
   }
   UNION 
   {
