@@ -75,8 +75,17 @@ WHERE {
   }
   UNION 
   {
-    # Derived from
     BIND(12 AS ?order)
+    BIND("Auxiliary verb" AS ?description)
+    ?lexeme wdt:P5401 ?value .
+    ?value wikibase:lemma ?valueLabel .
+    # BIND(CONCAT("property/P5401/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    BIND(SUBSTR(STR(?value), 32) AS ?value_Url)
+  }
+  UNION 
+  {
+    # Derived from
+    BIND(13 AS ?order)
     BIND("Derived from" AS ?description)
     OPTIONAL {
      ?lexeme wdt:P5191 ?value .
