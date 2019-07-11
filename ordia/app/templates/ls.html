@@ -84,7 +84,7 @@ WHERE {
   VALUES ?query_sense { wd:{{ l }}-{{ s }} }
   { ?query_sense wdt:P5137 / ^wdt:P5137 ?sense . }
   UNION
-  { ?query_sense wdt:P5972 | ^wdt:P5972 ?sense . }
+  { ?query_sense (wdt:P5972 | ^wdt:P5972)+ ?sense . }
 
   # Do not show senses from the query language
   ?query_sense ^ontolex:sense / dct:language ?query_language .
