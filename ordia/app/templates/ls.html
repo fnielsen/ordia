@@ -54,10 +54,24 @@ WHERE {
     ?value ^ontolex:sense / dct:language ?synonym_language .
     FILTER (?synonym_language = ?language)
      
-  }  
+  }
   UNION
   {
     BIND(11 AS ?order)
+    BIND("Hypernym" AS ?description)
+    ?sense wdt:P6593 ?value .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+  }  
+  UNION
+  {
+    BIND(12 AS ?order)
+    BIND("Hyponym" AS ?description)
+    ?sense ^wdt:P6593 ?value .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+  }  
+  UNION
+  {
+    BIND(13 AS ?order)
     BIND("Antonym" AS ?description)
     ?sense wdt:P5974 ?value .
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
