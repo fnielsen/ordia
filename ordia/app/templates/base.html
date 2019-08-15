@@ -16,8 +16,24 @@
 {{super()}}
 
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
+
+<!-- script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.min.js') }}"></script -->
+
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.emitter.bidi.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.emitter.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.fallbacks.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.language.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.messagestore.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.i18n.parser.js') }}"></script>
+
 <script type="text/javascript" src="{{ url_for('static', filename='ordia.js') }}"></script>
 
+
+<script type="text/javascript">
+    $(document).ready(function() {
+	translateI18n( $ );
+    });
 </script>
 
 {% endblock %}
@@ -31,7 +47,8 @@
 	<div class="input-group">
             <input type="text" class="form-control"
 		   name="q" id="searchterm" value="{{ query }}"
-		   placeholder="{{_("Search after lemma or form")}}"/>
+		   data-i18n="[placeholder]Search after lemma or form"
+		   placeholder="Search after lemma or form""/>
             <span class="input-group-btn">
 		<button class="btn btn-primary" type="submit">
 		    Ordia
@@ -50,39 +67,39 @@
     <div class="collapse navbar-collapse" id="navbarToogle">
 	<ul class="nav navbar-nav">
 	    <li class="nav-item">
-		<a class="nav-link" href="{{ url_for('app.index') }}">{{_("Home")}}</a>
+		<a class="nav-link" href="{{ url_for('app.index') }}" data-i18n="Home">Home</a>
 	    </li> 
 	    
 	    <li class="nav-item">
-		<a class="nav-link" data-toggle="collapse" data-target="#nav-aspects">{{_("Aspects")}}</a>
+		<a class="nav-link" data-toggle="collapse" data-target="#nav-aspects" data-i18n="Aspects">Aspects</a>
 	    </li>
 
 	    <div id="nav-aspects" class="collapse">
 		<ul class="nav navbar-nav">
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('app.show_language_index') }}">{{_("Languages")}}</a>
+			<a class="nav-link" href="{{ url_for('app.show_language_index') }}" data-i18n="Languages">Languages</a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('app.show_lexical_category_index') }}">{{_("Lexical categories")}}</a>
+			<a class="nav-link" href="{{ url_for('app.show_lexical_category_index') }}" data-i18n="Lexical categories"></a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('app.show_grammatical_feature_index') }}">{{_("Grammatical features")}}</a>
+			<a class="nav-link" href="{{ url_for('app.show_grammatical_feature_index') }}" data-i18n="Grammatical features"></a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('app.show_property_index') }}">{{_("Properties")}}</a>
+			<a class="nav-link" href="{{ url_for('app.show_property_index') }}" data-i18n="Properties"></a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('app.show_reference_index') }}">{{_("References")}}</a>
+			<a class="nav-link" href="{{ url_for('app.show_reference_index') }}" data-i18n="References"></a>
 		    </li>
 		</ul>
 	    </div>
 	    
 	    <li class="nav-item">
-		<a class="nav-link" href="{{ url_for('app.show_text_to_lexemes') }}">{{_("Text to lexemes")}}</a>
+		<a class="nav-link" href="{{ url_for('app.show_text_to_lexemes') }}" data-i18n="Text to lexemes"></a>
 	    </li>
 	    
 	    <li class="nav-item">
-		<a class="nav-link" data-toggle="collapse" data-target="#nav-examples">{{_("Examples")}}</a>
+		<a class="nav-link" data-toggle="collapse" data-target="#nav-examples" data-i18n="Examples"></a>
 	    </li>
 
 	    <div id="nav-examples" class="collapse">
@@ -97,7 +114,7 @@
 	    </div>
 
 	    <li class="nav-item">
-		<a class="nav-link" href="{{ url_for('app.show_statistics') }}">{{_("Statistics")}}</a>
+		<a class="nav-link" href="{{ url_for('app.show_statistics') }}" data-i18n="Statistics">Statistics</a>
 	    </li>
 
 	</ul>
@@ -119,7 +136,7 @@
 
 <div class="container">
     <hr>
-    Data from <a href="https://www.wikidata.org">Wikidata</a>
+    <span data-i18n="Data from">Data from</span> <a href="https://www.wikidata.org">Wikidata</a>
     |
     Code from
     <a href="https://github.com/fnielsen/ordia">GitHub repository</a>
