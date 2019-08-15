@@ -1,9 +1,12 @@
 """views."""
 
 
+from os.path import dirname, join
+
 import re
 
-from flask import (Blueprint, redirect, render_template, request, url_for)
+from flask import (Blueprint, redirect, render_template, request,
+                   send_from_directory, url_for)
 from werkzeug.routing import BaseConverter
 
 from six import u
@@ -120,6 +123,26 @@ def show_grammatical_feature(q):
 def show_hyphenation_index():
     """Render index webpage for hyphenation."""
     return render_template("hyphenation_index.html")
+
+
+@main.route('/i18n/<language_json>')
+def send_i18n(language_json):
+    """Send static banana file.
+
+    Parameters
+    ----------
+    language_json : str
+        Filename for language translation in the banana format.
+
+    Returns
+    -------
+    response : werkzeug.wrappers.Response
+        JSON file.
+
+    """
+    absdirname = join(dirname(__file__), 'i18n')
+    return send_from_directory(absdirname, language_json,
+                               mimetype='application/json')
 
 
 @main.route("/language/" + iso_language_pattern)
