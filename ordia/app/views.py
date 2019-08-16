@@ -5,7 +5,7 @@ from os.path import dirname, join
 
 import re
 
-from flask import (Blueprint, redirect, render_template, request,
+from flask import (Blueprint, current_app, redirect, render_template, request,
                    send_from_directory, url_for)
 from werkzeug.routing import BaseConverter
 
@@ -141,6 +141,8 @@ def send_i18n(language_json):
 
     """
     absdirname = join(dirname(__file__), 'i18n')
+    current_app.logger.info('Sending file {} from {}'.format(
+        language_json, absdirname))
     return send_from_directory(absdirname, language_json,
                                mimetype='application/json')
 
