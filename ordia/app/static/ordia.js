@@ -174,22 +174,3 @@ function sanitizeLanguage(language) {
     }
     return 'en';
 };
-
-
-function translateI18n( $ ) {
-    console.log('Setting up translation');
-    var i18n = $.i18n();
-
-    // Preferred language
-    preferredLanguage = navigator.languages 
-       ? navigator.languages[0]
-       : (navigator.language || navigator.userLanguage);
-    console.log('Detected preferred language: ' + preferredLanguage);
-    i18n.locale = sanitizeLanguage(preferredLanguage);
-
-    i18n.load( '/i18n/' + i18n.locale + '.json', i18n.locale )
-       .done( function() {
-           console.log('Translating');
-           $( 'body' ).i18n();
-       });
-};
