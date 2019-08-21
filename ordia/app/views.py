@@ -15,7 +15,7 @@ from ..text import lowercase_first_sentence_letters, text_to_words
 
 ALLOWED_LANGUAGES = [
     'ar', 'bn', 'br', 
-    'da', 'de', 'en', 'es', 'fr', 'hi', 'it', 'jp', 'ml',
+    'da', 'de', 'en', 'es', 'fr', 'hi', 'it', 'jp', 'ku', 'ml',
     'nl', 'nn', 'no', 'pl', 'pt', 'ru', 'sv', 'vi', 'zh',
 ]
 
