@@ -58,6 +58,15 @@ WHERE {
     BIND("Number of sense to item links" AS ?description)
     BIND("[] wdt:P5137 []" AS ?query)
   }
+    
+  UNION
+  {
+    # This query may be too expensive if the number of lexemes grows.
+    { SELECT (COUNT(DISTINCT ?language) AS ?count) { [] dct:language ?language . } }
+    BIND("Number of different languages" AS ?description)
+    BIND("[] dct:language ?language" AS ?query)
+  }
+    
 }
 ORDER BY DESC(?count)
 `
