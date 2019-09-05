@@ -62,8 +62,157 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
+  identifierStatisticsSparql = `
+SELECT
+  ?count
+  ?description 
+  ?query
+WHERE {
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5274 [] . } }
+    wd:P5274 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5274 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5275 [] . } }
+    wd:P5275 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5275 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5497 [] . } }
+    wd:P5497 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5497 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5533 [] . } }
+    wd:P5533 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5533 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5627 [] . } }
+    wd:P5627 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5627 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5720 [] . } }
+    wd:P5720 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5720 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5793 [] . } }
+    wd:P5793 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5793 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5844 [] . } }
+    wd:P5844 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5844 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5876 [] . } }
+    wd:P5876 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5876 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5877 [] . } }
+    wd:P5877 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5877 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5902 [] . } }
+    wd:P5902 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5902 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5903 [] . } }
+    wd:P5903 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5903 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5912 [] . } }
+    wd:P5912 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5912 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5928 [] . } }
+    wd:P5928 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5928 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5937 [] . } }
+    wd:P5937 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5937 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5938 [] . } }
+    wd:P5938 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5938 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5939 [] . } }
+    wd:P5939 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P5939 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P6140 [] } }
+    wd:P6140 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P6140 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P6168 [] } }
+    wd:P6168 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("[] wdt:P6168 []" AS ?query)
+  }
+  
+}
+ORDER BY DESC(?count)
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(statisticsSparql, "#statistics",
+		       options={
+			   sDom: 'rt',
+			   paging: false,
+		       });
+     sparqlToDataTable(identifierStatisticsSparql, "#identifier-statistics",
 		       options={
 			   sDom: 'rt',
 			   paging: false,
@@ -84,7 +233,11 @@ ORDER BY DESC(?count)
 
   <table class="table table-hover" id="statistics"></table>
   
-    
+  <h2>Identifier statistics</h2>
+
+  <table class="table table-hover" id="identifier-statistics"></table>
+  
+  
 </div>
 
 {% endblock %}
