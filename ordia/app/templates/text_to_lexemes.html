@@ -81,8 +81,9 @@ ORDER BY ?word
 
 <form action="" id="form" method="POST" class="form-horizontal">
     <div class="form-group">
-	<textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">{{ text }}
-	</textarea>
+      <textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text"
+		placeholder="Write case-sensitive words or a text here and select the language below"
+		>{{ text }}</textarea>
     </div>
     <div class="form-group">
 	<label for="language">Language:</label>
