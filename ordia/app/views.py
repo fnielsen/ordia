@@ -14,9 +14,27 @@ from ..text import lowercase_first_sentence_letters, text_to_words
 
 
 ALLOWED_LANGUAGES = [
-    'ar', 'bn', 'br', 
-    'da', 'de', 'en', 'es', 'fr', 'hi', 'it', 'jp', 'ku', 'ml',
-    'nl', 'nn', 'no', 'pl', 'pt', 'ru', 'sv', 'vi', 'zh',
+    'ar', 'arc',
+    'be', 'bg', 'bn', 'br',
+    'ca', 'ce', 'ceb', 'ckb', 'cs',
+    'da', 'de', 'diq',
+    'en', 'el', 'eo', 'es', 'et', 'eu',
+    'fa', 'fi', 'fo', 'fr',
+    'gl', 'glk',
+    'he', 'hi', 'hr', 'hu', 'hy',
+    'it', 'id',
+    'jp',
+    'ka', 'kk', 'kl', 'ko',
+    'ku', 'lrc', 'lt',
+    'ml', 'ms', 'mzn',
+    'nl', 'nn', 'no',
+    'pl', 'ps', 'pt',
+    'ro', 'ru',
+    'sh', 'sk', 'sv',
+    'tr', 'tt',
+    'uk',
+    'vi', 'wuu',
+    'zh',
 ]
 
 
