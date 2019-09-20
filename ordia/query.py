@@ -51,6 +51,46 @@ def escape_string(string):
     return string.replace('\\', '\\\\').replace('"', r'\"')
 
 
+def get_wikidata_language_codes():
+    """Get all Wikidata language codes.
+
+    Query the Wikidata Query Service to get language codes that 
+    Wikidata uses for the lemmas.
+
+    Returns
+    -------
+    codes : list of str
+        List of strings with language codes, e.g., ['ru', 'en', ...].
+
+    Examples
+    --------
+    >>> codes = get_wikidata_language_codes()
+    >>> 'ja-x-q53979341' in codes
+    True
+
+    """
+    query = """
+        SELECT (COUNT(?lexeme) AS ?count) ?language
+        {
+          ?lexeme wikibase:lemma ?lemma . 
+          BIND(LANG(?lemma) AS ?language) . 
+        }
+        GROUP BY ?language
+        ORDER BY DESC(?count)
+        """
+    
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    bindings = data['results']['bindings']
+    if bindings:
+        return [binding['language']['value'] for binding in bindings]
+    else:
+        return []
+
+
 def iso639_to_q(iso639):
     """Convert ISO 639 to Wikidata ID.
 
