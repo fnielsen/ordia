@@ -6,12 +6,15 @@
 
 <script type="text/javascript">
  senseDataSparql = `
+
 # Data for a specific sense
 SELECT DISTINCT 
   ?description 
   ?value ?valueLabel 
 WHERE {
-  VALUES ?sense { wd:{{ l }}-{{ s }} }
+  BIND(wd:{{ l }}-{{ s }} AS ?sense)
+  ?lexeme ontolex:sense ?sense ;
+          dct:language ?language . 
   {
     BIND(1 AS ?order)
     BIND("Lexeme" AS ?description)
@@ -49,31 +52,43 @@ WHERE {
       ?sense wdt:P5137 / ^wdt:P5137 ?value .
       FILTER (?value != ?sense)
     }
-    ?sense ^ontolex:sense / dct:language ?language .
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel .
-    ?value ^ontolex:sense / dct:language ?synonym_language .
-    FILTER (?synonym_language = ?language)
-     
+    ?value ^ontolex:sense / dct:language ?language .
   }
   UNION
   {
     BIND(11 AS ?order)
     BIND("Hypernym" AS ?description)
-    ?sense wdt:P6593 ?value .
+    { ?sense wdt:P6593 ?value . }
+    UNION
+    {
+      ?sense wdt:P5137 / wdt:P279 / ^wdt:P5137 ?value .
+      ?value ^ontolex:sense / dct:language ?language .
+    }
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
   UNION
   {
     BIND(12 AS ?order)
     BIND("Hyponym" AS ?description)
-    ?sense ^wdt:P6593 ?value .
+    { ?sense ^wdt:P6593 ?value . }
+    UNION
+    {
+      ?sense wdt:P5137 / ^wdt:P279 / ^wdt:P5137 ?value .
+      ?value ^ontolex:sense / dct:language ?language .
+    }
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
   UNION
   {
     BIND(13 AS ?order)
     BIND("Antonym" AS ?description)
-    ?sense wdt:P5974 ?value .
+    { ?sense wdt:P5974 ?value .  }
+    UNION
+    {
+      ?sense wdt:P5137 / wdt:P461 / ^wdt:P5137 ?value .
+      ?value ^ontolex:sense / dct:language ?language .
+    }
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
   UNION
