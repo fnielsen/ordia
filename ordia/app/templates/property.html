@@ -4,7 +4,33 @@
 {{super()}}
 
 <script type="text/javascript">
- lexemesSparql = `
+    valuesForLexemesByValueSparql = `
+SELECT
+  ?count
+  ?value ?valueLabel
+  ("→" AS ?zoom)
+  (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
+WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?value
+    {
+      [] a ontolex:LexicalEntry ; wdt:P31 ?value .
+    }
+    GROUP BY ?value
+  }
+  OPTIONAL {
+    { ?value wikibase:lemma ?valueLabel1 . }
+    UNION
+    { ?value rdfs:label ?valueLabel2 . FILTER (LANG(?valueLabel2) = 'en') }
+    BIND(COALESCE(?valueLabel1, ?valueLabel2) AS ?valueLabel)
+  }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
+`
+
+
+ valuesForLexemesByLanguageAndValueSparql = `
 SELECT
   ?lexeme ?lexemeLabel
   ?language ?languageLabel
@@ -61,7 +87,11 @@ LIMIT 10000
 
 
  $(document).ready(function() {
-     sparqlToDataTable(lexemesSparql, "#lexemes", {
+     sparqlToDataTable(valuesForLexemesByValueSparql, "#values-for-lexemes-by-value", {
+	 linkPrefixes: {
+	     value: '../'
+	 }});
+     sparqlToDataTable(valuesForLexemesByLanguageAndValueSparql, "#values-for-lexemes-by-language-and-value", {
 	 linkPrefixes: {
 	     lexeme: '../',
 	     language: '../language/', 
@@ -85,20 +115,30 @@ LIMIT 10000
 <div class="property-entries">
   <h1>Property: {{ p }}</h1>
 
+  <a title="Back"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="./">←</a>
   <a title="View and edit property on Wikidata"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata</a>
+     href="https://www.wikidata.org/wiki/Property:{{ p }}">Wikidata 🔗</a>
   <a title="View property in Scholia"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia</a>
+     href="https://tools.wmflabs.org/scholia/{{ p }}">Scholia 🔗</a>
 
   <hr/>
 
   <h2>Lexemes</h2>
 
-  <table class="table table-hover" id="lexemes"></table>
+  <h3 id="Lexemes-by-value">Lexemes by value</h3>
+
+  <table class="table table-hover" id="values-for-lexemes-by-value"></table>
+
+  <h3>Lexemes by language and value</h3>
+  
+  <table class="table table-hover" id="values-for-lexemes-by-language-and-value"></table>
 
   <hr/>
   
