@@ -3,7 +3,34 @@
 {% block scripts %}
 {{super()}}
 
-<script type="text/javascript">
+  <script type="text/javascript">
+    lexemesByLanguageSparql = `
+SELECT
+  ?count
+  ?language ?languageLabel
+  ?example_lexeme ?example_lexemeLabel
+WITH {
+  SELECT 
+    (COUNT(?lexeme) AS ?count)
+    ?language
+    (SAMPLE(?lexeme) AS ?example_lexeme)
+  {
+    ?lexeme wdt:{{ p }} wd:{{ q }} ;
+            dct:language ?language
+  }
+  GROUP BY ?language
+} AS %counts
+WHERE {
+  INCLUDE %counts
+  
+  ?example_lexeme wikibase:lemma ?example_lexemeLabel .
+  ?language rdfs:label ?languageLabel .
+  FILTER (LANG(?languageLabel) = 'en')
+}
+ORDER BY DESC(?count)
+`
+
+
  lexemesSparql = `
 SELECT
   ?lexeme ?lexemeLabel
@@ -30,6 +57,11 @@ LIMIT 1000
   `
 
  $(document).ready(function() {
+     sparqlToDataTable(lexemesByLanguageSparql, "#lexemes-by-language", {
+	 linkPrefixes: {
+	     example_lexeme: '../../../',
+	     language: '../../../language/', 
+	 }});
      sparqlToDataTable(lexemesSparql, "#lexemes", {
 	 linkPrefixes: {
 	     lexeme: '../../../',
@@ -46,7 +78,7 @@ LIMIT 1000
 
 
 <div class="property-entries">
-  <h1>Property: {{ p }}</h1>
+  <h1>Property/value: {{ p }}/{{ q }}</h1>
 
   <a title="Back"
      role="button"
@@ -75,6 +107,14 @@ LIMIT 1000
 
   <h2>Lexemes</h2>
 
+
+  <h3>Lexemes by language</h3>
+  
+  <table class="table table-hover" id="lexemes-by-language"></table>
+  
+
+  <h3>Lexemes by language and value</h3>
+  
   <table class="table table-hover" id="lexemes"></table>
 
   <!-- hr/>
