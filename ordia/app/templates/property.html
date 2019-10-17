@@ -93,6 +93,7 @@ LIMIT 10000
  $(document).ready(function() {
      sparqlToDataTable(valuesForLexemesByValueSparql, "#values-for-lexemes-by-value", {
 	 linkPrefixes: {
+	     example_lexeme: '../',
 	     value: '../'
 	 }});
      sparqlToDataTable(valuesForLexemesByLanguageAndValueSparql, "#values-for-lexemes-by-language-and-value", {
