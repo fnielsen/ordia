@@ -10,11 +10,14 @@ SELECT
   ?value ?valueLabel
   ("→" AS ?zoom)
   (IF(STRSTARTS(STR(?value), "http://www.wikidata.org/entity/Q"), CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)), "") AS ?zoomUrl)
+  ?example_lexeme ?example_lexemeLabel
 WHERE {
   {
-    SELECT (COUNT(*) AS ?count) ?value
+    SELECT
+      (COUNT(*) AS ?count) ?value
+      (SAMPLE(?lexeme) AS ?example_lexeme)
     {
-	[] a ontolex:LexicalEntry ; wdt:{{ p }} ?value .
+      ?lexeme a ontolex:LexicalEntry ; wdt:{{ p }} ?value .
     }
     GROUP BY ?value
   }
@@ -24,6 +27,7 @@ WHERE {
     { ?value rdfs:label ?valueLabel2 . FILTER (LANG(?valueLabel2) = 'en') }
     BIND(COALESCE(?valueLabel1, ?valueLabel2) AS ?valueLabel)
   }
+  ?example_lexeme wikibase:lemma ?example_lexemeLabel    
 }
 ORDER BY DESC(?count)
 LIMIT 1000
