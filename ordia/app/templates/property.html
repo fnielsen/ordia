@@ -9,12 +9,12 @@ SELECT
   ?count
   ?value ?valueLabel
   ("→" AS ?zoom)
-  (CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)) AS ?zoomUrl)
+  (IF(STRSTARTS(STR(?value), "http://www.wikidata.org/entity/Q"), CONCAT("{{ p }}/value/", SUBSTR(STR(?value), 32)), "") AS ?zoomUrl)
 WHERE {
   {
     SELECT (COUNT(*) AS ?count) ?value
     {
-      [] a ontolex:LexicalEntry ; wdt:P31 ?value .
+	[] a ontolex:LexicalEntry ; wdt:{{ p }} ?value .
     }
     GROUP BY ?value
   }
