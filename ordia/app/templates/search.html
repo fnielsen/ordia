@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript" src="{{ url_for('static', filename='lexemeforms.js') }}"></script>
+<script type="text/javascript">
+ $(document).ready(function() {
+     lexemeTemplateSelection("{{ lang }}", "{{ query }}", "#lexeme-templates");
+ });
+
+</script>
+
+{% endblock %}
+
 {% block page_content %}
 
 <div class="search-results">
@@ -39,6 +52,12 @@
 {% endfor %}
     </ul>
     
+</div>
+
+<div class="form-group" id="lexeme-templates">
+  {% if query and lang %}
+  <h3>Lexeme Form options for {{ lang }}: </h3>
+  {% endif %}
 </div>
 
 

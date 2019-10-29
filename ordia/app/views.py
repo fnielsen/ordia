@@ -371,10 +371,13 @@ def show_search():
     Parameters
     ----------
     q : str
-        Wikidata item identifier
+        Wikidata item identifier or search string
+    lang : str
+        Language
 
     """
     query = request.args.get('q', '').strip()
+    lang = request.args.get('lang', '').strip()
 
     if Q_PATTERN.match(query):
         q = Q_PATTERN.findall(query)[0]
@@ -388,7 +391,7 @@ def show_search():
                                    message=str(exception))
     else:
         search_results = []
-    return render_template("search.html",
+    return render_template("search.html", lang=lang,
                            query=query, search_results=search_results)
 
 
