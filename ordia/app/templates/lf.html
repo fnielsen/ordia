@@ -9,13 +9,14 @@
 # Data for a specific sense
 SELECT
   ?description 
-  ?value ?valueLabel 
+  ?value ?valueLabel ?valueUrl
 WHERE {
   VALUES ?form { wd:{{ l }}-{{ f }} }
   {
     BIND(1 AS ?order)
     ?form ontolex:representation ?value .
-    BIND("form" AS ?description)
+    BIND("representation" AS ?description)
+    BIND(CONCAT("representation/", ENCODE_FOR_URI(?value)) AS ?valueUrl)
   }
   UNION
   {
