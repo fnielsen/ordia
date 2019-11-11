@@ -54,7 +54,7 @@ def escape_string(string):
 def get_wikidata_language_codes():
     """Get all Wikidata language codes.
 
-    Query the Wikidata Query Service to get language codes that 
+    Query the Wikidata Query Service to get language codes that
     Wikidata uses for the lemmas.
 
     Returns
@@ -72,13 +72,13 @@ def get_wikidata_language_codes():
     query = """
         SELECT (COUNT(?lexeme) AS ?count) ?language
         {
-          ?lexeme wikibase:lemma ?lemma . 
-          BIND(LANG(?lemma) AS ?language) . 
+          ?lexeme wikibase:lemma ?lemma .
+          BIND(LANG(?lemma) AS ?language) .
         }
         GROUP BY ?language
         ORDER BY DESC(?count)
         """
-    
+
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)

@@ -115,16 +115,16 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 
 # Wikidata item identifier matcher
-q_pattern = '<regex("Q[1-9]\d*"):q>'
-l_pattern = '<regex("L[1-9]\d*"):l>'
-f_pattern = '<regex("F[1-9]\d*"):f>'
-s_pattern = '<regex("S[1-9]\d*"):s>'
-p_pattern = '<regex("P[1-9]\d*"):p>'
+q_pattern = r'<regex("Q[1-9]\d*"):q>'
+l_pattern = r'<regex("L[1-9]\d*"):l>'
+f_pattern = r'<regex("F[1-9]\d*"):f>'
+s_pattern = r'<regex("S[1-9]\d*"):s>'
+p_pattern = r'<regex("P[1-9]\d*"):p>'
 iso_language_pattern = """\
-<regex("[a-z]{2,3}"):language>"""
-q_language_pattern = """\
+<regex(r"[a-z]{2,3}"):language>"""
+q_language_pattern = r"""\
 <regex("(Q[1-9]\d*)|([a-z]{2,3}((-[a-z]{2})|(-x-Q[1-9]\d*)))"):q>"""
-representation_pattern = '<regex("\w+"):representation>'
+representation_pattern = r'<regex("\w+"):representation>'
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
@@ -370,8 +370,8 @@ def show_search():
 
     Notes
     -----
-    The function expects two URL arguments: `q` as a Wikidata item identifier or
-    search string and `language` as the ISO language code.
+    The function expects two URL arguments: `q` as a Wikidata item identifier
+    or search string and `language` as the ISO language code.
 
     """
     query = request.args.get('q', '').strip()
