@@ -7,7 +7,9 @@
 <script type="text/javascript">
     languagesSparql = `
 # List of languages with count of the number of lexemes
-SELECT ?number_of_lexemes ?language ?languageLabel
+SELECT
+  ?number_of_lexemes
+  ?language ?languageLabel ?languageDescription
 WITH {
   SELECT ?language (COUNT(*) AS ?number_of_lexemes) WHERE {
     [] dct:language ?language .
