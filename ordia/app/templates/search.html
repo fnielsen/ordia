@@ -6,7 +6,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='lexemeforms.js') }}"></script>
 <script type="text/javascript">
  $(document).ready(function() {
-     lexemeTemplateSelection("{{ lang }}", "{{ query }}", "#lexeme-templates");
+     lexemeTemplateSelection({{ language | tojson }}, {{ query | tojson }}, "#lexeme-templates");
  });
 
 </script>
@@ -54,20 +54,22 @@
     
 </div>
 
-<div class="form-group" id="lexeme-templates">
-  {% if query and lang %}
-  <h3>Lexeme Form options for {{ lang }}: </h3>
-  {% endif %}
-</div>
 
-
-<div class="new-lexeme">
+<div id="new-lexeme">
   {% if query %}
 
   <a href="https://www.wikidata.org/wiki/Special:NewLexeme?lemma={{ query }}"><button type="button" class="btn btn-primary">Create new lexeme in Wikidata</button></a>
   
   {% endif %}
 </div>
+
+  {% if query and language %}
+  <div>
+    <div class="form-group" id="lexeme-templates">
+      <h3><em>Wikidata Lexeme Forms</em> options for <em>{{ language }}</em>: </h3>
+    </div>
+  </div>
+  {% endif %}
 
 
 {% endblock %}

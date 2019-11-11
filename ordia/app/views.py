@@ -368,16 +368,14 @@ def show_search():
     Show search interface and search results if anything has been typed in.
     Redirect of search string matches a Q identifier.
 
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier or search string
-    lang : str
-        Language
+    Notes
+    -----
+    The function expects two URL arguments: `q` as a Wikidata item identifier or
+    search string and `language` as the ISO language code.
 
     """
     query = request.args.get('q', '').strip()
-    lang = request.args.get('lang', '').strip()
+    language = request.args.get('language', '').strip()
 
     if Q_PATTERN.match(query):
         q = Q_PATTERN.findall(query)[0]
@@ -391,7 +389,7 @@ def show_search():
                                    message=str(exception))
     else:
         search_results = []
-    return render_template("search.html", lang=lang,
+    return render_template("search.html", language=language,
                            query=query, search_results=search_results)
 
 
