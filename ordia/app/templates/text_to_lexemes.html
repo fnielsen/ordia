@@ -51,7 +51,7 @@ WHERE {
       }
     }
   }
-  BIND(IF(BOUND(?form), "", CONCAT("search?lang={{text_language}}&q=", ?word)) AS ?wordUrl)
+  BIND(IF(BOUND(?form), "", CONCAT("search?language={{text_language}}&q=", ?word)) AS ?wordUrl)
 }
 GROUP BY
   ?word ?wordUrl ?form ?formLabel
