@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    lexemesSparql = `
+# List lexemess wrt. a lexical category
+SELECT
+  ?lexeme ?lexemeLabel
+  ?length
+{
+  ?lexeme wikibase:lexicalCategory wd:{{ q1 }} ;
+          wikibase:lemma ?lexemeLabel ;
+          dct:language wd:{{ q2 }} .
+  BIND(STRLEN(?lexemeLabel) AS ?length)
+}
+LIMIT 10000
+`
+
+
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(lexemesSparql, "#lexemes", {
+	 linkPrefixes: {
+	     lexeme: '../../../',
+	 }});
+ });
+
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+
+<h1>Lexical category: {{ q1 }}; language: {{ q2 }}</h1>
+
+  <a title="Back"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="../../{{ q1 }}">←</a>
+  <a title="View and edit item for lexical cateogry on Wikidata"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://www.wikidata.org/wiki/{{ q1 }}">Wikidata for lexical category 🔗</a>
+  <a title="View item for lexical category in Sholia"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="https://tools.wmflabs.org/scholia/topic/{{ q1 }}">Scholia for lexical category 🔗</a>
+
+<hr/>
+
+<h2>Lexemes</h2>
+
+<table class="table table-hover" id="lexemes"></table>
+
+
+{% endblock %}
+
+

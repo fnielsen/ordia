@@ -116,6 +116,8 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
 q_pattern = r'<regex("Q[1-9]\d*"):q>'
+q1_pattern = r'<regex("Q[1-9]\d*"):q1>'
+q2_pattern = r'<regex("Q[1-9]\d*"):q2>'
 l_pattern = r'<regex("L[1-9]\d*"):l>'
 f_pattern = r'<regex("F[1-9]\d*"):f>'
 s_pattern = r'<regex("S[1-9]\d*"):s>'
@@ -249,6 +251,26 @@ def show_lexical_category(q):
 def show_lexical_category_index():
     """Render webpage for lexical_category index page."""
     return render_template("lexical_category_index.html")
+
+
+@main.route("/lexical-category/" + q1_pattern + "/language/" + q2_pattern)
+def show_lexical_category_language(q1, q2):
+    """Render webpage for lexical category and language item.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for lexical category.
+    q2 : str
+        Wikidata item identifier for language.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("lexical_category_language.html", q1=q1, q2=q2)
 
 
 @main.route("/" + l_pattern + "-" + f_pattern)

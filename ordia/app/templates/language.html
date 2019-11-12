@@ -18,6 +18,7 @@ WITH {
       ?lexeme wikibase:lexicalCategory ?lexical_category .
     }
   }
+  LIMIT 10000
 } AS %results
 WHERE {
   INCLUDE %results
@@ -29,6 +30,33 @@ WHERE {
   # SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
 }
   `
+
+  lexicalCategoriesSparql = `
+# Statistics for word class for a specific language
+SELECT
+  ?count
+    ?lexical_category ?lexical_categoryLabel
+    ?zoom ?zoomUrl
+    ?lexical_categoryDescription
+WITH {
+  SELECT
+    (COUNT(*) AS ?count)
+    ?lexical_category
+  {
+    [] a ontolex:LexicalEntry ;
+       dct:language wd:{{ q }} ; 
+       wikibase:lexicalCategory ?lexical_category .
+  }
+    GROUP BY ?lexical_category
+} AS %results
+WHERE {
+  INCLUDE %results
+  BIND("→" AS ?zoom)
+  BIND(CONCAT("../lexical-category/", SUBSTR(STR(?lexical_category), 32) ,"/language/{{ q }}") AS ?zoomUrl)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+`
 
 
  longestWordsAndPhrasesSparql = `
@@ -52,6 +80,10 @@ LIMIT 200
 	 'linkPrefixes': {
 	     'lexeme': '../',
 	     'lexical_category': '../'}});
+     sparqlToDataTable(lexicalCategoriesSparql, "#lexical-categories", {
+	 'linkPrefixes': {
+	     'lexical_category': '../lexical-category/',
+	 }});
      sparqlToDataTable(longestWordsAndPhrasesSparql,
 		       "#longest-words-and-phrases", {
 			   'linkPrefixes': {
@@ -70,18 +102,22 @@ LIMIT 200
 <div class="language-entries">
   <h1>{{ q }}</h1>
 
+  <a title="Back"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="./">←</a>
   <a title="View and edit item in Wikidata"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata</a>
+     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata 🔗</a>
   <a title="View item in Reasonator"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://tools.wmflabs.org/reasonator/?&q={{ q }}">Reasonator</a>
+     href="https://tools.wmflabs.org/reasonator/?&q={{ q }}">Reasonator 🔗</a>
   <a title="View item as a Scholia topic"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia</a>
+     href="https://tools.wmflabs.org/scholia/topic/{{ q }}">Scholia 🔗</a>
 
 
   <h2>Lexemes</h2>
@@ -91,17 +127,24 @@ LIMIT 200
 </div>
 
 
-<h2>Longest words and phrases</h2>
-
-<table class="table table-hover" id="longest-words-and-phrases"></table>
-
-
 <h2>Lexical categories</h2>
 
   <div class="embed-responsive embed-responsive-4by3">
     <iframe loading="lazy" class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0A%23%20Count%20of%20lexemes%20wrt.%20lexical%20category%20for%20a%20language%0ASELECT%0A%20%20%3Fcount%0A%20%20%3Flexical_category%20%3Flexical_categoryLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Flexeme%29%20AS%20%3Fcount%29%0A%20%20%20%20%3Flexical_category%20%0A%20%20%20WHERE%20%7B%0A%20%20%20%20%3Flexeme%20a%20ontolex%3ALexicalEntry%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20dct%3Alanguage%20wd%3A{{ q }}%20%3B%20%0A%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Alemma%20%3FlexemeLabel%20.%0A%20%20%20%20%3Flexeme%20wikibase%3AlexicalCategory%20%3Flexical_category%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Flexical_category%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20OPTIONAL%20%7B%20%20%20%20%20%20%20%20%0A%20%20%20%20%3Flexical_category%20rdfs%3Alabel%20%3Flexical_categoryLabel%20.%0A%20%20%20%20FILTER%20%28LANG%28%3Flexical_categoryLabel%29%20%3D%20%22en%22%29%0A%20%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
   </div>
 
+  <table class="table table-hover" id="lexical-categories"></table>
+
+
+
+  
+<h2>Longest words and phrases</h2>
+
+<table class="table table-hover" id="longest-words-and-phrases"></table>
+
+
+
+  
 
 {% endblock %}
 
