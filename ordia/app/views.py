@@ -52,7 +52,7 @@ ALLOWED_LANGUAGES = [
     'mis-x-q35505', 'mis-x-q35527', 'mis-x-q3558112', 'mis-x-q35668',
     'mis-x-q35726', 'mis-x-q36155', 'mis-x-q36395', 'mis-x-q36730',
     'mis-x-q36741', 'mis-x-q36790', 'mis-x-q36819', 'mis-x-q36822',
-    'mis-x-Q36846', 
+    'mis-x-Q36846',
     'mis-x-q37178', 'mis-x-q3938', 'mis-x-q401', 'mis-x-q44679',
     'mis-x-q47091826', 'mis-x-q505674', 'mis-x-q50868',
     'mis-x-q533109', 'mis-x-q56384', 'mis-x-q56430', 'mis-x-q56485',
