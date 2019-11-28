@@ -10,6 +10,7 @@
 SELECT
   ?description 
   ?value ?valueLabel ?valueUrl
+  ?source ?sourceUrl
 WHERE {
   VALUES ?form { wd:{{ l }}-{{ f }} }
   {
@@ -47,13 +48,35 @@ WHERE {
     ?form wdt:P2859 ?value .
     BIND("X-SAMPA" AS ?description)
   }
+  UNION 
+  {
+    BIND(20 AS ?order)
+    BIND("Attested in" AS ?description)
+    ?form p:P5323 ?value_statement .
+    ?value_statement ps:P5323 ?value_ .
+    ?value_ rdfs:label ?value .
+    FILTER (LANG(?value) = "en")
+    BIND(CONCAT("reference/", SUBSTR(STR(?value_), 32))  AS ?valueUrl)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      OPTIONAL { ?value_statement pq:P577 ?date }
+      BIND(COALESCE(
+	  CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date)), "&nbsp;🔗"),
+        "🔗") AS ?source)
+    }
+  }
   UNION  
   {   
-    BIND(20 AS ?order)
+    BIND(21 AS ?order)
     ?lexeme ontolex:lexicalForm ?form .
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
     ?value_statement pq:P5830 ?form .
+    ?lexeme dct:language / wdt:P424 ?language_code .
+    BIND(CONCAT("./text-to-lexemes?text-language=",
+		ENCODE_FOR_URI(?language_code),
+		"&text=",
+		ENCODE_FOR_URI(?value)) AS ?valueUrl)
     BIND("example use" AS ?description)
   }
 }
@@ -78,11 +101,14 @@ ORDER BY ?order
 <div class="l-entity">
   <h1>Form: {{ l }}-{{ f }}</h1>
 
-
+  <a title="Back"
+     role="button"
+     class="btn btn-outline-dark btn-sm"
+     href="./">←</a>
   <a title="View and edit form in Wikidata"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata</a>
+     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata 🔗</a>
 
   
   <table class="table table-hover" id="form-data"></table>
