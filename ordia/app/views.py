@@ -127,7 +127,7 @@ iso_language_pattern = """\
 <regex(r"[a-z]{2,3}"):language>"""
 q_language_pattern = (r'<regex("(Q[1-9]\d*)|([a-z]{2,3}((-[a-z]{2})|'
                       r'(-x-Q[1-9]\d*)))"):q>')
-representation_pattern = r'<regex("\w+"):representation>'
+representation_pattern = r'<regex("[\w\-\']+"):representation>'
 
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 L_PATTERN = re.compile(r'L[1-9]\d*')
