@@ -149,9 +149,14 @@ WHERE {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
       OPTIONAL { ?value_statement pq:P577 ?date }
       BIND(COALESCE(
-        CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date))),
+	  CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date)), " 🔗"),
         "🔗") AS ?source)
     }
+    OPTIONAL {
+      ?value wdt:P577 ?date . 
+      BIND(CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date))) AS ?source)
+    }
+
   }
   UNION 
   {
@@ -277,10 +282,14 @@ WHERE {
      
      
      <p>
+         <a title="Back"
+	    role="button"
+	    class="btn btn-outline-dark btn-sm"
+	    href="./">←</a>
 	 <a title="View and edit lexeme in Wikidata"
 	    role="button"
 	    class="btn btn-outline-dark btn-sm"
-	    href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata</a>
+	    href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata 🔗</a>
      </p>
      
      <table class="table table-hover" id="lexeme"></table>
