@@ -83,12 +83,42 @@ WHERE {
 ORDER BY ?order
 `
 
+  homographsSparql = `
+# Homographs for a lexeme form
+SELECT
+  ?lexeme (SUBSTR(STR(?lexeme), 32) AS ?lexemeLabel)
+  ?lemma ?lexical_category ?lexical_categoryLabel
+  ?form (SUBSTR(STR(?form), 32) AS ?formLabel)
+  (GROUP_CONCAT(DISTINCT ?featureLabel; separator=" // ") AS ?features)
+WHERE {
+  wd:{{ l }}-{{ f }} ontolex:representation / ^ontolex:representation ?form .
+
+  FILTER (wd:{{ l }}-{{ f }} != ?form)
+
+  ?lexeme ontolex:lexicalForm ?form ;
+          wikibase:lemma ?lemma ;
+          wikibase:lexicalCategory ?lexical_category .
+  OPTIONAL {
+    ?form wikibase:grammaticalFeature ?feature .
+    ?feature rdfs:label ?featureLabel .
+    FILTER (LANG(?featureLabel) = "en")
+  }
+    
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  }
+GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
+  ?form ?formLabel
+`
+
 
  $(document).ready(function() {
-     sparqlToDataTable(formDataSparql, "#form-data",
-		       options={
-			   paging: false
-		       });
+     sparqlToDataTable(
+	 formDataSparql, "#form-data",
+	 options={
+	     paging: false
+	 });
+     sparqlToDataTable(
+	 homographsSparql, "#homographs");
  });
 
 </script>
@@ -108,10 +138,16 @@ ORDER BY ?order
   <a title="View and edit form in Wikidata"
      role="button"
      class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata 🔗</a>
+     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata ↗</a>
 
   
   <table class="table table-hover" id="form-data"></table>
+
+
+  <h2>Homographs</h2>
+  
+  <table class="table table-hover" id="homographs"></table>
+
 
   
 </div>
