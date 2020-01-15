@@ -13,9 +13,13 @@ WHERE {
   UNION
   {
     ?lexeme ?property ?statement . 
-    ?statement prov:wasDerivedFrom / pr:P248 wd:wd:{{ q }} .
+    ?statement prov:wasDerivedFrom / pr:P248 wd:{{ q }} .
   }
-  
+  UNION
+  {
+    ?lexeme ontolex:lexicalForm? / wdt:P5323 wd:{{ q }} .
+  }
+    
   ?lexeme wikibase:lemma ?lexemeLabel .
 }
 `
