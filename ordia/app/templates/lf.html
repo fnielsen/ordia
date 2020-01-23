@@ -68,8 +68,8 @@ WHERE {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
       OPTIONAL { ?value_statement pq:P577 ?date }
       BIND(COALESCE(
-	  CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date)), "&nbsp;🔗"),
-        "🔗") AS ?source)
+	  CONCAT(STR(YEAR(?date)), "-", STR(MONTH(?date)), "-", STR(DAY(?date)), "&nbsp;↗"),
+        "↗") AS ?source)
     }
   }
   UNION  

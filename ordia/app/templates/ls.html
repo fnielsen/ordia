@@ -168,12 +168,18 @@ ORDER BY ?languageLabel
 
 <div class="ls-entity">
   <h1>Sense: {{ l }}-{{ s }}</h1>
-  
-  <a title="View and edit the lexeme sense on Wikidata"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ s }}">Wikidata</a>
 
+  <p>
+    <a title="Back"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="./">←</a>
+    
+    <a title="View and edit the lexeme sense on Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ s }}">Wikidata ↗</a>
+    </p>
   
     <table class="table table-hover" id="sense-data"></table>
 
