@@ -54,8 +54,15 @@ WHERE {
     BIND("Attested in" AS ?description)
     ?form p:P5323 ?value_statement .
     ?value_statement ps:P5323 ?value_ .
-    ?value_ rdfs:label ?value .
-    FILTER (LANG(?value) = "en")
+
+    OPTIONAL {
+      ?value_ rdfs:label ?value_label .
+      FILTER (LANG(?value_label) = "en")
+    }
+    # If English label are missing
+    BIND(COALESCE(?value_label, SUBSTR(STR(?value_), 32)) AS ?value) 
+
+
     BIND(CONCAT("reference/", SUBSTR(STR(?value_), 32))  AS ?valueUrl)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
