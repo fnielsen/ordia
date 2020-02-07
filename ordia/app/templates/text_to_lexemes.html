@@ -85,34 +85,47 @@ ORDER BY ?word
 		placeholder="Write case-sensitive words or a text here and select the language below"
 		>{{ text }}</textarea>
     </div>
-    <div class="form-group">
+    <div class="form-row">
+      <div class="form-group col-md-6">
 	<label for="language">Language:</label>
 	<select class="form-control" id="language-selector" name="text-language">
-	    <option value="ar"{% if text_language == 'ar' %} selected="selected"{% endif %}>العربية</option>
-	    <option value="bn"{% if text_language == 'bn' %} selected="selected"{% endif %}>বাংলা</option>
-	    <option value="br"{% if text_language == 'br' %} selected="selected"{% endif %}>Brezhoneg</option>
-	    <option value="da"{% if text_language == 'da' %} selected="selected"{% endif %}>Dansk</option>
-	    <option value="de"{% if text_language == 'de' %} selected="selected"{% endif %}>Deutsch</option>
-	    <option value="en"{% if text_language == 'en' %} selected="selected"{% endif %}>English</option>
- 	    <option value="es"{% if text_language == 'es' %} selected="selected"{% endif %}>Español</option>
- 	    <option value="eu"{% if text_language == 'eu' %} selected="selected"{% endif %}>Euskara</option>
-	    <option value="fr"{% if text_language == 'fr' %} selected="selected"{% endif %}>Français</option>
-	    <option value="hi"{% if text_language == 'hi' %} selected="selected"{% endif %}>हिन्दी</option>
-	    <option value="kk"{% if text_language == 'kk' %} selected="selected"{% endif %}>Қазақша</option>
-	    <option value="kl"{% if text_language == 'kl' %} selected="selected"{% endif %}>kalaallisut</option>
-	    <option value="ku"{% if text_language == 'ku' %} selected="selected"{% endif %}>kurdî</option>
-	    <option value="ky"{% if text_language == 'ky' %} selected="selected"{% endif %}>Кыргызча</option>
-	    <option value="mis-x-Q36846"{% if text_language == 'mis-x-Q36846' %} selected="selected"{% endif %}>Toki Pona</option>
-	    <option value="ml"{% if text_language == 'ml' %} selected="selected"{% endif %}>മലയാളം</option>
-	    <option value="pa"{% if text_language == 'pa' %} selected="selected"{% endif %}>ਪੰਜਾਬੀ</option>
-	    <option value="pl"{% if text_language == 'pl' %} selected="selected"{% endif %}>Polski</option>
-	    <option value="pt"{% if text_language == 'pt' %} selected="selected"{% endif %}>Português</option>
-	    <option value="sv"{% if text_language == 'sv' %} selected="selected"{% endif %}>Svenska</option>
-	    <option value="tg"{% if text_language == 'tg' %} selected="selected"{% endif %}>Тоҷикӣ</option>
-	    <option value="tk"{% if text_language == 'tk' %} selected="selected"{% endif %}>Türkmençe</option>
-	    <option value="uz"{% if text_language == 'uz' %} selected="selected"{% endif %}>Oʻzbekcha</option>
-	    <option value="vi"{% if text_language == 'vi' %} selected="selected"{% endif %}>Tiếng Việt</option>
+	  <option value="ar"{% if text_language == 'ar' %} selected="selected"{% endif %}>العربية</option>
+	  <option value="bn"{% if text_language == 'bn' %} selected="selected"{% endif %}>বাংলা</option>
+	  <option value="br"{% if text_language == 'br' %} selected="selected"{% endif %}>Brezhoneg</option>
+	  <option value="da"{% if text_language == 'da' %} selected="selected"{% endif %}>Dansk</option>
+	  <option value="de"{% if text_language == 'de' %} selected="selected"{% endif %}>Deutsch</option>
+	  <option value="en"{% if text_language == 'en' %} selected="selected"{% endif %}>English</option>
+ 	  <option value="es"{% if text_language == 'es' %} selected="selected"{% endif %}>Español</option>
+ 	  <option value="eu"{% if text_language == 'eu' %} selected="selected"{% endif %}>Euskara</option>
+	  <option value="fr"{% if text_language == 'fr' %} selected="selected"{% endif %}>Français</option>
+	  <option value="hi"{% if text_language == 'hi' %} selected="selected"{% endif %}>हिन्दी</option>
+	  <option value="kk"{% if text_language == 'kk' %} selected="selected"{% endif %}>Қазақша</option>
+	  <option value="kl"{% if text_language == 'kl' %} selected="selected"{% endif %}>kalaallisut</option>
+	  <option value="ku"{% if text_language == 'ku' %} selected="selected"{% endif %}>kurdî</option>
+	  <option value="ky"{% if text_language == 'ky' %} selected="selected"{% endif %}>Кыргызча</option>
+	  <option value="mis-x-Q36846"{% if text_language == 'mis-x-Q36846' %} selected="selected"{% endif %}>Toki Pona</option>
+	  <option value="ml"{% if text_language == 'ml' %} selected="selected"{% endif %}>മലയാളം</option>
+	  <option value="pa"{% if text_language == 'pa' %} selected="selected"{% endif %}>ਪੰਜਾਬੀ</option>
+	  <option value="pl"{% if text_language == 'pl' %} selected="selected"{% endif %}>Polski</option>
+	  <option value="pt"{% if text_language == 'pt' %} selected="selected"{% endif %}>Português</option>
+	  <option value="sv"{% if text_language == 'sv' %} selected="selected"{% endif %}>Svenska</option>
+	  <option value="tg"{% if text_language == 'tg' %} selected="selected"{% endif %}>Тоҷикӣ</option>
+	  <option value="tk"{% if text_language == 'tk' %} selected="selected"{% endif %}>Türkmençe</option>
+	  <option value="uz"{% if text_language == 'uz' %} selected="selected"{% endif %}>Oʻzbekcha</option>
+	  <option value="vi"{% if text_language == 'vi' %} selected="selected"{% endif %}>Tiếng Việt</option>
 	</select>
+      </div>
+      
+      <div class="form-group col-md-6">
+	<label for="casing">Casing:</label>
+	<select class="form-control" id="casing-selector" name="casing">	
+	  <option value="none"{% if casing == 'none' %} selected="selected"{% endif %}>None</option>
+	  <option value="lowercase"{% if casing == 'lowercase' %} selected="selected"{% endif %}>Lowercase</option>
+	  <option value="uppercase"{% if casing == 'uppercase' %} selected="selected"{% endif %}>Uppercase</option>
+ 	  <option value="lowercase-first-sentence-letters"{% if casing == 'lowercase_first_sentence_letters' %} selected="selected"{% endif %}>Lowercase first sentence letters</option>
+ 	  <option value="uppercase-first-word-letters"{% if casing == 'uppercase_first_word_letters' %} selected="selected"{% endif %}>Uppercase first word letters</option>
+	</select>
+      </div>
     </div>
     <div class="form-group">
 	<button class="btn btn-primary" type="submit">Submit</button>
