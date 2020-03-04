@@ -5,15 +5,18 @@
 
 <script type="text/javascript">
  lexemesSparql = `
+# tool: Ordia
 SELECT
   ?lexeme ?lexemeLabel
+  ?lexical_category ?lexical_categoryLabel
   ?language ?languageLabel
   ?sense ?senseLabel
   (GROUP_CONCAT(?gloss; separator=" // ") AS ?glosses)
 WHERE {
-  ?lexeme ontolex:sense ?sense .
-	
-  ?lexeme dct:language ?language .
+  ?lexeme ontolex:sense ?sense ; 
+	      dct:language ?language ;
+          wikibase:lexicalCategory ?lexical_category .
+  
   OPTIONAL {
     ?language rdfs:label ?languageLabel .
     FILTER (LANG(?languageLabel) = "en")
@@ -25,14 +28,17 @@ WHERE {
   ?sense wdt:P5137 wd:{{ q }} .
   BIND(SUBSTR(STR(?sense), 32) AS ?senseLabel)
   ?sense skos:definition ?gloss .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,[AUTO_LANGUAGE]". }
 }
 GROUP BY
   ?lexeme ?lexemeLabel
+  ?lexical_category ?lexical_categoryLabel
   ?language ?languageLabel
   ?sense ?senseLabel
   `
 
   var wembedderSparql = `
+# tool: Ordia
   SELECT
     ((ROUND(1000 * ?similarity) / 1000) AS ?similarity)
     ?concept ?conceptLabel
@@ -64,6 +70,7 @@ GROUP BY
  $(document).ready(function() {
      sparqlToDataTable(lexemesSparql, "#lexemes", {
 	 'linkPrefixes': {
+	     'lexical_category': 'lexical-category/',
 	     'language': 'language/'
 	 }
      });
