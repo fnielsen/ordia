@@ -441,13 +441,20 @@ def show_text_to_lexemes():
     html : str
         Rendered HTML.
 
+    Notes
+    -----
+    This function looks at the `text`, `text-language` and `casing` URI
+    parameters.
+
     """
     if request.method == 'GET':
         text = request.args.get('text')
         text_language = request.args.get('text-language')
+        casing = request.args.get('casing')
     elif request.method == 'POST':
         text = request.form.get('text')
         text_language = request.form.get('text-language')
+        casing = request.form.get('casing')
     else:
         assert False
 
@@ -455,12 +462,33 @@ def show_text_to_lexemes():
     if text_language not in ALLOWED_LANGUAGES:
         text_language = 'da'
 
+    # Sanitize casing
+    if casing not in ['none', 'lowercase', 'uppercase',
+                      'lowercase-first-sentence-letters',
+                      'uppercase-first-word-letters']:
+        casing = 'lowercase_first_sentence_letters'
+    casing = casing.replace('-', '_')
+
     if not text:
         return render_template('text_to_lexemes.html',
-                               text_language=text_language)
+                               text_language=text_language,
+                               casing=casing)
 
-    lowercased_text = lowercase_first_sentence_letters(text.strip())
-    list_of_words = text_to_words(lowercased_text)
+    # Casing processing
+    cased_text = text.strip()
+    if casing == 'none':
+        pass
+    elif casing == 'lowercase':
+        cased_text = cased_text.lower()
+    elif casing == 'uppercase':
+        cased_text = cased_text.upper()
+    elif casing == 'lowercase_first_sentence_letters':
+        cased_text = lowercase_first_sentence_letters(cased_text)
+    elif casing == 'uppercase_first_word_letters':
+        cased_text = cased_text.title()
+    else:
+        assert False
+    list_of_words = text_to_words(cased_text)
 
     # Make the list only consists of unique words
     list_of_words = list(set(list_of_words))
@@ -474,4 +502,4 @@ def show_text_to_lexemes():
             word=word, language=text_language)
 
     return render_template('text_to_lexemes.html', text=text, words=words,
-                           text_language=text_language)
+                           text_language=text_language, casing=casing)

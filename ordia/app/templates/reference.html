@@ -13,9 +13,13 @@ WHERE {
   UNION
   {
     ?lexeme ?property ?statement . 
-    ?statement prov:wasDerivedFrom / pr:P248 wd:wd:{{ q }} .
+    ?statement prov:wasDerivedFrom / pr:P248 wd:{{ q }} .
   }
-  
+  UNION
+  {
+    ?lexeme ontolex:lexicalForm? / wdt:P5323 wd:{{ q }} .
+  }
+    
   ?lexeme wikibase:lemma ?lexemeLabel .
 }
 `
@@ -75,19 +79,21 @@ WHERE {
   
   <h1>Reference: {{ q }}</h1>
 
-  <!-- a title="Back"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="./">←</a -->
-  <a title="View and edit reference on Wikidata"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/{{ q }}">Wikidata 🔗</a>
-  <a title="View reference in Scholia"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://tools.wmflabs.org/scholia/work/{{ q }}">Scholia 🔗</a>
-
+  <p>
+    <a title="Back"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="./">←</a>
+    <a title="View and edit reference on Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/{{ q }}">Wikidata ↗</a>
+    <a title="View reference in Scholia"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://tools.wmflabs.org/scholia/work/{{ q }}">Scholia ↗</a>
+  </p>
+    
   <hr>
 
   <h2>Lexemes</h2>

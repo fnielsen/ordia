@@ -114,6 +114,8 @@ WHERE {
   { ?query_sense wdt:P5137 / ^wdt:P5137 ?sense . }
   UNION
   { ?query_sense (wdt:P5972 | ^wdt:P5972)+ ?sense . }
+  UNION
+  { ?query_sense (wdt:P6271 | ^wdt:P6271)+ ?sense . }
 
   # Do not show senses from the query language
   ?query_sense ^ontolex:sense / dct:language ?query_language .
@@ -166,12 +168,18 @@ ORDER BY ?languageLabel
 
 <div class="ls-entity">
   <h1>Sense: {{ l }}-{{ s }}</h1>
-  
-  <a title="View and edit the lexeme sense on Wikidata"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ s }}">Wikidata</a>
 
+  <p>
+    <a title="Back"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="./">←</a>
+    
+    <a title="View and edit the lexeme sense on Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ s }}">Wikidata ↗</a>
+    </p>
   
     <table class="table table-hover" id="sense-data"></table>
 
