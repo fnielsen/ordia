@@ -1,4 +1,4 @@
-// functions to interact with https://tools.wmflabs.org/lexeme-forms
+// functions to interact with https://lexeme-forms.toolforge.org
 
 function lexemeTemplatesByLang(templates_response) {
     var templates_by_language = {};
@@ -15,8 +15,8 @@ function lexemeTemplatesByLang(templates_response) {
 }
 
 function lexemeTemplateSelection(language, lexeme, element) {
-    var templates_api_url = "https://tools.wmflabs.org/lexeme-forms/api/v1/template/";
-    var templates_prefix = "https://tools.wmflabs.org/lexeme-forms/template/";
+    var templates_api_url = "https://lexeme-forms.toolforge.org/api/v1/template/";
+    var templates_prefix = "https://lexeme-forms.toolforge.org/template/";
     
     $.getJSON(templates_api_url, function(response) {
         var templates_by_language = lexemeTemplatesByLang(response);
