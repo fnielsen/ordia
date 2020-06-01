@@ -165,6 +165,7 @@ WHERE {
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
     BIND(?value AS ?valueLabel)
+    BIND(CONCAT("text-to-lexemes?text=", ENCODE_FOR_URI(?value), "&text-language=", LANG(?value)) AS ?value_Url)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ . 
       OPTIONAL {
