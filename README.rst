@@ -5,7 +5,7 @@ Ordia is a Python package for working with lexicographical data on Wikidata.
 Ordia includes a webservice that can be run locally. A public webservice with Ordia
 runs from:
 
-https://tools.wmflabs.org/ordia/
+https://ordia.toolforge.org/
 
 To start the local webserver go to the `ordia` directly::
 
