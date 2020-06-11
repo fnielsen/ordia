@@ -10,7 +10,7 @@
 # Data for a specific sense
 SELECT DISTINCT 
   ?description 
-  ?value ?valueLabel 
+  ?value ?valueLabel ?valueUrl
 WHERE {
   BIND(wd:{{ l }}-{{ s }} AS ?sense)
   ?lexeme ontolex:sense ?sense ;
@@ -98,6 +98,12 @@ WHERE {
     ?sense ^ontolex:sense / p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .
     ?value_statement pq:P6072 ?sense .
+    ?language wdt:P424 ?language_code .
+    BIND(CONCAT("./text-to-lexemes?text-language=",
+      ENCODE_FOR_URI(?language_code),
+        "&text=",
+   	ENCODE_FOR_URI(?value)) AS ?valueUrl)
+
   }  
 }
 ORDER BY ?order
