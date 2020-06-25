@@ -145,7 +145,7 @@ function sparqlToDataTable(sparql, element, options={}) {
 }
 
 function qToWembedderToDataTable(q, sparql, element, options={}) {
-    var wembedderUrl = "https://tools.wmflabs.org/wembedder/api/most-similar/" + q;
+    var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/" + q;
     $.ajax({
 	url: wembedderUrl,
 	error: function(xhr, status, error) { $(element).append(error); },
