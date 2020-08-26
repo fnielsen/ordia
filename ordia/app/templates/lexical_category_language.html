@@ -6,16 +6,28 @@
 
 <script type="text/javascript">
     lexemesSparql = `
-# List lexemess wrt. a lexical category
+# List lexemes wrt. a lexical category and language
 SELECT
   ?lexeme ?lexemeLabel
   ?length
+  ?number_of_compounds
+      
 {
-  ?lexeme wikibase:lexicalCategory wd:{{ q1 }} ;
-          wikibase:lemma ?lexemeLabel ;
-          dct:language wd:{{ q2 }} .
+  {
+    SELECT 
+      ?lexeme
+      (COUNT(?compound) AS ?number_of_compounds)
+    {
+      ?lexeme wikibase:lexicalCategory wd:{{ q1 }} ;
+              dct:language wd:{{ q2 }} .
+      OPTIONAL { ?compound wdt:P5238 ?lexeme }
+    }
+    GROUP BY ?lexeme
+  }
+  ?lexeme wikibase:lemma ?lexemeLabel
   BIND(STRLEN(?lexemeLabel) AS ?length)
 }
+ORDER BY ?lexemeLabel ?length ?number_of_compounds
 LIMIT 10000
 `
 
