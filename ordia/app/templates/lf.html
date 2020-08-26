@@ -5,7 +5,7 @@
 {{super()}}
 
 <script type="text/javascript">
-    formDataSparql = `
+ formDataSparql = `
 # Data for a specific sense
 SELECT
   ?description 
@@ -47,6 +47,14 @@ WHERE {
     BIND(11 AS ?order)
     ?form wdt:P2859 ?value .
     BIND("X-SAMPA" AS ?description)
+  }
+  UNION
+  {
+    # Alternative form
+    BIND(12 AS ?order)
+    ?form wdt:P8530 ?value .
+    ?value ontolex:representation ?valueLabel .
+    BIND("alternative form" AS ?description)
   }
   UNION 
   {
@@ -90,7 +98,7 @@ WHERE {
 ORDER BY ?order
 `
 
-  homographsSparql = `
+ homographsSparql = `
 # Homographs for a lexeme form
 SELECT
   ?lexeme (SUBSTR(STR(?lexeme), 32) AS ?lexemeLabel)
@@ -136,19 +144,19 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
 {% block page_content %}
 
 <div class="l-entity">
-  <h1>Form: {{ l }}-{{ f }}</h1>
+    <h1>Form: {{ l }}-{{ f }}</h1>
 
-  <a title="Back"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="./">←</a>
-  <a title="View and edit form in Wikidata"
-     role="button"
-     class="btn btn-outline-dark btn-sm"
-     href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata ↗</a>
+    <a title="Back"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="./">←</a>
+    <a title="View and edit form in Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Lexeme:{{ l }}#{{ f }}">Wikidata ↗</a>
 
-  
-  <table class="table table-hover" id="form-data"></table>
+    
+    <table class="table table-hover" id="form-data"></table>
 
 
   <h2>Homographs</h2>

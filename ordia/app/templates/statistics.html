@@ -71,18 +71,26 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
-  identifierStatisticsSparql = `
+ identifierStatisticsSparql = `
 SELECT
   ?count
   ?description ?descriptionUrl
   ?query
 WHERE {
   {
-    { SELECT (COUNT(*) AS ?count) { [] wdt:P6838 [] . } }
-    wd:P6838 rdfs:label ?description .
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P2581 [] . } }
+    wd:P2581 rdfs:label ?description .
     FILTER (LANG(?description) = 'en')
-    BIND("../property/P6838" AS ?descriptionUrl)
-    BIND("[] wdt:P6838 []" AS ?query)
+    # BIND("../property/P2581" AS ?descriptionUrl)
+    BIND("[] wdt:P2581 []" AS ?query)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P5063 [] . } }
+    wd:P5063 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    # BIND("../property/P5063" AS ?descriptionUrl)
+    BIND("[] wdt:P5063 []" AS ?query)
   }
   UNION
   {
@@ -236,7 +244,14 @@ WHERE {
     BIND("../property/P6168" AS ?descriptionUrl)
     BIND("[] wdt:P6168 []" AS ?query)
   }
-  
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P6838 [] . } }
+    wd:P6838 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("../property/P6838" AS ?descriptionUrl)
+    BIND("[] wdt:P6838 []" AS ?query)
+  }
 }
 ORDER BY DESC(?count)
 `
