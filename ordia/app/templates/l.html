@@ -114,10 +114,15 @@ WHERE {
   {
     BIND(20 AS ?order)
     BIND("Described in" AS ?description)
-    ?lexeme wdt:P1343 ?value .
+    ?lexeme wdt:P1343 ?value ;
+            p:P1343 ?value_statement .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      BIND("↗" AS ?source)
+    }
   }
   UNION 
   {
