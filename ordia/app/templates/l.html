@@ -114,8 +114,8 @@ WHERE {
   {
     BIND(20 AS ?order)
     BIND("Described in" AS ?description)
-    ?lexeme wdt:P1343 ?value ;
-            p:P1343 ?value_statement .
+    ?lexeme ontolex:lexicalForm? / p:P1343 ?value_statement .
+    ?value_statement ps:P1343 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
@@ -145,7 +145,7 @@ WHERE {
   {
     BIND(31 AS ?order)
     BIND("Attested in" AS ?description)
-    ?lexeme p:P5323 ?value_statement .
+    ?lexeme ontolex:lexicalForm? / p:P5323 ?value_statement .
     ?value_statement ps:P5323 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = "en")
