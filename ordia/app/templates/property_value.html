@@ -3,8 +3,8 @@
 {% block scripts %}
 {{super()}}
 
-  <script type="text/javascript">
-    lexemesByLanguageSparql = `
+<script type="text/javascript">
+ lexemesByLanguageSparql = `
 SELECT
   ?count
   ?language ?languageLabel
@@ -56,6 +56,32 @@ WHERE {
 LIMIT 1000
   `
 
+ formsByLanguageSparql = `
+SELECT
+  ?count
+  ?language ?languageLabel
+  ?example_lexeme ?example_lexemeLabel
+WITH {
+  SELECT 
+    (COUNT(?lexeme) AS ?count)
+    ?language
+    (SAMPLE(?lexeme) AS ?example_lexeme)
+  {
+    ?lexeme ontolex:lexicalForm / wdt:{{ p }} wd:{{ q }} ;
+            dct:language ?language
+  }
+  GROUP BY ?language
+} AS %counts
+WHERE {
+  INCLUDE %counts
+  
+  ?example_lexeme wikibase:lemma ?example_lexemeLabel .
+  ?language rdfs:label ?languageLabel .
+  FILTER (LANG(?languageLabel) = 'en')
+}
+ORDER BY DESC(?count)
+   `; 
+ 
  $(document).ready(function() {
      sparqlToDataTable(lexemesByLanguageSparql, "#lexemes-by-language", {
 	 linkPrefixes: {
@@ -67,6 +93,11 @@ LIMIT 1000
 	     lexeme: '../../../',
 	     language: '../../../language/', 
 	     value: '../../../'}});
+     sparqlToDataTable(formsByLanguageSparql, "#forms-by-language", {
+	 linkPrefixes: {
+	     example_lexeme: '../../../',
+	     language: '../../../language/', 
+	 }});
  });
 
 </script>
@@ -117,18 +148,14 @@ LIMIT 1000
   
   <table class="table table-hover" id="lexemes"></table>
 
-  <!-- hr/>
+  <hr/>
   
   <h2>Forms</h2>
   
-  <table class="table table-hover" id="forms"></table>
+  <h3>Forms by language</h3>
+  
+  <table class="table table-hover" id="forms-by-language"></table>
 
-  <hr/>
-  
-  <h2>Senses</h2>
-  
-  <table class="table table-hover" id="senses"></table -->
-  
 </div>
 
 

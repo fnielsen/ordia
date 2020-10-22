@@ -50,6 +50,18 @@ WHERE {
   UNION
   {
     BIND(5 AS ?order)
+    BIND("Gloss quote" AS ?description)
+    ?sense wdt:P8394 ?value_ . 
+    BIND(LANG(?value_) AS ?language_code)
+    BIND(CONCAT(?value_, " (", LANG(?value_), ")") AS ?value)
+    BIND(CONCAT("./text-to-lexemes?text-language=",
+      ENCODE_FOR_URI(?language_code),
+        "&text=",
+   	ENCODE_FOR_URI(?value_)) AS ?valueUrl)
+  }  
+  UNION
+  {
+    BIND(6 AS ?order)
     BIND("Usage style" AS ?description)
     ?sense wdt:P6191 ?value .
     ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
