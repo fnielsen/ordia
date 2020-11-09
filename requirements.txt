@@ -1,5 +1,6 @@
 docopt
 flask
+functools32
 regex
 requests
 six
