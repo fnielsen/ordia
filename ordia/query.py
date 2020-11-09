@@ -2,6 +2,10 @@
 
 Usage:
   ordia.query iso639-to-q <iso639>
+  ordia.query get-wikidata-language-codes [options]
+
+Options:
+  --min-count=<min-count>   Minimum count [default: 0]
 
 Description:
   Functions in this module query the Wikidata Query Service and
@@ -17,6 +21,11 @@ Examples
 
 from __future__ import absolute_import, division, print_function
 
+try:
+    from functools import lru_cache
+except ImportError:
+    # For Python 2.
+    from functools32 import lru_cache
 
 import requests
 
@@ -51,11 +60,17 @@ def escape_string(string):
     return string.replace('\\', '\\\\').replace('"', r'\"')
 
 
-def get_wikidata_language_codes():
+def get_wikidata_language_codes(min_count=0):
     """Get all Wikidata language codes.
 
     Query the Wikidata Query Service to get language codes that
     Wikidata uses for the lemmas.
+
+    Parameters
+    ----------
+    min_count : int, optional
+        Minimum count of lexemes for a particular language. The default is 0
+        meaning that all language will be returned.
 
     Returns
     -------
@@ -70,14 +85,24 @@ def get_wikidata_language_codes():
 
     """
     query = """
+        # tool: Ordia
         SELECT (COUNT(?lexeme) AS ?count) ?language
         {
           ?lexeme wikibase:lemma ?lemma .
           BIND(LANG(?lemma) AS ?language) .
         }
         GROUP BY ?language
-        ORDER BY DESC(?count)
         """
+    if min_count:
+        try:
+            min_count_value = int(min_count)
+            if min_count_value < 0:
+                raise ValueError('min_count should be non-negative')
+        except ValueError:
+            raise ValueError('min_count should be an integer.')
+        query += "\nHAVING (?count > {})".format(min_count_value)
+
+    query += "\nORDER BY DESC(?count)"
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -89,6 +114,27 @@ def get_wikidata_language_codes():
         return [binding['language']['value'] for binding in bindings]
     else:
         return []
+
+
+@lru_cache(maxsize=128)
+def get_wikidata_language_codes_cached(*args, **kwargs):
+    """Get unique language codes from Wikidata's lexemes.
+
+    Cached version of `get_wikidata_language_codes`.
+
+    Parameters
+    ----------
+    min_count : int, optional
+        Minimum count of lexemes for a particular language. The default is 0
+        meaning that all language will be returned.
+
+    Returns
+    -------
+    codes : list of str
+        List of strings with language codes, e.g., ['ru', 'en', ...].
+
+    """
+    return get_wikidata_language_codes(*args, **kwargs)
 
 
 def iso639_to_q(iso639):
@@ -150,6 +196,19 @@ def main():
     if arguments['iso639-to-q']:
         q = iso639_to_q(arguments['<iso639>'])
         print(q)
+
+    elif arguments['get-wikidata-language-codes']:
+        if arguments['--min-count']:
+            try:
+                min_count = int(arguments['--min-count'])
+            except ValueError:
+                raise ValueError('min-count parameter should be an integer')
+            language_codes = get_wikidata_language_codes(min_count=min_count)
+        else:
+            language_codes = get_wikidata_language_codes()
+
+        for language_code in language_codes:
+            print(language_code)
 
 
 if __name__ == '__main__':

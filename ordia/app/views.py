@@ -9,7 +9,7 @@ from werkzeug.routing import BaseConverter
 from six import u
 
 from ..api import wb_search_lexeme_entities
-from ..query import iso639_to_q
+from ..query import get_wikidata_language_codes_cached, iso639_to_q
 from ..text import lowercase_first_sentence_letters, text_to_words
 
 
@@ -378,7 +378,6 @@ def show_reference(q):
 @main.route("/representation/" + representation_pattern)
 def show_representation(representation):
     """Render webpage for representation."""
-    print(representation)
     return render_template("representation.html",
                            representation=representation,
                            languages=ALLOWED_LANGUAGES)
@@ -427,6 +426,79 @@ def show_statistics():
 
     """
     return render_template("statistics.html")
+
+
+@main.route('/text-to-languages', methods=['POST', 'GET'])
+def show_text_to_languages():
+    """Return HTML page for text-to-languages query.
+
+    Return HTML page with form for text-to-languages query or if the text field
+    is set, extract Wikidata identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    Notes
+    -----
+    This function looks at the `text`, `text-language` and `casing` URI
+    parameters.
+
+    """
+    if request.method == 'GET':
+        text = request.args.get('text')
+        casing = request.args.get('casing')
+    elif request.method == 'POST':
+        text = request.form.get('text')
+        casing = request.form.get('casing')
+    else:
+        assert False
+
+    # Sanitize casing
+    if casing not in ['none', 'lowercase', 'uppercase',
+                      'lowercase-first-sentence-letters',
+                      'uppercase-first-word-letters']:
+        casing = 'lowercase_first_sentence_letters'
+    casing = casing.replace('-', '_')
+
+    if not text:
+        return render_template('text_to_languages.html',
+                               casing=casing)
+
+    # Casing processing
+    cased_text = text.strip()
+    if casing == 'none':
+        pass
+    elif casing == 'lowercase':
+        cased_text = cased_text.lower()
+    elif casing == 'uppercase':
+        cased_text = cased_text.upper()
+    elif casing == 'lowercase_first_sentence_letters':
+        cased_text = lowercase_first_sentence_letters(cased_text)
+    elif casing == 'uppercase_first_word_letters':
+        cased_text = cased_text.title()
+    else:
+        assert False
+    list_of_words = text_to_words(cased_text)
+
+    # Make the list only consists of unique words
+    list_of_words = list(set(list_of_words))
+
+    # Only match languages with more than 100 lexemes
+    language_codes = get_wikidata_language_codes_cached(100)
+
+    # Build list of monolingual strings
+    words = ''
+    for word in list_of_words:
+        for language_code in language_codes:
+            if words != '':
+                words += ' '
+            words += u('"{word}"@{language_code}').format(
+                word=word, language_code=language_code)
+
+    return render_template('text_to_languages.html', text=text, words=words,
+                           casing=casing)
 
 
 @main.route('/text-to-lexemes', methods=['POST', 'GET'])

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ extractionSparql = `
+# tool: Ordia
+SELECT
+  ?count
+  ?language ?languageUrl
+  ?words (CONCAT("text-to-lexemes?text=", ENCODE_FOR_URI(?words), "&text-language=", ?language_code) AS ?wordsUrl)
+WITH {
+  SELECT (COUNT(DISTINCT ?lexeme) AS ?count) ?language_ (GROUP_CONCAT(DISTINCT ?word; separator=" ") AS ?words) {
+    VALUES ?word { 
+      {{ words | safe }}
+    }
+    ?lexeme ontolex:lexicalForm / ontolex:representation ?word ;
+            dct:language ?language_ .
+  }
+  GROUP BY ?language_
+} AS %result
+WHERE {
+  INCLUDE %result
+  ?language_ rdfs:label ?language . FILTER (LANG(?language) = 'en')
+  ?language_ wdt:P218 ?language_code .
+  BIND(CONCAT("language/", SUBSTR(STR(?language_), 32)) AS ?languageUrl)
+}
+ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(extractionSparql, "#extraction",
+		       options={
+			   paging: false,
+			   linkPrefixes: {
+			       source: 'reference/'
+			   }
+		       });
+ });
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Text to languages</h1>
+
+<form action="" id="form" method="POST" class="form-horizontal">
+    <div class="form-group">
+      <textarea rows=2 class="form-control" style="min-width: 100%" id="text" name="text"
+		placeholder="Write case-sensitive words or a text here and select case handling below"
+		>{{ text }}</textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+	<label for="casing">Casing:</label>
+	<select class="form-control" id="casing-selector" name="casing">	
+	  <option value="none"{% if casing == 'none' %} selected="selected"{% endif %}>None</option>
+	  <option value="lowercase"{% if casing == 'lowercase' %} selected="selected"{% endif %}>Lowercase</option>
+	  <option value="uppercase"{% if casing == 'uppercase' %} selected="selected"{% endif %}>Uppercase</option>
+ 	  <option value="lowercase-first-sentence-letters"{% if casing == 'lowercase_first_sentence_letters' %} selected="selected"{% endif %}>Lowercase first sentence letters</option>
+ 	  <option value="uppercase-first-word-letters"{% if casing == 'uppercase_first_word_letters' %} selected="selected"{% endif %}>Uppercase first word letters</option>
+	</select>
+      </div>
+
+      <div class="form-group col-md-6">
+      </div>
+
+    </div>
+    <div class="form-group">
+	<button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+</form>
+
+
+<h2>Extraction</h2>
+
+<table class="table table-hover" id="extraction"></table>
+
+{% endblock %}
