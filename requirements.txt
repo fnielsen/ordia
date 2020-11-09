@@ -1,6 +1,6 @@
 docopt
 flask
-functools32
+functools32 ; python_version < '3'
 regex
 requests
 six
