@@ -107,12 +107,19 @@ WHERE {
   {
     BIND(13 AS ?order)
     BIND("Antonym" AS ?description)
-    { ?sense wdt:P5974 ?value .  }
+    { ?sense wdt:P5974 ?value . }
     UNION
     {
       ?sense wdt:P5137 / wdt:P461 / ^wdt:P5137 ?value .
       ?value ^ontolex:sense / dct:language ?language .
     }
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+  }  
+  UNION
+  {
+    BIND(14 AS ?order)
+    BIND("Pertainym" AS ?description)
+    { ?sense wdt:P8471 ?value . }
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
   }  
   UNION
