@@ -9,7 +9,8 @@ from werkzeug.routing import BaseConverter
 from six import u
 
 from ..api import wb_search_lexeme_entities
-from ..query import get_wikidata_language_codes_cached, iso639_to_q
+from ..query import (escape_string, form_to_representation_and_iso639,
+                     get_wikidata_language_codes_cached, iso639_to_q)
 from ..text import lowercase_first_sentence_letters, text_to_words
 
 
@@ -286,7 +287,20 @@ def show_lf(l, f):
         Wikidata lexeme form identifier
 
     """
-    return render_template("lf.html", l=l, f=f)
+    form = l + "-" + f
+
+    # Server-side query to get the representation and language
+    result = form_to_representation_and_iso639(form)
+    if result is None:
+        representation = ""
+        iso639 = 'en'
+    else:
+        representation = result[0]
+        iso639 = result[1]
+
+    return render_template("lf.html", l=l, f=f,
+                           representation=escape_string(representation),
+                           iso639=iso639)
 
 
 @main.route("/" + l_pattern + "-" + s_pattern)

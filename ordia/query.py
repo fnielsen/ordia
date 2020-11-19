@@ -3,6 +3,7 @@
 Usage:
   ordia.query iso639-to-q <iso639>
   ordia.query get-wikidata-language-codes [options]
+  ordia.query form-to-iso639 <form>
 
 Options:
   --min-count=<min-count>   Minimum count [default: 0]
@@ -21,6 +22,11 @@ Examples
 
 from __future__ import absolute_import, division, print_function
 
+from re import compile
+
+from six import string_types
+
+
 try:
     from functools import lru_cache
 except ImportError:
@@ -33,6 +39,8 @@ import requests
 USER_AGENT = 'Ordia'
 
 HEADERS = {'User-Agent': USER_AGENT}
+
+FORM_PATTERN = compile(r'L[1-9]\d*-F[1-9]\d*')
 
 
 def escape_string(string):
@@ -58,6 +66,59 @@ def escape_string(string):
 
     """
     return string.replace('\\', '\\\\').replace('"', r'\"')
+
+
+def form_to_representation_and_iso639(form):
+    """Return representation and iso639 for a form.
+
+    Parameters
+    ----------
+    form : str
+        String for the form identifier.
+
+    Returns
+    -------
+    representation_and_form : tuple with str or None
+        Tuple with two strings or None if not found
+
+    Raises
+    ------
+    ValueError
+        If the `form` input argument does not matches the
+        form identifier.
+
+    Examples
+    --------
+    >>> result = form_to_representation_and_iso639('L33930-F1')
+    >>> result == ("fyr", "da")
+    True
+
+    """
+    # Validate input
+    if not isinstance(form, string_types):
+        raise ValueError('`form` input should be a string')
+    if not FORM_PATTERN.match(form):
+        raise ValueError(('`form` input should be a form identifier, '
+                          'e.g., "L33930-F1"'))
+
+    url = "https://www.wikidata.org/wiki/Special:EntityData/{}.json".format(
+        form)
+    response = requests.get(url, headers=HEADERS)
+
+    # Handle response
+    if not response.ok:
+        return None
+    data = response.json()
+    if 'entities' in data and form in data['entities']:
+        entities = data['entities']
+        if 'representations' in entities[form]:
+            representations = entities[form]['representations']
+            if len(representations) > 0:
+                first_representation = next(iter(representations.values()))
+                representation = first_representation['value']
+                iso639 = first_representation['language']
+                return (representation, iso639)
+    return None
 
 
 def get_wikidata_language_codes(min_count=0):
@@ -193,7 +254,12 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['iso639-to-q']:
+    if arguments['form-to-iso639']:
+        result = form_to_representation_and_iso639(arguments['<form>'])
+        if result is not None:
+            print(result[1])
+
+    elif arguments['iso639-to-q']:
         q = iso639_to_q(arguments['<iso639>'])
         print(q)
 

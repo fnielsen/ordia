@@ -125,6 +125,22 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
   ?form ?formLabel
 `
 
+ wikisourceSparql = `
+ SELECT * WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "Search" .
+      bd:serviceParam wikibase:endpoint "{{ iso639 }}.wikisource.org" .
+      bd:serviceParam mwapi:srsearch "{{ representation }}" .
+      bd:serviceParam mwapi:language "{{ iso639 }}" .
+      ?title wikibase:apiOutput mwapi:title .
+  }
+  hint:Prior hint:runFirst "true" .
+  BIND(CONCAT("https://{{ iso639 }}.wikisource.org/wiki/", ENCODE_FOR_URI(?title)) AS ?titleUrl)
+}
+LIMIT 50
+`
+
+ 
 
  $(document).ready(function() {
      sparqlToDataTable(
@@ -134,6 +150,9 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
 	 });
      sparqlToDataTable(
 	 homographsSparql, "#homographs");
+
+     sparqlToDataTable(
+	 wikisourceSparql, "#wikisource-table");
  });
 
 </script>
@@ -159,11 +178,16 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
     <table class="table table-hover" id="form-data"></table>
 
 
-  <h2>Homographs</h2>
+    <h2>Homographs</h2>
+    
+    <table class="table table-hover" id="homographs"></table>
+
+    <h2>Wikisource</h2>
+    
+    <table class="table table-hover" id="wikisource-table"></table>
+
+
   
-  <table class="table table-hover" id="homographs"></table>
-
-
   
 </div>
 
