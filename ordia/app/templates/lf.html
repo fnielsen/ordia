@@ -126,16 +126,18 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
 `
 
  wikisourceSparql = `
- SELECT * WHERE {
+ SELECT ?title ?titleUrl ?snippet WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "Search" .
       bd:serviceParam wikibase:endpoint "{{ iso639 }}.wikisource.org" .
       bd:serviceParam mwapi:srsearch "{{ representation }}" .
       bd:serviceParam mwapi:language "{{ iso639 }}" .
       ?title wikibase:apiOutput mwapi:title .
+      ?snippet_ wikibase:apiOutput "@snippet" .
   }
   hint:Prior hint:runFirst "true" .
   BIND(CONCAT("https://{{ iso639 }}.wikisource.org/wiki/", ENCODE_FOR_URI(?title)) AS ?titleUrl)
+  BIND(REPLACE(REPLACE(?snippet_, '</span>', ''), '<span class="searchmatch">', '') AS ?snippet)
 }
 LIMIT 50
 `
