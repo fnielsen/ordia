@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ zeroToTenSparql = `
+ # tool: ordia
+SELECT
+  ?language ?languageLabel
+  (GROUP_CONCAT(DISTINCT ?zeros; separator=", ") AS ?zero)
+  (GROUP_CONCAT(DISTINCT ?ones; separator=", ") AS ?one)
+  (GROUP_CONCAT(DISTINCT ?twos; separator=", ") AS ?two)
+  (GROUP_CONCAT(DISTINCT ?threes; separator=", ") AS ?three)
+  (GROUP_CONCAT(DISTINCT ?fours; separator=", ") AS ?four)
+  (GROUP_CONCAT(DISTINCT ?fives; separator=", ") AS ?five)
+  (GROUP_CONCAT(DISTINCT ?sixs; separator=", ") AS ?six)
+{
+  VALUES ?language {
+    wd:Q1860 
+    
+    wd:Q13955 wd:Q8752 wd:Q9610 wd:Q25167 wd:Q12107 wd:Q9056
+    wd:Q9035 wd:Q150 wd:Q188 wd:Q9288 wd:Q1568
+    wd:Q5287 wd:Q397 wd:Q25164
+    # R
+    wd:Q7737 wd:Q809 wd:Q9058 wd:Q1321 wd:Q9027 
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?zeros ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "0"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?ones ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "1"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?twos ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "2"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?threes ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "3"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?fours ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "4"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?fives ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "5"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?sixs ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "6"^^xsd:decimal .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?language ?languageLabel
+ORDER BY ?languageLabel
+`;
+
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(
+	 zeroToTenSparql, "#zero-to-ten-table",
+	 option={
+	     linkPrefixes: {
+		 language: 'language/'
+	     }
+	 }
+     );
+ });
+ 
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<div>
+    
+    <h1>Numerals</h1>
+
+    <h2>Zero to five</h2>
+    
+    <table class="table table-hover" id="zero-to-ten-table"></table>
+    
+</div>
+
+{% endblock %}
+
+

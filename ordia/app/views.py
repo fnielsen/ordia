@@ -318,6 +318,12 @@ def show_ls(l, s):
     return render_template("ls.html", l=l, s=s)
 
 
+@main.route("/numeral")
+def show_numeral_index():
+    """Render webpage for numeral index page."""
+    return render_template("numeral_index.html")
+
+
 @main.route("/property/" + p_pattern)
 def show_property(p):
     """Render webpage for a property.
