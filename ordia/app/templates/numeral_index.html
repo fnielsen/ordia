@@ -16,6 +16,10 @@ SELECT
   (GROUP_CONCAT(DISTINCT ?fours; separator=", ") AS ?four)
   (GROUP_CONCAT(DISTINCT ?fives; separator=", ") AS ?five)
   (GROUP_CONCAT(DISTINCT ?sixs; separator=", ") AS ?six)
+  (GROUP_CONCAT(DISTINCT ?sevens; separator=", ") AS ?seven)
+  (GROUP_CONCAT(DISTINCT ?eights; separator=", ") AS ?eight)
+  (GROUP_CONCAT(DISTINCT ?nines; separator=", ") AS ?nine)
+  (GROUP_CONCAT(DISTINCT ?tens; separator=", ") AS ?ten)
 {
   VALUES ?language {
     wd:Q1860 
@@ -61,6 +65,26 @@ SELECT
        wikibase:lemma ?sixs ;             
        ontolex:sense / wdt:P5137 / wdt:P1181 "6"^^xsd:decimal .
   }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?sevens ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "7"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?eights ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "8"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?nines ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "9"^^xsd:decimal .
+  }
+  OPTIONAL {
+    [] dct:language ?language ; 
+       wikibase:lemma ?tens ;             
+       ontolex:sense / wdt:P5137 / wdt:P1181 "10"^^xsd:decimal .
+  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 GROUP BY ?language ?languageLabel
@@ -90,7 +114,7 @@ ORDER BY ?languageLabel
     
     <h1>Numerals</h1>
 
-    <h2>Zero to five</h2>
+    <h2>Zero to Ten</h2>
     
     <table class="table table-hover" id="zero-to-ten-table"></table>
     
