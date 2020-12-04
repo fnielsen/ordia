@@ -5,7 +5,8 @@
 {{super()}}
 
 <script type="text/javascript">
-    listOfReferencesSparql = `
+ listOfReferencesSparql = `
+ # tool: ordia
 SELECT 
   ?count 
   ?reference ?referenceLabel ?referenceDescription
@@ -24,15 +25,44 @@ WHERE {
 }
 ORDER BY DESC(?count)
 `
-  
-  $(document).ready(function() {
-      sparqlToDataTable(listOfReferencesSparql, "#list-of-references",
-			options={
-			    'linkPrefixes': {
-				'reference': 'reference/'
-			    }});
-  });
-  
+
+ descriptionsSparql = `
+ # tool: ordia
+ SELECT 
+   ?count 
+   ?reference ?referenceLabel ?referenceDescription
+ WITH {
+     SELECT 
+     (COUNT(*) AS ?count)
+     ?reference
+     WHERE {
+	 [] dct:language [] ; wdt:P1343 ?reference .
+     }
+     GROUP BY ?reference
+     ORDER BY DESC(?count)
+     LIMIT 1000
+ } AS %results
+ WHERE {
+     INCLUDE %results
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+ }
+ ORDER BY DESC(?count)
+ `;
+
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(listOfReferencesSparql, "#list-of-references",
+		       options={
+			   'linkPrefixes': {
+			       'reference': 'reference/'
+			   }});
+     sparqlToDataTable(descriptionsSparql, "#descriptions-table",
+		       options={
+			   'linkPrefixes': {
+			       'reference': 'reference/'
+			   }});
+ });
+ 
 </script>
 
 {% endblock %}
@@ -41,13 +71,18 @@ ORDER BY DESC(?count)
 {% block page_content %}
 
 <div class="reference-entry">
-  
-  <h1>References</h1>
-  
-  <h2>Use</h2>
-
-  <table class="table table-hover" id="list-of-references"></table>
     
+    <h1>References</h1>
+
+    
+    <h2>Use</h2>
+
+    <table class="table table-hover" id="list-of-references"></table>
+    
+
+    <h2>Descriptions</h2>
+
+    <table class="table table-hover" id="descriptions-table"></table>
     
 </div>
 
