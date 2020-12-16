@@ -29,7 +29,7 @@ ORDER BY DESC(?count)
 SELECT ?count ?property ?propertyLabel
 WITH {
   SELECT ?property (COUNT(*) AS ?count) WHERE {
-    hint:Query hint:optimizer "None".
+    ?property wdt:P31 wd:Q54275221 .
     [] ontolex:lexicalForm ?form .
     ?form ?direct_property [] .
     ?property wikibase:directClaim ?direct_property .
@@ -88,6 +88,8 @@ ORDER BY DESC(?count)
   <hr/>
   
   <h2>For forms</h2>
+
+  Only statistics for a limited number of properties are shown.
   
   <table class="table table-hover" id="properties-for-forms"></table>
 
