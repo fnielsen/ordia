@@ -12,7 +12,9 @@ SELECT
   ?language ?languageUrl
   ?words (CONCAT("text-to-lexemes?text=", ENCODE_FOR_URI(?words), "&text-language=", ?language_code) AS ?wordsUrl)
 WITH {
-  SELECT (COUNT(DISTINCT ?lexeme) AS ?count) ?language_ (GROUP_CONCAT(DISTINCT ?word; separator=" ") AS ?words) {
+  # We could count either representations or lexemes.
+  # Representations are probably more appropriate in most cases?
+  SELECT (COUNT(DISTINCT ?word) AS ?count) ?language_ (GROUP_CONCAT(DISTINCT ?word; separator=" ") AS ?words) {
     VALUES ?word { 
       {{ words | safe }}
     }
