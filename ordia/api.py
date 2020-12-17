@@ -31,7 +31,7 @@ def wb_get_entities(ids):
 
     Parameters
     ----------
-    is : list of str
+    ids : list of str
         List of strings, each with a Wikidata item identifier.
 
     Returns

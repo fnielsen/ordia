@@ -101,18 +101,24 @@ def form_to_representation_and_iso639(form):
         raise ValueError(('`form` input should be a form identifier, '
                           'e.g., "L33930-F1"'))
 
+    lexeme = form.split('-')[0]
     url = "https://www.wikidata.org/wiki/Special:EntityData/{}.json".format(
-        form)
+        lexeme)
     response = requests.get(url, headers=HEADERS)
 
     # Handle response
     if not response.ok:
         return None
     data = response.json()
-    if 'entities' in data and form in data['entities']:
-        entities = data['entities']
-        if 'representations' in entities[form]:
-            representations = entities[form]['representations']
+    if 'entities' in data and lexeme in data['entities']:
+        entities = data['entities'][lexeme]
+        for entity_form in entities['forms']:
+            if form == entity_form['id']:
+                break
+        else:
+            return None
+        if 'representations' in entity_form:
+            representations = entity_form['representations']
             if len(representations) > 0:
                 first_representation = next(iter(representations.values()))
                 representation = first_representation['value']

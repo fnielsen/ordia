@@ -211,6 +211,8 @@ class Base(object):
         ----------
         word : str
            Word to query.
+        language : str
+           Two-letter representation of language.
 
         Returns
         -------
@@ -231,8 +233,10 @@ class Base(object):
 
         Parameters
         ----------
-        word : lists of str
+        words : lists of str
            Word to query.
+        language : str
+           Two-letter representation of language.
 
         Returns
         -------

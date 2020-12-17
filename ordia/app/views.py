@@ -120,7 +120,7 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 q_pattern = r'<regex("Q[1-9]\d*"):q>'
 q1_pattern = r'<regex("Q[1-9]\d*"):q1>'
 q2_pattern = r'<regex("Q[1-9]\d*"):q2>'
-l_pattern = r'<regex("L[1-9]\d*"):l>'
+l_pattern = r'<regex("L[1-9]\d*"):lexeme>'
 f_pattern = r'<regex("F[1-9]\d*"):f>'
 s_pattern = r'<regex("S[1-9]\d*"):s>'
 p_pattern = r'<regex("P[1-9]\d*"):p>'
@@ -150,16 +150,16 @@ def index():
 
 
 @main.route("/" + l_pattern)
-def show_l(l):
+def show_l(lexeme):
     """Render webpage for l Wikidata item.
 
     Parameters
     ----------
-    l : str
+    lexeme : str
         Wikidata lexeme item identifier.
 
     """
-    return render_template("l.html", l=l)
+    return render_template("l.html", l=lexeme)
 
 
 @main.route("/grammatical-feature/")
@@ -276,18 +276,18 @@ def show_lexical_category_language(q1, q2):
 
 
 @main.route("/" + l_pattern + "-" + f_pattern)
-def show_lf(l, f):
+def show_lf(lexeme, f):
     """Render webpage for l-f Wikidata item.
 
     Parameters
     ----------
-    l : str
+    lexeme : str
         Wikidata lexeme form item identifier
     f : str
         Wikidata lexeme form identifier
 
     """
-    form = l + "-" + f
+    form = lexeme + "-" + f
 
     # Server-side query to get the representation and language
     result = form_to_representation_and_iso639(form)
@@ -298,24 +298,24 @@ def show_lf(l, f):
         representation = result[0]
         iso639 = result[1]
 
-    return render_template("lf.html", l=l, f=f,
+    return render_template("lf.html", l=lexeme, f=f,
                            representation=escape_string(representation),
                            iso639=iso639)
 
 
 @main.route("/" + l_pattern + "-" + s_pattern)
-def show_ls(l, s):
+def show_ls(lexeme, s):
     """Render webpage for l-s Wikidata item.
 
     Parameters
     ----------
-    l : str
+    lexeme : str
         Wikidata lexeme form item identifier
     s : str
         Wikidata lexeme sense identifier
 
     """
-    return render_template("ls.html", l=l, s=s)
+    return render_template("ls.html", l=lexeme, s=s)
 
 
 @main.route("/numeral")
