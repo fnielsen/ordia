@@ -27,7 +27,7 @@ class WikidataAPIException(Exception):
 def wb_get_entities(ids):
     """Get entities from Wikidata.
 
-    Query the Wikidata webservice via is API.
+    Query the Wikidata webservice via its API.
 
     Parameters
     ----------
