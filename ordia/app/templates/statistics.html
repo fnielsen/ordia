@@ -252,6 +252,14 @@ WHERE {
     BIND("../property/P6838" AS ?descriptionUrl)
     BIND("[] wdt:P6838 []" AS ?query)
   }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P8478 [] . } }
+    wd:P8478 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("../property/P8478" AS ?descriptionUrl)
+    BIND("[] wdt:P8478 []" AS ?query)
+  }  
 }
 ORDER BY DESC(?count)
 `
