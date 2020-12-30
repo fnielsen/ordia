@@ -4,8 +4,67 @@
 {{super()}}
 
 <script type="text/javascript">
+  dataSparql = `
+# tool: ordia
+SELECT ?description ?value ?valueUrl
+WHERE {
+  BIND(wd:{{ q }} AS ?language)
+  {
+    BIND(1 AS ?order)
+    BIND("Language" AS ?description)
+    ?language rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+  }
+  UNION
+  {
+    SELECT
+      (2 AS ?order)
+      ("Number of lexemes" AS ?description)
+      (COUNT(*) AS ?value)
+    {
+      [] dct:language wd:{{ q }} .
+      BIND(1 AS ?dummy)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("Number of senses" AS ?description)
+      (COUNT(*) AS ?value)
+    {
+      [] ^ontolex:sense / dct:language wd:{{ q }} .
+      BIND(1 AS ?dummy)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    SELECT
+      (4 AS ?order)
+      ("Number of forms" AS ?description)
+      (COUNT(*) AS ?value)
+    {
+      [] ^ontolex:lexicalForm / dct:language wd:{{ q }} .
+      BIND(1 AS ?dummy)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("Number of speakers" AS ?description)
+    ?language wdt:P1098 ?value .
+  }
+} 
+ORDER BY ?order
+`;
+  
  lexemesSparql = `
-# List of lexemes for a language
+# tool: ordia
+# title: List of lexemes for a language
 SELECT
   ?lexeme ?lexemeLabel
   ?lexical_category ?lexical_categoryLabel
@@ -32,7 +91,8 @@ WHERE {
   `
 
   lexicalCategoriesSparql = `
-# Statistics for word class for a specific language
+# tool: ordia
+# title: Statistics for word class for a specific language
 SELECT
   ?count
     ?lexical_category ?lexical_categoryLabel
@@ -60,7 +120,8 @@ ORDER BY DESC(?count)
 
 
  longestWordsAndPhrasesSparql = `
-# List of longest words for a language
+# tool: ordia
+# title: List of longest words for a language
 # https://lists.wikimedia.org/pipermail/wikidata/2018-October/012545.html
 SELECT DISTINCT ?length ?form ?formLabel ?lexeme ?lexemeLabel WHERE {
   ?lexeme a ontolex:LexicalEntry ;
@@ -76,6 +137,7 @@ LIMIT 200
 
 
  $(document).ready(function() {
+     sparqlToDataTable(dataSparql, "#data");
      sparqlToDataTable(lexemesSparql, "#lexemes", {
 	 'linkPrefixes': {
 	     'lexeme': '../',
@@ -119,6 +181,11 @@ LIMIT 200
      class="btn btn-outline-dark btn-sm"
      href="https://scholia.toolforge.org/topic/{{ q }}">Scholia ↗</a>
 
+
+  <h2>Data</h2>
+
+  <table class="table table-hover" id="data"></table>
+  
 
   <h2>Lexemes</h2>
 
