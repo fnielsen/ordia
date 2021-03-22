@@ -5,6 +5,30 @@
 {{super()}}
 
 <script type="text/javascript">
+    numeralsPerLanguageSparql = `
+# tool: ordia
+SELECT ?count ?language ?languageLabel ?example_lexeme ?example_lexemeLabel
+WITH {
+  SELECT
+    (COUNT(*) AS ?count)
+    ?language 
+    (SAMPLE(?lexeme) AS ?example_lexeme)
+  {
+    ?lexeme wikibase:lexicalCategory wd:Q63116 ;
+            dct:language ?language
+  }
+  GROUP BY ?language
+} AS %result
+WHERE {
+  INCLUDE %result
+  ?example_lexeme wikibase:lemma ?example_lexemeLabel
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+  `;
+
+
+
  zeroToTenSparql = `
  # tool: ordia
 SELECT
@@ -94,6 +118,13 @@ ORDER BY ?languageLabel
  
  $(document).ready(function() {
      sparqlToDataTable(
+	 numeralsPerLanguageSparql, "#numerals-per-language-table",
+	 option={
+	     linkPrefixes: {
+		 language: 'language/'
+	     }
+	 });
+     sparqlToDataTable(
 	 zeroToTenSparql, "#zero-to-ten-table",
 	 option={
 	     linkPrefixes: {
@@ -114,6 +145,11 @@ ORDER BY ?languageLabel
     
     <h1>Numerals</h1>
 
+    <h2>Numerals per language</h2>
+
+    <table class="table table-hover" id="numerals-per-language-table"></table>
+
+    
     <h2>Zero to Ten</h2>
     
     <table class="table table-hover" id="zero-to-ten-table"></table>
