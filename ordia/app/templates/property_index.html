@@ -6,23 +6,22 @@
 
 <script type="text/javascript">
     propertiesForLexemesSparql = `
-# Properties of lexemes sorted by count of usage
+# title: Properties of lexemes sorted by count of usage
 SELECT ?count ?property ?propertyLabel
 WITH {
-  SELECT ?property (COUNT(*) AS ?count) WHERE {
-    hint:Query hint:optimizer "None".
-    ?lexeme a ontolex:LexicalEntry .
-    ?lexeme ?direct_property [] .
-    ?property wikibase:directClaim ?direct_property .
+  SELECT ?direct_property (COUNT(*) AS ?count) WHERE {
+    [] dct:language [] ; ?direct_property [] .
   }
-  GROUP BY ?property
+  GROUP BY ?direct_property
 } AS %results
 WHERE {
   INCLUDE %results
+  FILTER (STRSTARTS(STR(?direct_property), "http://www.wikidata.org/prop/direct/P"))
+  ?property wikibase:directClaim ?direct_property .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
-  `
+`
 
     propertiesForFormsSparql = `
 # Properties of forms sorted by count of usage
