@@ -147,7 +147,7 @@ def get_wikidata_language_codes(min_count=0):
     Examples
     --------
     >>> codes = get_wikidata_language_codes()
-    >>> 'ja-x-q53979341' in codes
+    >>> 'da' in codes
     True
 
     """
@@ -252,6 +252,80 @@ def iso639_to_q(iso639):
         return bindings[0]['code']['value'][31:]
     else:
         return ""
+
+
+@lru_cache(maxsize=1048)
+def spacy_token_to_lexemes(token):
+    """Identify Wikidata lexeme from spaCy token.
+
+    Parameters
+    ----------
+    token : spacy.tokens.token.Token
+
+    Returns
+    -------
+    lexemes : list of strings
+
+    Examples
+    --------
+    >>> class Token(object):
+    ...     pass
+    >>> token = Token()
+    >>> setattr(token, 'lang_', 'da')
+    >>> setattr(token, 'norm_', 'biler')
+    >>> setattr(token, 'pos_', 'NOUN')
+    >>> spacy_token_to_lexemes(token)
+    ['L36385']
+
+    """
+    POSTAG_TO_Q = {
+        "ADJ": "Q34698",
+        "ADV": "Q380057",
+        "INTJ": "Q83034",
+        "NOUN": "Q1084",
+        "PROPB": "Q147276",
+        "VERB": "Q24905",
+
+        "ADP": "Q134316",
+        "AUX": "Q24905",
+        "CCONJ": "Q36484",
+        "DET": "Q576271",
+        "NUM": "Q63116",
+        "PART": "Q184943",
+        "PRON": "Q36224",
+        "SCONJ": "Q36484",
+    }
+
+    if token.pos_ in ['PUNCT', 'SYM', 'X']:
+        return []
+
+    iso639 = token.lang_
+    language = iso639_to_q(iso639)
+    representation = token.norm_
+    if token.pos_ not in POSTAG_TO_Q:
+        return []
+    lexical_category = POSTAG_TO_Q[token.pos_]
+
+    query = '''
+       SELECT DISTINCT ?lexeme {{
+           ?lexeme dct:language wd:{language} ;
+            wikibase:lexicalCategory / wdt:P279* wd:{lexical_category} ;
+            ontolex:lexicalForm / ontolex:representation
+                "{representation}"@{iso639} .
+    }}'''.format(language=language, lexical_category=lexical_category,
+                 representation=representation, iso639=iso639)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    bindings = data['results']['bindings']
+    if bindings:
+        lexemes = [binding['lexeme']['value'][31:] for binding in bindings]
+        return lexemes
+    else:
+        return []
 
 
 def main():
