@@ -41,10 +41,17 @@ WHERE {
   {
     BIND(4 AS ?order)
     BIND("Instance of" AS ?description)
-    ?lexeme wdt:P31 ?value .
+    ?lexeme p:P31 ?value_statement .
+    ?value_statement ps:P31 ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("property/P31/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ .
+      ?source_ rdfs:label ?source .
+      FILTER (LANG(?source) = 'en')
+      BIND(CONCAT("reference/", SUBSTR(STR(?source_), 32))  AS ?sourceUrl)
+    }
   }
   UNION 
   {
