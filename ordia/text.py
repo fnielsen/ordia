@@ -42,7 +42,7 @@ def lowercase_first_sentence_letters(text):
             lowercased_text += ' '
         if len(sentence) > 0:
             lowercased_text += sentence[0].lower()
-            if len(sentence) > 2:
+            if len(sentence) >= 2:
                 lowercased_text += sentence[1:]
     return lowercased_text
 
