@@ -11,6 +11,10 @@ To start the local webserver go to the `ordia` directly::
 
     python app.py
 
+Introductory video
+------------------
+Daniel Mietchen, "`Demo of Ordia, a Wikidata tool to visualize lexicographic information from Wikidata <https://www.youtube.com/watch?v=ur-ehBrWbMU>`_", YouTube, 18 May 2021.
+
 License
 -------
 The license for Ordia is Apache License 2.0 except for included third-party packages which 
