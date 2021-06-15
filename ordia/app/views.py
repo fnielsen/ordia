@@ -419,6 +419,9 @@ def show_search():
     query = request.args.get('q', '').strip()
     language = request.args.get('language', '').strip()
 
+    if len(query) == 0:
+        return redirect(url_for("app.index"), code=302)
+
     if Q_PATTERN.match(query):
         q = Q_PATTERN.findall(query)[0]
         return redirect(url_for("app.show_q", q=q), code=302)
