@@ -17,10 +17,6 @@
 
 <div class="search-results">
 
-  <!-- div class="alert alert-warning" role="alert">
-    Currently, only a limited set of lexemes and forms are searched,
-    so the search results may not be complete.
-  </div -->
   
     <h2>Search results</h2>
 
@@ -37,6 +33,9 @@
 	    <br>
 	    {{ search_result['match']['text'] }}
 	    (<a href='{{ url_for("app.redirect_language", language=search_result["match"]["language"]) }}'>{{ search_result['match']['language'] }}</a>)
+	    &mdash;
+	    <a href="https://www.wikidata.org/wiki/Lexeme:{{ search_result['id'] }}">Wikidata ↗</a>
+	    
 	    
 	    {% else %}
 	    
