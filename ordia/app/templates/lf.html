@@ -142,6 +142,24 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
 LIMIT 50
 `
 
+ wiktionarySparql = `
+ SELECT ?title ?titleUrl ?snippet WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "Search" .
+      bd:serviceParam wikibase:endpoint "{{ iso639 }}.wiktionary.org" .
+      bd:serviceParam mwapi:srsearch "{{ representation }}" .
+      bd:serviceParam mwapi:language "{{ iso639 }}" .
+      ?title wikibase:apiOutput mwapi:title .
+      ?snippet_ wikibase:apiOutput "@snippet" .
+  }
+  hint:Prior hint:runFirst "true" .
+  BIND(CONCAT("https://{{ iso639 }}.wiktionary.org/wiki/", ENCODE_FOR_URI(?title)) AS ?titleUrl)
+  BIND(REPLACE(REPLACE(?snippet_, '</span>', ''), '<span class="searchmatch">', '') AS ?snippet)
+}
+LIMIT 200
+`
+
+  
  
 
  $(document).ready(function() {
@@ -155,6 +173,9 @@ LIMIT 50
 
      sparqlToDataTable(
 	 wikisourceSparql, "#wikisource-table");
+
+     sparqlToDataTable(
+	 wiktionarySparql, "#wiktionary-table");
  });
 
 </script>
@@ -188,6 +209,9 @@ LIMIT 50
     
     <table class="table table-hover" id="wikisource-table"></table>
 
+    <h2>Wiktionary</h2>
+    
+    <table class="table table-hover" id="wiktionary-table"></table>
 
   
   
