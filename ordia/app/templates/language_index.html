@@ -23,9 +23,34 @@ WHERE {
 ORDER BY DESC(?number_of_lexemes)
   `
 
+  numberOfStatementsSparql = `
+SELECT
+  ?total_number_of_statements
+  ?average_number_of_statements
+  ?language ?languageLabel ?languageDescription
+WHERE {
+  {
+    SELECT
+      ?language
+      (SUM(?statements) AS ?total_number_of_statements)
+      (AVG(?statements) AS ?average_number_of_statements)
+    {
+      [] wikibase:statements ?statements ;
+         dct:language ?language .
+    }
+    GROUP BY ?language
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?total_number_of_statements)
+`;
+
+  
 
  $(document).ready(function() {
      sparqlToDataTable(languagesSparql, "#languages");
+		      //  {'linkPrefixes': {'language': '/language/'}});
+     sparqlToDataTable(numberOfStatementsSparql, "#number-of-statements");
 		      //  {'linkPrefixes': {'language': '/language/'}});
  });
 
@@ -58,6 +83,13 @@ ORDER BY DESC(?number_of_lexemes)
   </div>
 
 
+  <hr>
+  
+  <h2 title="Number of statements">Number of statements</h2>
+
+  <table class="table table-hover" id="number-of-statements"></table>
+ 
+  
   
 </div>
 
