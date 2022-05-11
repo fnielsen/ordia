@@ -32,7 +32,7 @@ WHERE {
   {
     BIND(3 AS ?order)
     BIND("Concept" AS ?description)
-    ?sense wdt:P5137 ?value .
+    ?sense wdt:P5137 | wdt:P9970 ?value .
     ?value rdfs:label ?valueLabel FILTER (LANG(?valueLabel) = "en")
   }  
   UNION
@@ -152,6 +152,8 @@ WHERE {
   { ?query_sense (wdt:P5972 | ^wdt:P5972)+ ?sense . }
   UNION
   { ?query_sense (wdt:P6271 | ^wdt:P6271)+ ?sense . }
+  UNION
+  { ?query_sense wdt:P9970 / ^wdt:P9970 ?sense . }
 
   # Do not show senses from the query language
   ?query_sense ^ontolex:sense / dct:language ?query_language .
