@@ -260,6 +260,22 @@ WHERE {
     BIND("../property/P8478" AS ?descriptionUrl)
     BIND("[] wdt:P8478 []" AS ?query)
   }  
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P10831 [] . } }
+    wd:P10831 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("../property/P10831" AS ?descriptionUrl)
+    BIND("[] wdt:P10831 []" AS ?query)
+  }  
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) { [] wdt:P10830 [] . } }
+    wd:P10830 rdfs:label ?description .
+    FILTER (LANG(?description) = 'en')
+    BIND("../property/P10830" AS ?descriptionUrl)
+    BIND("[] wdt:P10830 []" AS ?query)
+  }  
 }
 ORDER BY DESC(?count)
 `
