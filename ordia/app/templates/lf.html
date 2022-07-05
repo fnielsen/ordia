@@ -8,7 +8,7 @@
  formDataSparql = `
 # Data for a specific sense
 SELECT
-  ?description 
+  ?description ?descriptionUrl
   ?value ?valueLabel ?valueUrl
   ?source ?sourceUrl
 WHERE {
@@ -56,9 +56,55 @@ WHERE {
     ?value ontolex:representation ?valueLabel .
     BIND("alternative form" AS ?description)
   }
+  UNION
+  {
+    # Homofon form
+    BIND(13 AS ?order)
+
+    BIND("homophone form" AS ?description)
+    BIND("../property/P10822" AS ?descriptionUrl)
+
+    ?form wdt:P10822 ?value .
+    ?value ontolex:representation ?valueLabel .
+  }
   UNION 
   {
     BIND(20 AS ?order)
+
+    BIND("Described in" AS ?description)
+    BIND("../property/P1343" AS ?descriptionUrl)
+
+    ?form p:P1343 ?value_statement .
+    ?value_statement ps:P1343 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      BIND("↗" AS ?source)
+    }
+  }
+  UNION 
+  {
+    BIND(21 AS ?order)
+
+    BIND("Not described in" AS ?description)
+    BIND("../property/P9660" AS ?descriptionUrl)
+
+    ?form p:P9660 ?value_statement .
+    ?value_statement ps:P9660 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
+      BIND("↗" AS ?source)
+    }
+  }
+
+  UNION 
+  {
+    BIND(25 AS ?order)
     BIND("Attested in" AS ?description)
     ?form p:P5323 ?value_statement .
     ?value_statement ps:P5323 ?value_ .
@@ -82,7 +128,7 @@ WHERE {
   }
   UNION  
   {   
-    BIND(21 AS ?order)
+    BIND(26 AS ?order)
     ?lexeme ontolex:lexicalForm ?form .
     ?lexeme p:P5831 ?value_statement .
     ?value_statement ps:P5831 ?value .

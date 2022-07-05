@@ -89,6 +89,32 @@ LIMIT 10000
 `
 
 
+  senseSparql = `
+SELECT
+  ?lexeme ?lexemeLabel
+  ?sense ?senseUrl
+  ?language ?languageLabel
+  ?value ?valueUrl
+WHERE {
+  ?lexeme wikibase:lemma ?lexemeLabel .
+  ?lexeme ontolex:sense ?sense_ .
+  BIND(SUBSTR(STR(?sense_), 32) AS ?sense)
+  BIND(CONCAT("../", ?sense) AS ?senseUrl)
+
+  ?sense_ wdt:{{ p }} ?value_ .
+  BIND(SUBSTR(STR(?value_), 32) AS ?value)
+  BIND(CONCAT("../", ?value) AS ?valueUrl)
+  ?lexeme dct:language ?language
+  OPTIONAL {
+    ?language rdfs:label ?languageLabel .
+    FILTER (LANG(?languageLabel) = 'en')
+  }
+}
+LIMIT 10000
+`
+
+
+
 
  $(document).ready(function() {
      sparqlToDataTable(valuesForLexemesByValueSparql, "#values-for-lexemes-by-value", {
@@ -107,7 +133,14 @@ LIMIT 10000
 	     form: '../',
 	     language: '../language/', 
 	     value: '../'}});
+     sparqlToDataTable(senseSparql, "#senses", {
+	 linkPrefixes: {
+	     lexeme: '../',
+	     form: '../',
+	     language: '../language/', 
+	     value: '../'}});
  });
+
 
 </script>
 
