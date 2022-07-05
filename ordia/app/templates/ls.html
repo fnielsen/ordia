@@ -9,8 +9,9 @@
 
 # Data for a specific sense
 SELECT DISTINCT 
-  ?description 
+  ?description ?descriptionUrl
   ?value ?valueLabel ?valueUrl
+  ?source ?sourceLabel ?sourceUrl
 WHERE {
   BIND(wd:{{ l }}-{{ s }} AS ?sense)
   ?lexeme ontolex:sense ?sense ;
@@ -121,6 +122,21 @@ WHERE {
     BIND("Pertainym" AS ?description)
     { ?sense wdt:P8471 ?value . }
     ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+  }  
+  UNION
+  {
+    BIND(15 AS ?order)
+    BIND("False friend" AS ?description)
+    BIND("../property/P5976" AS ?descriptionUrl)
+    ?sense p:P5976 ?value_statement .
+    ?value_statement ps:P5976 ?value .
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ .
+      ?source_ rdfs:label ?source .
+      FILTER (LANG(?source) = 'en')
+      BIND(CONCAT("reference/", SUBSTR(STR(?source_), 32))  AS ?sourceUrl)
+    }
   }  
   UNION
   {
