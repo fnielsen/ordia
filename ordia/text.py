@@ -9,7 +9,7 @@ sentence_split_pattern = regex.compile(
     r"(?<=[\.!?:])\s",
     flags=regex.UNICODE | regex.DOTALL)
 word_pattern = regex.compile(
-    r"((?:\p{L}\p{M}?)+(?:-(?:\p{L}\p{M}?)+)*)",
+    r"((?:\p{L}\p{M}*)+(?:-(?:\p{L}\p{M}*)+)*)",
     flags=regex.UNICODE)
 
 
