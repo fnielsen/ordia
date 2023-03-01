@@ -205,8 +205,23 @@ LIMIT 50
 LIMIT 200
 `
 
-  
- 
+ wikiquoteSparql = `
+ SELECT ?title ?titleUrl ?snippet WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "Search" .
+      bd:serviceParam wikibase:endpoint "{{ iso639 }}.wikiquote.org" .
+      bd:serviceParam mwapi:srsearch "{{ representation }}" .
+      bd:serviceParam mwapi:language "{{ iso639 }}" .
+      ?title wikibase:apiOutput mwapi:title .
+      ?snippet_ wikibase:apiOutput "@snippet" .
+  }
+  hint:Prior hint:runFirst "true" .
+  BIND(CONCAT("https://{{ iso639 }}.wikiquote.org/wiki/", ENCODE_FOR_URI(?title)) AS ?titleUrl)
+  BIND(REPLACE(REPLACE(?snippet_, '</span>', ''), '<span class="searchmatch">', '') AS ?snippet)
+}
+LIMIT 50
+`
+   
 
  $(document).ready(function() {
      sparqlToDataTable(
@@ -222,6 +237,9 @@ LIMIT 200
 
      sparqlToDataTable(
 	 wiktionarySparql, "#wiktionary-table");
+
+     sparqlToDataTable(
+	 wikiquoteSparql, "#wikiquote-table");
  });
 
 </script>
@@ -258,6 +276,10 @@ LIMIT 200
     <h2>Wiktionary</h2>
     
     <table class="table table-hover" id="wiktionary-table"></table>
+
+    <h2>Wikiquote</h2>
+    
+    <table class="table table-hover" id="wikiquote-table"></table>
 
   
   
