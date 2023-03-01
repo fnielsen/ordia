@@ -176,7 +176,7 @@ GROUP BY ?lexeme ?lemma ?lexical_category ?lexical_categoryLabel
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "Search" .
       bd:serviceParam wikibase:endpoint "{{ iso639 }}.wikisource.org" .
-      bd:serviceParam mwapi:srsearch "{{ representation }}" .
+      bd:serviceParam mwapi:srsearch "\\"{{ representation }}\\"" .
       bd:serviceParam mwapi:language "{{ iso639 }}" .
       ?title wikibase:apiOutput mwapi:title .
       ?snippet_ wikibase:apiOutput "@snippet" .
