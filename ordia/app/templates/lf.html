@@ -9,21 +9,23 @@
 # Data for a specific sense
 SELECT
   ?description ?descriptionUrl
-  ?value ?valueLabel ?valueUrl
+  (?valueLabel AS ?value_) ?value_Url
   ?source ?sourceUrl
 WHERE {
   VALUES ?form { wd:{{ l }}-{{ f }} }
   {
     BIND(1 AS ?order)
     ?form ontolex:representation ?value .
+    BIND(?value AS ?valueLabel)
     BIND("representation" AS ?description)
-    BIND(CONCAT("representation/", ENCODE_FOR_URI(?value)) AS ?valueUrl)
+    BIND(CONCAT("representation/", ENCODE_FOR_URI(?value)) AS ?value_Url)
   }
   UNION
   {
     BIND(2 AS ?order)
     ?value ontolex:lexicalForm ?form .
     ?value wikibase:lemma ?valueLabel .
+    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
     BIND("lexeme" AS ?description)
   }
   UNION
@@ -33,19 +35,48 @@ WHERE {
     ?form ^ontolex:lexicalForm / dct:language ?value .
     ?value rdfs:label ?valueLabel .
     FILTER (LANG(?valueLabel) = "en")
+    BIND(CONCAT("language/", SUBSTR(STR(?value), 32))  AS ?value_Url)
     BIND("language" AS ?description)
+  }
+  UNION 
+  {
+    BIND(4 AS ?order)
+    BIND("Instance of" AS ?description)
+    ?form p:P31 ?value_statement .
+    ?value_statement ps:P31 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = 'en')
+    BIND(CONCAT("property/P31/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
+    OPTIONAL {
+      ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ .
+      ?source_ rdfs:label ?source .
+      FILTER (LANG(?source) = 'en')
+      BIND(CONCAT("reference/", SUBSTR(STR(?source_), 32))  AS ?sourceUrl)
+    }
+  }
+  UNION 
+  {
+    # Characterized by
+    BIND(5 AS ?order)
+    BIND("characterized by" AS ?description)
+    ?form wdt:P1552 ?value .
+    ?value rdfs:label ?valueLabel .
+    FILTER (LANG(?valueLabel) = "en")
+    BIND(CONCAT("property/P1552/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION
   {
     # Hyphenation
     BIND(10 AS ?order)
     ?form wdt:P5279 ?value .
+    BIND(?value AS ?valueLabel)
     BIND("hyphenation" AS ?description)
   }
   UNION  
   {   
     BIND(11 AS ?order)
     ?form wdt:P2859 ?value .
+    BIND(?value AS ?valueLabel)
     BIND("X-SAMPA" AS ?description)
   }
   UNION
@@ -54,6 +85,7 @@ WHERE {
     BIND(12 AS ?order)
     ?form wdt:P8530 ?value .
     ?value ontolex:representation ?valueLabel .
+    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
     BIND("alternative form" AS ?description)
   }
   UNION
@@ -117,7 +149,7 @@ WHERE {
     BIND(COALESCE(?value_label, SUBSTR(STR(?value_), 32)) AS ?value) 
 
 
-    BIND(CONCAT("reference/", SUBSTR(STR(?value_), 32))  AS ?valueUrl)
+    BIND(CONCAT("reference/", SUBSTR(STR(?value_), 32))  AS ?value_Url)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
       OPTIONAL { ?value_statement pq:P577 ?date }
@@ -137,7 +169,7 @@ WHERE {
     BIND(CONCAT("./text-to-lexemes?text-language=",
 		ENCODE_FOR_URI(?language_code),
 		"&text=",
-		ENCODE_FOR_URI(?value)) AS ?valueUrl)
+		ENCODE_FOR_URI(?value)) AS ?value_Url)
     BIND("example use" AS ?description)
   }
 }
