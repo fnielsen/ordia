@@ -33,7 +33,7 @@ WHERE {
     SELECT
       ?language
       (SUM(?statements) AS ?total_number_of_statements)
-      (AVG(?statements) AS ?average_number_of_statements)
+      (ROUND(AVG(?statements)*100)/100 AS ?average_number_of_statements)
     {
       [] wikibase:statements ?statements ;
          dct:language ?language .
