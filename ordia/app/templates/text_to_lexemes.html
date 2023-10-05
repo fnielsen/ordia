@@ -86,70 +86,19 @@ ORDER BY ?word
 		>{{ text }}</textarea>
     </div>
     <div class="form-row">
-      <div class="form-group col-md-4">
-	<label for="language">Language:</label>
-	<select class="form-control" id="language-selector" name="text-language">
-	  <option value="ar"{% if text_language == 'ar' %} selected="selected"{% endif %}>العربية - ar - Arabic</option>
-	  <option value="bg"{% if text_language == 'bg' %} selected="selected"{% endif %}>Български - bg - Bulgarian</option>
-	  <option value="bho"{% if text_language == 'bho' %} selected="selected"{% endif %}>𑂦𑂷𑂔𑂣𑂳𑂩𑂲 - bho - Bhojpuri</option>
-	  <option value="bn"{% if text_language == 'bn' %} selected="selected"{% endif %}>বাংলা - bn - Bengali</option>
-	  <option value="br"{% if text_language == 'br' %} selected="selected"{% endif %}>Brezhoneg - br - Breton</option>
-	  <option value="cs"{% if text_language == 'cs' %} selected="selected"{% endif %}>Čeština - cs - Czech</option>
-	  <option value="da"{% if text_language == 'da' %} selected="selected"{% endif %}>Dansk - da - Danish</option>
-	  <option value="dag"{% if text_language == 'dag' %} selected="selected"{% endif %}>Dagbanli - dag - Dagbani</option>
-	  <option value="de"{% if text_language == 'de' %} selected="selected"{% endif %}>Deutsch - de - German</option>
-	  <option value="el"{% if text_language == 'el' %} selected="selected"{% endif %}>ελληνικά - el - Greek</option>
- 	  <option value="en"{% if text_language == 'en' %} selected="selected"{% endif %}>English - en - English</option>
- 	  <option value="eo"{% if text_language == 'eo' %} selected="selected"{% endif %}>Esperanto - eo - Esperanto</option>
- 	  <option value="es"{% if text_language == 'es' %} selected="selected"{% endif %}>Español - es - Spanish</option>
- 	  <option value="et"{% if text_language == 'et' %} selected="selected"{% endif %}>Eesti - et - Estonian</option>
- 	  <option value="eu"{% if text_language == 'eu' %} selected="selected"{% endif %}>Euskara - eu - Basque</option>
-	  <option value="fa"{% if text_language == 'fa' %} selected="selected"{% endif %}>فارسی - fa - Persian</option>
-	  <option value="fi"{% if text_language == 'fi' %} selected="selected"{% endif %}>Suomen - fi - Finnish</option>
-	  <option value="fo"{% if text_language == 'fo' %} selected="selected"{% endif %}>Føroyskt - fo - Faroese</option>
-	  <option value="fr"{% if text_language == 'fr' %} selected="selected"{% endif %}>Français - fr - French</option>
-	  <option value="gu"{% if text_language == 'gu' %} selected="selected"{% endif %}>ગુજરાતી - gu - Gujarati</option>
-	  <option value="hi"{% if text_language == 'hi' %} selected="selected"{% endif %}>हिन्दी - hi - Hindi</option>
-	  <option value="id"{% if text_language == 'id' %} selected="selected"{% endif %}>Indonesia - id - Indonesian</option>
-	  <option value="it"{% if text_language == 'it' %} selected="selected"{% endif %}>Italiano - it - Italian</option>
-	  <option value="ja"{% if text_language == 'ja' %} selected="selected"{% endif %}>日本語 - ja - Japanese</option>
-	  <option value="kk"{% if text_language == 'kk' %} selected="selected"{% endif %}>Қазақша - kk - Kazakh</option>
-	  <option value="kl"{% if text_language == 'kl' %} selected="selected"{% endif %}>kalaallisut - kl - Greenlandic</option>
-	  <option value="kn"{% if text_language == 'kn' %} selected="selected"{% endif %}>ಕನ್ನಡ - kn - Kannada</option>
-	  <option value="ko"{% if text_language == 'ko' %} selected="selected"{% endif %}>한국어 - ko - Korean</option>
-	  <option value="ku"{% if text_language == 'ku' %} selected="selected"{% endif %}>kurdî - ku - Kurdish</option>
-	  <option value="ky"{% if text_language == 'ky' %} selected="selected"{% endif %}>Кыргызча - ky - Kyrghyz</option>
-	  <option value="la"{% if text_language == 'la' %} selected="selected"{% endif %}>Latina - la - Latin</option>
-	  <option value="mai"{% if text_language == 'mai' %} selected="selected"{% endif %}>মৈথিনী - mai - Maithili</option>
-	  <option value="mis-x-Q36846"{% if text_language == 'mis-x-Q36846' %} selected="selected"{% endif %}>Toki Pona - mis-x-Q36846 - Toki Pona</option>
-	  <option value="ml"{% if text_language == 'ml' %} selected="selected"{% endif %}>മലയാളം - ml - Malayalam</option>
-	  <option value="mn"{% if text_language == 'mn' %} selected="selected"{% endif %}>Монгол - mn - Mongolian</option>
-	  <option value="mr"{% if text_language == 'mr' %} selected="selected"{% endif %}>मराठी - mr - Marathi</option>
-	  <option value="nb"{% if text_language == 'nb' %} selected="selected"{% endif %}>norsk bokmål - nb - Norwegian Bokmål</option>
-	  <option value="ne"{% if text_language == 'ne' %} selected="selected"{% endif %}>नेपाली - ne - Nepali</option>
-	  <option value="nl"{% if text_language == 'nl' %} selected="selected"{% endif %}>Nederlands - nl - Dutch</option>
-	  <option value="nn"{% if text_language == 'nn' %} selected="selected"{% endif %}>norsk nynorsk - nn - Norwegian Nynorsk</option>
-	  <option value="nv"{% if text_language == 'nv' %} selected="selected"{% endif %}>Diné bizaad - nv - Navajo</option>
-	  <option value="or"{% if text_language == 'or' %} selected="selected"{% endif %}>ଓଡ଼ିଆ - or - Ordia</option>
-	  <option value="pa"{% if text_language == 'pa' %} selected="selected"{% endif %}>ਪੰਜਾਬੀ - pa - Punjabi Gurmukhi</option>
-	  <option value="pl"{% if text_language == 'pl' %} selected="selected"{% endif %}>Polski - pl - Polish</option>
-	  <option value="pnb"{% if text_language == 'pnb' %} selected="selected"{% endif %}>پن٘جابی - pnb - Punjabi Shahmukhi</option>
-	  <option value="pt"{% if text_language == 'pt' %} selected="selected"{% endif %}>Português - pt - Portuguese</option>
-	  <option value="ru"{% if text_language == 'ru' %} selected="selected"{% endif %}>Русский - ru - Russian</option>
-	  <option value="sk"{% if text_language == 'sk' %} selected="selected"{% endif %}>Slovenčina - sk - Slovak</option>
-	  <option value="sl"{% if text_language == 'sl' %} selected="selected"{% endif %}>Slovenščina - sl - Slovene</option>
-	  <option value="sv"{% if text_language == 'sv' %} selected="selected"{% endif %}>Svenska - sv - Swedish</option>
-	  <option value="sw"{% if text_language == 'sw' %} selected="selected"{% endif %}>Kiswahili - sw - Swahili</option>
-	  <option value="ta"{% if text_language == 'ta' %} selected="selected"{% endif %}>தமிழ் - ta - Tamil</option>
-	  <option value="te"{% if text_language == 'te' %} selected="selected"{% endif %}>తెలుగు - te - Telugu</option>
-	  <option value="tg"{% if text_language == 'tg' %} selected="selected"{% endif %}>Тоҷикӣ - tg - Tajik</option>
-	  <option value="tk"{% if text_language == 'tk' %} selected="selected"{% endif %}>Türkmençe - tk - Turkmen</option>
-	  <option value="ug"{% if text_language == 'ug' %} selected="selected"{% endif %}>ئۇيغۇرچە - ug - Uyghur</option>
-	  <option value="uk"{% if text_language == 'uk' %} selected="selected"{% endif %}>Українська - uk - Ukrainian</option>
-	  <option value="ur"{% if text_language == 'ur' %} selected="selected"{% endif %}>اُردُو - ur - Urdu</option>
-	  <option value="uz"{% if text_language == 'uz' %} selected="selected"{% endif %}>Oʻzbekcha - uz - Uzbek</option>
-	  <option value="vi"{% if text_language == 'vi' %} selected="selected"{% endif %}>Tiếng Việt - vi - Vietnamese</option>
-	  <option value="zh"{% if text_language == 'zh' %} selected="selected"{% endif %}>汉语 - zh - Chinese</option>
+      <div class="form-group col-md-6">
+        <label for="language">Language:</label>
+        <select class="form-control" id="language-selector" name="text-language">
+          {% for lang in languages | sort %}
+            <option value="{{ lang }}"{% if text_language == lang %} selected="selected"{% endif %}>
+            {% if languages[lang].autonym %}
+              {{ languages[lang].autonym }}
+            {% else %}
+              {{ languages[lang].name }}
+            {% endif %}
+            - {{ lang }} - {{ languages[lang].name }}
+            </option>
+          {% endfor %}
 	</select>
       </div>
       
