@@ -5,4 +5,4 @@ functools32 ; python_version < '3'
 regex
 requests
 six
-werkzeug>=0.9
+werkzeug>=3.0.1
