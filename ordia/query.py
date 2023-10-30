@@ -261,6 +261,7 @@ def spacy_token_to_lexemes(token):
     Parameters
     ----------
     token : spacy.tokens.token.Token
+        Token object from processing with SpaCy.
 
     Returns
     -------

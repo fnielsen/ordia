@@ -1,6 +1,6 @@
 certifi>=2022.12.7
 docopt
-flask
+Flask>=3.0.0
 functools32 ; python_version < '3'
 regex
 requests
