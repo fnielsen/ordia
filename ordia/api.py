@@ -12,6 +12,11 @@ Options:
 
 import requests
 
+try:
+    from functools import lru_cache
+except ImportError:
+    # For Python 2.
+    from functools32 import lru_cache
 
 HEADERS = {
     'User-Agent': 'Ordia',
@@ -78,6 +83,28 @@ def wb_get_entities(ids):
                 break
 
     return entities
+
+
+def wb_content_languages():
+    params = {
+        'action': 'query',
+        'format': 'json',
+        'meta': 'wbcontentlanguages',
+        'wbclcontext': 'term-lexicographical',
+        'wbclprop': 'code|name|autonym',
+    }
+
+    response = requests.get(
+        'https://www.wikidata.org/w/api.php',
+        headers=HEADERS, params=params)
+
+    response_data = response.json()
+    return response_data['query']['wbcontentlanguages']
+
+
+@lru_cache(maxsize=None)
+def wb_content_languages_cached():
+	return wb_content_languages()
 
 
 def wb_search_lexeme_entities(query, language='en'):
