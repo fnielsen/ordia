@@ -86,7 +86,7 @@ ORDER BY ?word
 		>{{ text }}</textarea>
     </div>
     <div class="form-row">
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-4">
 	<label for="language">Language:</label>
 	<select class="form-control" id="language-selector" name="text-language">
 	  <option value="ar"{% if text_language == 'ar' %} selected="selected"{% endif %}>العربية - ar - Arabic</option>
@@ -151,7 +151,7 @@ ORDER BY ?word
 	</select>
       </div>
       
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-4">
 	<label for="casing">Casing:</label>
 	<select class="form-control" id="casing-selector" name="casing">	
 	  <option value="none"{% if casing == 'none' %} selected="selected"{% endif %}>None</option>
@@ -161,10 +161,22 @@ ORDER BY ?word
  	  <option value="uppercase-first-word-letters"{% if casing == 'uppercase_first_word_letters' %} selected="selected"{% endif %}>Uppercase first word letters</option>
 	</select>
       </div>
+
+      <div class="form-group col-md-4">
+	<label for="max-n-gram">Max N-gram:</label>
+	<select class="form-control" id="max-n-gram-selector" name="max-n-gram">	
+	  <option value="1"{% if max_n_gram == 1 %} selected="selected"{% endif %}>1 (unigrams)</option>
+	  <option value="2"{% if max_n_gram == 2 %} selected="selected"{% endif %}>2 (unigrams + bigrams)</option>
+ 	  <option value="3"{% if max_n_gram == 3 %} selected="selected"{% endif %}>3 (unigrams + bigrams + trigrams)</option>
+	</select>
+      </div>
+      
     </div>
+    
     <div class="form-group">
-	<button class="btn btn-primary" type="submit">Submit</button>
+      <button class="btn btn-primary" type="submit">Submit</button>
     </div>
+
 </form>
 
 <h2>Extraction</h2>
