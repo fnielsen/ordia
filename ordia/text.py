@@ -115,3 +115,36 @@ def text_to_words(text):
     """
     words = word_pattern.findall(text)
     return words
+
+
+def word_list_to_everygrams(word_list, max_n_gram=3):
+    """Convert a word list to a everygram list.
+
+    Convert a list of strings to a list of strings that contain, unigrams,
+    bigram, trigram, ...
+
+    Parameters
+    ----------
+    word_list : list of str
+        List of strings with words.
+    max_n_gram : int
+        Maximum n-gram, e.g., if `max_n_gram=2` then the list consists of
+        unigrams and bigrams.
+
+    Returns
+    -------
+    everygrams : list of str
+        List of strings with words within an n-gram joined by space.
+
+    Examples
+    --------
+    >>> word_list = ['nuclear', 'magnetic', 'resonance']
+    >>> everygrams = word_list_to_everygrams(word_list, max_n_gram=3)
+    >>> everygrams[:4]
+    ['nuclear', 'nuclear magnetic', 'nuclear magnetic resonance', 'magnetic']
+
+    """
+    everygrams = [" ".join(word_list[i:i + n + 1])
+                  for i in range(len(word_list))
+                  for n in range(max_n_gram) if len(word_list) >= i + n + 1]
+    return everygrams

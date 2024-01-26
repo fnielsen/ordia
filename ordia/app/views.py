@@ -11,7 +11,8 @@ from six import u
 from ..api import wb_search_lexeme_entities
 from ..query import (escape_string, form_to_representation_and_iso639,
                      get_wikidata_language_codes_cached, iso639_to_q)
-from ..text import lowercase_first_sentence_letters, text_to_words
+from ..text import (lowercase_first_sentence_letters, text_to_words,
+                    word_list_to_everygrams)
 
 
 ALLOWED_LANGUAGES = [
@@ -546,10 +547,12 @@ def show_text_to_lexemes():
         text = request.args.get('text')
         text_language = request.args.get('text-language')
         casing = request.args.get('casing')
+        max_n_gram = request.args.get('max-n-gram')
     elif request.method == 'POST':
         text = request.form.get('text')
         text_language = request.form.get('text-language')
         casing = request.form.get('casing')
+        max_n_gram = request.form.get('max-n-gram')
     else:
         assert False
 
@@ -564,10 +567,20 @@ def show_text_to_lexemes():
         casing = 'lowercase_first_sentence_letters'
     casing = casing.replace('-', '_')
 
+    # Convert and sanitize max_n_gram
+    try:
+        max_n_gram = int(max_n_gram)
+    except Exception:
+        max_n_gram = 1
+
+    # Currently confined to between 1 and 3
+    max_n_gram = min(3, max(1, max_n_gram))
+
     if not text:
         return render_template('text_to_lexemes.html',
                                text_language=text_language,
-                               casing=casing)
+                               casing=casing,
+                               max_n_gram=max_n_gram)
 
     # Casing processing
     cased_text = text.strip()
@@ -585,6 +598,11 @@ def show_text_to_lexemes():
         assert False
     list_of_words = text_to_words(cased_text)
 
+    if max_n_gram > 1:
+        list_of_words = word_list_to_everygrams(list_of_words,
+                                                max_n_gram=max_n_gram)
+        # list_of_words is now a list of everygrams
+
     # Make the list only consists of unique words
     list_of_words = list(set(list_of_words))
 
@@ -597,4 +615,5 @@ def show_text_to_lexemes():
             word=word, language=text_language)
 
     return render_template('text_to_lexemes.html', text=text, words=words,
-                           text_language=text_language, casing=casing)
+                           text_language=text_language, casing=casing,
+                           max_n_gram=max_n_gram)
