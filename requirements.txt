@@ -3,6 +3,6 @@ docopt
 Flask>=3.0.0
 functools32 ; python_version < '3'
 regex
-requests
+requests>=2.32.0
 six
 werkzeug>=3.0.3
