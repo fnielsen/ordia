@@ -573,9 +573,6 @@ def show_text_to_lexemes():
     except Exception:
         max_n_gram = 1
 
-    # Currently confined to between 1 and 3
-    max_n_gram = min(3, max(1, max_n_gram))
-
     if not text:
         return render_template('text_to_lexemes.html',
                                text_language=text_language,
