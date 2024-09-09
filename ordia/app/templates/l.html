@@ -244,6 +244,27 @@ ORDER BY ?order
  ORDER BY (STR(?sense))
 `
 
+identifiersSparql = `
+SELECT 
+  ?property_item ?property_itemLabel ?property_itemDescription
+  # ?identifier ?identifierLabel
+  ?identifier_url
+WHERE {
+  wd:{{ l }} ?property ?identifier .
+  ?property_item wikibase:directClaim ?property ;
+                 wikibase:propertyType wikibase:ExternalId .
+  OPTIONAL {
+    ?property_item wdt:P1630 ?url_pattern .
+  }
+  BIND(CONCAT(?identifier, "&nbsp;↗") AS ?identifierLabel)
+  BIND(IRI(REPLACE(?url_pattern, "\\\\$1", ENCODE_FOR_URI(STR(?identifier)))) AS ?identifier_url)
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?property_itemLabel
+`
+
+  
 
  compoundsSparql = `
 SELECT
@@ -288,6 +309,8 @@ WHERE {
 		       options={paging: false, sDom: 'rt',});
      sparqlToDataTable(sensesSparql, "#senses",
 		       options={paging: false, sDom: 'rt',});
+     sparqlToDataTable(identifiersSparql, "#identifiers",
+		       options={paging: false, sDom: 'rt',});
      sparqlToDataTable(compoundsSparql, "#compounds",
 		       options={paging: false, sDom: 'rt',});
  });
@@ -327,6 +350,13 @@ WHERE {
 	      </div>
 	 </div>
      </div>
+
+    <hr/>
+
+    <h2>Identifiers</h2>
+
+    <table class="table table-hover" id="identifiers"></table>
+    
 
     <hr/>
     
