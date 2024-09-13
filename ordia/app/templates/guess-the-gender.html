@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<script>
+        const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
+        const MAX_QUESTIONS = 10;
+        let nouns = [];
+        let currentQuestion = 0;
+        let score = 0;
+
+        // Gender Q-Identifiers and labels
+        const genders = [
+            { id: 'Q499327', label: 'Masculine' },
+            { id: 'Q1775415', label: 'Feminine' },
+            { id: 'Q1775461', label: 'Neuter' },
+            { id: 'Q1305037', label: 'Common' }
+        ];
+
+        // Fetch data from Wikidata
+        async function fetchNouns() {
+            const genderValues = genders.map(g => 'wd:' + g.id).join(', ');
+            const query = `
+            SELECT ?lemma ?gender WHERE {
+              ?lexeme dct:language wd:Q9035 ;
+                      wikibase:lexicalCategory wd:Q1084 ;
+                      wikibase:lemma ?lemma ;
+                      wdt:P5185 ?gender .
+              FILTER (?gender IN (${genderValues}))
+            }
+            LIMIT 100
+            `;
+            const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/sparql-results+json' }
+            });
+            const data = await response.json();
+
+            // Prepare nouns list
+            nouns = data.results.bindings.map(item => ({
+                lemma: item.lemma.value,
+                genderId: item.gender.value.split('/').pop() // Extract QID
+            }));
+            nouns = shuffleArray(nouns).slice(0, MAX_QUESTIONS);
+            startGame();
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Start the game
+        function startGame() {
+            showQuestion();
+        }
+
+        // Show current question
+        function showQuestion() {
+            if (currentQuestion >= MAX_QUESTIONS) {
+                endGame();
+                return;
+            }
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('noun').textContent = nouns[currentQuestion].lemma;
+        }
+
+        // Handle user's guess
+        function makeGuess(guessGenderId) {
+            const correctGenderId = nouns[currentQuestion].genderId;
+            if (guessGenderId === correctGenderId) {
+                score++;
+            }
+            currentQuestion++;
+            showQuestion();
+        }
+
+        // End the game
+        function endGame() {
+            document.getElementById('game').classList.add('d-none');
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('d-none');
+            resultDiv.textContent = `You scored ${score} out of ${MAX_QUESTIONS}!`;
+        }
+
+        // Initialize the game
+        fetchNouns();
+
+ </script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Guess the Gender</h1>
+        <div id="game" class="card p-4">
+            <div id="progress" class="mb-3">
+                Question <span id="current-question">1</span> of 10
+            </div>
+            <h2 id="noun" class="text-center mb-4"></h2>
+            <div class="text-center" id="gender-buttons">
+                <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q499327')">Masculine</button>
+                <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q1775415')">Feminine</button>
+                <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q1775461')">Neuter</button>
+                <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q1305037')">Common</button>
+            </div>
+        </div>
+
+	<!-- Game Result -->
+        <div id="result" class="alert alert-info mt-4 d-none"></div>
+
+
+	 <!-- Acknowledgment Note -->
+        <div class="text-center mt-4">
+            <p>This game was inspired by Léa Lacroix's derdiedas game.</p>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
