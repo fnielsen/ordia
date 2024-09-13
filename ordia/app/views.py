@@ -182,6 +182,18 @@ def show_grammatical_feature(q):
     return render_template("grammatical_feature.html", q=q)
 
 
+@main.route("/guess-the-gender/")
+def show_guess_the_gender():
+    """Render webpage for Guess the Gender.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("guess-the-gender.html")
+
 @main.route("/hyphenation/")
 def show_hyphenation_index():
     """Render index webpage for hyphenation."""
