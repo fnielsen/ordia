@@ -194,6 +194,7 @@ def show_guess_the_gender():
     """
     return render_template("guess-the-gender.html")
 
+
 @main.route("/hyphenation/")
 def show_hyphenation_index():
     """Render index webpage for hyphenation."""
