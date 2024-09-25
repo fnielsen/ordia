@@ -9,7 +9,9 @@
         let nouns = [];
         let currentQuestion = 0;
         let score = 0;
-
+        let selectedLanguageCode = '';
+        let selectedLanguageQID = '';
+  
         // Gender Q-Identifiers and labels
         const genders = [
             { id: 'Q499327', label: 'Masculine' },
@@ -18,12 +20,50 @@
             { id: 'Q1305037', label: 'Common' }
         ];
 
+        // Mapping of language codes to Wikidata Q-IDs
+        const languageCodeToQID = {
+            'da': 'Q9035',     // Danish
+            'de': 'Q188',      // German
+            'en': 'Q1860',     // English
+            'es': 'Q1321',     // Spanish
+            'fr': 'Q150',      // French
+            'it': 'Q652',      // Italian
+	    'nb': 'Q25167',    // Bokmal
+            'nl': 'Q7411',     // Dutch
+	    'sv': 'Q9027',     // Swedish
+            // Add more languages and their Wikidata Q-IDs as needed
+        };
+
+        // Start a new game
+        function startNewGame() {
+            selectedLanguageCode = document.getElementById('language-selector').value;
+            selectedLanguageQID = languageCodeToQID[selectedLanguageCode];
+
+            if (!selectedLanguageQID) {
+                alert('Selected language is not supported.');
+                return;
+            }
+
+            // Reset game state
+            nouns = [];
+            currentQuestion = 0;
+            score = 0;
+
+            // Hide result and language selection, show game
+            document.getElementById('result').classList.add('d-none');
+            document.getElementById('language-selection').classList.add('d-none');
+            document.getElementById('game').classList.remove('d-none');
+
+            // Fetch nouns and start the game
+            fetchNouns();
+        }
+  
         // Fetch data from Wikidata
         async function fetchNouns() {
             const genderValues = genders.map(g => 'wd:' + g.id).join(', ');
             const query = `
             SELECT ?lemma ?gender WHERE {
-              ?lexeme dct:language wd:Q9035 ;
+              ?lexeme dct:language wd:${selectedLanguageQID} ;
                       wikibase:lexicalCategory wd:Q1084 ;
                       wikibase:lemma ?lemma ;
                       wdt:P5185 ?gender .
@@ -42,6 +82,13 @@
                 lemma: item.lemma.value,
                 genderId: item.gender.value.split('/').pop() // Extract QID
             }));
+
+          if (nouns.length === 0) {
+                alert('No nouns found for the selected language.');
+                resetGame();
+                return;
+            }
+	    
             nouns = shuffleArray(nouns).slice(0, MAX_QUESTIONS);
             startGame();
         }
@@ -80,16 +127,22 @@
             showQuestion();
         }
 
-        // End the game
+       // End the game
         function endGame() {
             document.getElementById('game').classList.add('d-none');
             const resultDiv = document.getElementById('result');
             resultDiv.classList.remove('d-none');
             resultDiv.textContent = `You scored ${score} out of ${MAX_QUESTIONS}!`;
+            // Show language selection again for a new game
+            document.getElementById('language-selection').classList.remove('d-none');
         }
 
-        // Initialize the game
-        fetchNouns();
+        // Reset the game to initial state
+        function resetGame() {
+            document.getElementById('game').classList.add('d-none');
+            document.getElementById('result').classList.add('d-none');
+            document.getElementById('language-selection').classList.remove('d-none');
+        }
 
  </script>
 
@@ -99,8 +152,28 @@
 {% block page_content %}
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Guess the Gender</h1>
-        <div id="game" class="card p-4">
+      <h1 class="text-center mb-4">Guess the Gender</h1>
+
+
+         <!-- Language Selection -->
+        <div id="language-selection" class="card p-4 mb-4">
+            <label for="language-selector">Select Language:</label>
+            <select class="form-control mb-3" id="language-selector">
+                <option value="da">Dansk - da - Danish</option>
+                <option value="de">Deutsch - de - German</option>
+                <option value="es">Español - es - Spanish</option>
+                <option value="fr">Français - fr - French</option>
+                <option value="it">Italiano - it - Italian</option>
+                <option value="nb">Norsk bokmål - nb - Norwegian Bokmål</option>
+                <option value="nl">Nederlands - nl - Dutch</option>
+	        <option value="sv">Svenska - sv - Swedish</option>
+                <!-- Add more languages as needed -->
+            </select>
+            <button class="btn btn-success" onclick="startNewGame()">New Game</button>
+        </div>
+
+        <!-- Game Content -->
+         <div id="game" class="card p-4">
             <div id="progress" class="mb-3">
                 Question <span id="current-question">1</span> of 10
             </div>
