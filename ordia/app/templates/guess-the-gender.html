@@ -62,16 +62,28 @@
         // Fetch data from Wikidata
         async function fetchNouns() {
             const genderValues = genders.map(g => 'wd:' + g.id).join(', ');
-            const query = `
-            SELECT ?lexeme ?lemma ?gender WHERE {
-              ?lexeme dct:language wd:${selectedLanguageQID} ;
-                      wikibase:lexicalCategory wd:Q1084 ;
-                      wikibase:lemma ?lemma ;
-                      wdt:P5185 ?gender .
-              FILTER (?gender IN (${genderValues}))
-            }
-            LIMIT 100
-            `;
+	    const query = `
+              SELECT
+                ?lexeme
+                (GROUP_CONCAT(?lemma_; separator="/") AS ?lemma)
+                (SAMPLE(?gender_) AS ?gender) 
+              WITH {
+                SELECT ?lexeme ?gender_ WHERE {
+                  ?lexeme dct:language wd:${selectedLanguageQID} ;
+                  wikibase:lexicalCategory wd:Q1084 ;
+                  wdt:P5185 ?gender_ .
+                  FILTER (?gender_ IN (${genderValues}))
+                }
+                LIMIT 1000
+              } AS %lexemes
+              WHERE {
+                INCLUDE %lexemes
+                ?lexeme wikibase:lemma ?lemma_ .
+              }
+              GROUP BY ?lexeme ?lemma_ ?gender_
+              HAVING (COUNT(DISTINCT ?gender_) = 1)
+              LIMIT 100
+            `
             const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
             const response = await fetch(url, {
                 headers: { 'Accept': 'application/sparql-results+json' }
