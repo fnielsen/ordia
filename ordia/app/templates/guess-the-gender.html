@@ -31,6 +31,7 @@
 	    'nb': 'Q25167',    // Bokmal
             'nl': 'Q7411',     // Dutch
 	    'sv': 'Q9027',     // Swedish
+	    'uk': 'Q8798',     // Ukrainian
             // Add more languages and their Wikidata Q-IDs as needed
         };
 
@@ -38,22 +39,22 @@
         function startNewGame() {
             selectedLanguageCode = document.getElementById('language-selector').value;
             selectedLanguageQID = languageCodeToQID[selectedLanguageCode];
-
+	    
             if (!selectedLanguageQID) {
                 alert('Selected language is not supported.');
                 return;
             }
-
+	    
             // Reset game state
             nouns = [];
             currentQuestion = 0;
             score = 0;
-
+	    
             // Hide result and language selection, show game
             document.getElementById('result').classList.add('d-none');
             document.getElementById('language-selection').classList.add('d-none');
             document.getElementById('game').classList.remove('d-none');
-
+	    
             // Fetch nouns and start the game
             fetchNouns();
         }
@@ -62,7 +63,7 @@
         async function fetchNouns() {
             const genderValues = genders.map(g => 'wd:' + g.id).join(', ');
             const query = `
-            SELECT ?lemma ?gender WHERE {
+            SELECT ?lexeme ?lemma ?gender WHERE {
               ?lexeme dct:language wd:${selectedLanguageQID} ;
                       wikibase:lexicalCategory wd:Q1084 ;
                       wikibase:lemma ?lemma ;
@@ -76,23 +77,26 @@
                 headers: { 'Accept': 'application/sparql-results+json' }
             });
             const data = await response.json();
-
+	    
             // Prepare nouns list
-            nouns = data.results.bindings.map(item => ({
+	    nouns = data.results.bindings.map(item => ({
+                lexeme: item.lexeme.value,
                 lemma: item.lemma.value,
-                genderId: item.gender.value.split('/').pop() // Extract QID
+                genderId: item.gender.value.split('/').pop(), // Extract QID
+                userGuess: null,  // To store user's guess
+                isCorrect: null   // To store if the guess was correct
             }));
-
-          if (nouns.length === 0) {
+	    
+            if (nouns.length === 0) {
                 alert('No nouns found for the selected language.');
                 resetGame();
-                return;
+		return;
             }
 	    
             nouns = shuffleArray(nouns).slice(0, MAX_QUESTIONS);
-            startGame();
+            showQuestion();
         }
-
+  
         // Shuffle array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -101,7 +105,7 @@
             }
             return array;
         }
-
+  
         // Start the game
         function startGame() {
             showQuestion();
@@ -115,26 +119,88 @@
             }
             document.getElementById('current-question').textContent = currentQuestion + 1;
             document.getElementById('noun').textContent = nouns[currentQuestion].lemma;
+            document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
         }
 
         // Handle user's guess
         function makeGuess(guessGenderId) {
+	    const currentNoun = nouns[currentQuestion];
+            currentNoun.userGuess = guessGenderId;
             const correctGenderId = nouns[currentQuestion].genderId;
+	    
+	    let feedbackDiv = document.getElementById('feedback');
             if (guessGenderId === correctGenderId) {
                 score++;
+                currentNoun.isCorrect = true;
+                feedbackDiv.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Correct!</span>';
+            } else {
+                currentNoun.isCorrect = false;
+                const correctGenderLabel = getGenderLabelById(correctGenderId);
+                feedbackDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> Incorrect! The correct gender is ${correctGenderLabel}.</span>`;
             }
             currentQuestion++;
-            showQuestion();
+	    // Delay before showing next question
+            setTimeout(showQuestion, 1500);
         }
 
-       // End the game
+        // Get gender label by QID
+        function getGenderLabelById(genderId) {
+            const gender = genders.find(g => g.id === genderId);
+            return gender ? gender.label : 'Unknown';
+        }
+  
+        // End the game
         function endGame() {
             document.getElementById('game').classList.add('d-none');
             const resultDiv = document.getElementById('result');
             resultDiv.classList.remove('d-none');
-            resultDiv.textContent = `You scored ${score} out of ${MAX_QUESTIONS}!`;
-            // Show language selection again for a new game
-            document.getElementById('language-selection').classList.remove('d-none');
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('total-questions').textContent = MAX_QUESTIONS;
+	    
+            // Populate summary table
+            const summaryTableBody = document.getElementById('summary-table-body');
+            summaryTableBody.innerHTML = ''; // Clear previous content
+	    
+            nouns.forEach((noun, index) => {
+                const row = document.createElement('tr');
+                // Index
+                const cellIndex = document.createElement('td');
+                cellIndex.textContent = index + 1;
+                row.appendChild(cellIndex);
+		
+                // Noun
+                const cellNoun = document.createElement('td');
+                const link = document.createElement('a');
+		const lexeme = noun.lexeme.split('/').pop()
+                link.href = '/' + lexeme;
+                link.textContent = noun.lemma;
+                cellNoun.appendChild(link);
+		row.appendChild(cellNoun);
+		
+                // Your Guess
+                const cellUserGuess = document.createElement('td');
+                const userGuessLabel = getGenderLabelById(noun.userGuess) || 'No Guess';
+                cellUserGuess.textContent = userGuessLabel;
+                row.appendChild(cellUserGuess);
+		
+                // Correct Gender
+                const cellCorrectGender = document.createElement('td');
+                const correctGenderLabel = getGenderLabelById(noun.genderId);
+                cellCorrectGender.textContent = correctGenderLabel;
+                row.appendChild(cellCorrectGender);
+		
+                // Result
+                const cellResult = document.createElement('td');
+                if (noun.isCorrect) {
+                    cellResult.innerHTML = '<span class="text-success">✔</span>';
+                } else {
+                    cellResult.innerHTML = '<span class="text-danger">❌</span>';
+                }
+                row.appendChild(cellResult);
+		
+		
+                summaryTableBody.appendChild(row);
+            });
         }
 
         // Reset the game to initial state
@@ -144,6 +210,7 @@
             document.getElementById('language-selection').classList.remove('d-none');
         }
 
+  
  </script>
 
 {% endblock %}
@@ -167,13 +234,14 @@
                 <option value="nb">Norsk bokmål - nb - Norwegian Bokmål</option>
                 <option value="nl">Nederlands - nl - Dutch</option>
 	        <option value="sv">Svenska - sv - Swedish</option>
+	        <option value="uk">Українська - uk - Ukranian</option>
                 <!-- Add more languages as needed -->
             </select>
             <button class="btn btn-success" onclick="startNewGame()">New Game</button>
         </div>
 
         <!-- Game Content -->
-         <div id="game" class="card p-4">
+         <div id="game" class="card p-4 d-none">
             <div id="progress" class="mb-3">
                 Question <span id="current-question">1</span> of 10
             </div>
@@ -184,26 +252,40 @@
                 <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q1775461')">Neuter</button>
                 <button class="btn btn-primary mx-2 my-2" onclick="makeGuess('Q1305037')">Common</button>
             </div>
+	    <!-- Feedback Area -->
+            <div id="feedback" class="text-center mt-3"></div>
         </div>
 
-	<!-- Game Result -->
-        <div id="result" class="alert alert-info mt-4 d-none"></div>
+        <!-- Game Result -->
+        <div id="result" class="mt-4 d-none">
+            <div class="alert alert-info">
+                You scored <span id="final-score"></span> out of <span id="total-questions"></span>!
+            </div>
+            <!-- Summary Table -->
+            <h3>Summary:</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Noun</th>
+                        <th>Your Guess</th>
+                        <th>Correct Gender</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table-body">
+                    <!-- Rows will be populated dynamically -->
+                </tbody>
+            </table>
+            <!-- Restart Button -->
+            <button class="btn btn-success" onclick="resetGame()">Play Again</button>
+        </div>
 
-
-	 <!-- Acknowledgment Note -->
+        <!-- Acknowledgment Note -->
         <div class="text-center mt-4">
             <p>This game was inspired by Léa Lacroix's derdiedas game.</p>
         </div>
     </div>
 
 
-
 {% endblock %}
-
-
-
-
-
-
-
-
