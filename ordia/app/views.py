@@ -195,6 +195,19 @@ def show_guess_the_gender():
     return render_template("guess-the-gender.html")
 
 
+@main.route("/guess-word-from-image/")
+def show_guess_word_from_image():
+    """Render webpage for Guess word from image.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("guess-word-from-image.html")
+
+
 @main.route("/hyphenation/")
 def show_hyphenation_index():
     """Render index webpage for hyphenation."""
