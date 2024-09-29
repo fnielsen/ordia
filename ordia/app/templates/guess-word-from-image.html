@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+    <style>
+        #game-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .option-button {
+            margin: 5px;
+        }
+        .summary-image {
+            max-width: 100px;
+            height: auto;
+        }
+    </style>
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script>
+        const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
+        const MAX_QUESTIONS = 10;
+        let dataItems = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedLanguageCode = '';
+        let selectedLanguageQID = '';
+        let currentCorrectItem = null;
+        let questionsData = []; // To store data for the summary table
+
+        // Mapping of language codes to Wikidata Q-IDs
+        // Mapping of language codes to Wikidata Q-IDs
+        const languageCodeToQID = {
+            'da': 'Q9035',     // Danish
+            'de': 'Q188',      // German
+            'en': 'Q1860',     // English
+            'es': 'Q1321',     // Spanish
+            'fr': 'Q150',      // French
+            'it': 'Q652',      // Italian
+	    'nb': 'Q25167',    // Bokmal
+            'nl': 'Q7411',     // Dutch
+	    'sv': 'Q9027',     // Swedish
+	    'uk': 'Q8798',     // Ukrainian
+            // Add more languages and their Wikidata Q-IDs as needed
+        };
+
+        // Start a new game
+        function startNewGame() {
+            selectedLanguageCode = document.getElementById('language-selector').value;
+            selectedLanguageQID = languageCodeToQID[selectedLanguageCode];
+
+            if (!selectedLanguageQID) {
+                alert('Selected language is not supported.');
+                return;
+            }
+
+            // Reset game state
+            dataItems = [];
+            currentQuestion = 0;
+            score = 0;
+            questionsData = [];
+
+            // Hide result and language selection, show game
+            document.getElementById('result').classList.add('d-none');
+            document.getElementById('language-selection').classList.add('d-none');
+            document.getElementById('game').classList.remove('d-none');
+
+            // Fetch data and start the game
+            fetchData();
+        }
+
+        // Fetch data from Wikidata
+        async function fetchData() {
+            const query = `
+            SELECT ?lexeme ?lemma ?gloss ?image_url WHERE {
+              ?lexeme dct:language wd:${selectedLanguageQID} ;
+                      wikibase:lemma ?lemma ;
+                      ontolex:sense ?sense .
+              OPTIONAL {
+                ?sense skos:definition ?gloss .
+                FILTER (LANG(?gloss) = 'en')
+              }
+              ?sense wdt:P18 ?image .
+
+              BIND(REPLACE(STR(?image), "^http://", "https://") AS ?image_https)
+              BIND(CONCAT(?image_https, "?width=300") AS ?image_url)
+            }
+            LIMIT 100
+            `;
+            const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/sparql-results+json' }
+                });
+                const data = await response.json();
+
+                // Prepare data items
+                dataItems = data.results.bindings.map(item => ({
+                    lexeme: item.lexeme.value,
+                    lemma: item.lemma.value,
+                    gloss: item.gloss ? item.gloss.value : '',
+                    imageUri: item.image_url.value
+                }));
+
+                if (dataItems.length < 3) {
+                    alert('Not enough data found for the selected language.');
+                    resetGame();
+                    return;
+                }
+
+                // Shuffle data items
+                dataItems = shuffleArray(dataItems);
+
+                // Adjust total questions if there are fewer items
+                const totalQuestions = Math.min(MAX_QUESTIONS, Math.floor(dataItems.length / 3));
+                document.getElementById('total-questions').textContent = totalQuestions;
+                document.getElementById('total-questions-result').textContent = totalQuestions;
+
+                showQuestion();
+            } catch (error) {
+                alert('An error occurred while fetching data.');
+                console.error(error);
+                resetGame();
+            }
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Show current question
+        function showQuestion() {
+            const totalQuestions = parseInt(document.getElementById('total-questions').textContent);
+
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
+
+            // Get three items for options
+            const options = dataItems.slice(currentQuestion * 3, currentQuestion * 3 + 3);
+            currentCorrectItem = options[0];
+
+            // Shuffle options
+            const shuffledOptions = shuffleArray(options);
+
+            // Display image of the correct item
+            const gameImage = document.getElementById('game-image');
+            gameImage.src = currentCorrectItem.imageUri;
+            gameImage.alt = currentCorrectItem.gloss || currentCorrectItem.lemma;
+
+            // Generate option buttons
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-primary option-button';
+                button.textContent = option.lemma;
+                button.onclick = () => makeGuess(option);
+                optionsDiv.appendChild(button);
+            });
+
+            // Initialize question data for this question
+            questionsData.push({
+		lexeme: currentCorrectItem.lexeme,
+                lemma: currentCorrectItem.lemma,
+                gloss: currentCorrectItem.gloss,
+                imageUri: currentCorrectItem.imageUri,
+                userGuess: null,
+                isCorrect: null
+            });
+        }
+
+        // Handle user's guess
+        function makeGuess(selectedOption) {
+            let feedbackDiv = document.getElementById('feedback');
+            const isCorrect = selectedOption.lexeme === currentCorrectItem.lexeme;
+            if (isCorrect) {
+                score++;
+                feedbackDiv.innerHTML = '<span class="text-success">✔️ Correct!</span>';
+            } else {
+                feedbackDiv.innerHTML = `<span class="text-danger">❌ Incorrect! The correct word is "${currentCorrectItem.lemma}".</span>`;
+            }
+
+            // Update the questionsData for current question
+            questionsData[currentQuestion].userGuess = selectedOption.lemma;
+            questionsData[currentQuestion].isCorrect = isCorrect;
+
+            currentQuestion++;
+            // Delay before showing next question
+            setTimeout(showQuestion, 2000);
+        }
+
+        // End the game
+        function endGame() {
+            document.getElementById('game').classList.add('d-none');
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('d-none');
+            document.getElementById('final-score').textContent = score;
+
+            // Populate summary table
+            const summaryTableBody = document.getElementById('summary-table-body');
+            summaryTableBody.innerHTML = ''; // Clear previous content
+
+            questionsData.forEach((item, index) => {
+                const row = document.createElement('tr');
+
+                // Index
+                const cellIndex = document.createElement('td');
+                cellIndex.textContent = index + 1;
+                row.appendChild(cellIndex);
+
+                // Image
+                const cellImage = document.createElement('td');
+                const img = document.createElement('img');
+                img.src = item.imageUri;
+                img.alt = item.gloss || item.lemma;
+                img.className = 'summary-image';
+                cellImage.appendChild(img);
+                row.appendChild(cellImage);
+
+                // User's Guess
+                const cellUserGuess = document.createElement('td');
+                cellUserGuess.textContent = item.userGuess;
+                row.appendChild(cellUserGuess);
+
+                // Correct Lemma
+                const cellCorrectLemma = document.createElement('td');
+                const link = document.createElement('a');
+		const lexeme = item.lexeme.split('/').pop()
+                link.href = '/' + lexeme;
+                link.textContent = item.lemma;
+                cellCorrectLemma.appendChild(link);
+		row.appendChild(cellCorrectLemma);
+
+                // English Gloss
+                const cellGloss = document.createElement('td');
+                cellGloss.textContent = item.gloss;
+                row.appendChild(cellGloss);
+
+                // Result
+                const cellResult = document.createElement('td');
+                if (item.isCorrect) {
+                    cellResult.innerHTML = '<span class="text-success">✔️</span>';
+                } else {
+                    cellResult.innerHTML = '<span class="text-danger">❌</span>';
+                }
+                row.appendChild(cellResult);
+
+                summaryTableBody.appendChild(row);
+            });
+        }
+
+        // Reset the game to initial state
+        function resetGame() {
+            document.getElementById('game').classList.add('d-none');
+            document.getElementById('result').classList.add('d-none');
+            document.getElementById('language-selection').classList.remove('d-none');
+        }
+
+
+ </script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Guess Word from Image</h1>
+        
+        <!-- Language Selection -->
+        <div id="language-selection" class="card p-4 mb-4">
+            <label for="language-selector">Select Language:</label>
+            <select class="form-control mb-3" id="language-selector">
+                <option value="da">Dansk - da - Danish</option>
+                <option value="de">Deutsch - de - German</option>
+                <option value="en">English - en - English</option>
+                <option value="fr">Français - fr - French</option>
+                <!-- Add more languages as needed -->
+            </select>
+            <button class="btn btn-success" onclick="startNewGame()">New Game</button>
+        </div>
+
+        <!-- Game Content -->
+        <div id="game" class="card p-4 d-none">
+            <div id="progress" class="mb-3">
+                Question <span id="current-question">1</span> of <span id="total-questions">10</span>
+            </div>
+            <div class="text-center">
+                <img id="game-image" src="" alt="Guess the word">
+            </div>
+            <div class="mt-3 text-center" id="options">
+                <!-- Option buttons will be generated dynamically -->
+            </div>
+            <!-- Feedback Area -->
+            <div id="feedback" class="text-center mt-3"></div>
+        </div>
+
+        <!-- Game Result -->
+        <div id="result" class="mt-4 d-none">
+            <div class="alert alert-info">
+                You scored <span id="final-score"></span> out of <span id="total-questions-result"></span>!
+            </div>
+            <!-- Summary Table -->
+            <h3>Summary:</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Your Guess</th>
+                        <th>Correct Word</th>
+                        <th>English Gloss</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table-body">
+                    <!-- Rows will be populated dynamically -->
+                </tbody>
+            </table>
+            <!-- Restart Button -->
+            <button class="btn btn-success" onclick="resetGame()">Play Again</button>
+        </div>
+
+    </div>
+
+
+{% endblock %}
