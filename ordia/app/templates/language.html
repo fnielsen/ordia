@@ -210,6 +210,14 @@ LIMIT 200
 <table class="table table-hover" id="longest-words-and-phrases"></table>
 
 
+<h2>Toponym map</h2>
+
+  <div class="embed-responsive embed-responsive-4by3">
+    <iframe loading="lazy" class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Flexeme%20%3Flemma%20%3Flocation%20%3Fgeo%20%7B%0A%20%20%3Flexeme%20dct%3Alanguage%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20wikibase%3Alemma%20%3Flemma%20%3B%0A%20%20%20%20%20%20%20%20%20%20ontolex%3Asense%20%2F%20wdt%3AP5137%20%3Flocation%20.%0A%20%20%3Flocation%20wdt%3AP625%20%3Fgeo%20.%0A%7D"></iframe>
+  </div>
+
+
+
 <h2>Demonym map</h2>
 
   <div class="embed-responsive embed-responsive-4by3">
