@@ -68,7 +68,7 @@
               BIND(REPLACE(STR(?image), "^http://", "https://") AS ?image_https)
               BIND(CONCAT(?image_https, "?width=300") AS ?image_url)
             }
-            LIMIT 100
+            LIMIT 1000
             `;
             const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
 
