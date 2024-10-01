@@ -48,6 +48,9 @@
             document.getElementById('language-selection').classList.add('d-none');
             document.getElementById('game').classList.remove('d-none');
 
+	    // Hide the game image at the start
+	    document.getElementById('game-image').classList.add('d-none');
+
             // Fetch data and start the game
             fetchData();
         }
@@ -136,7 +139,8 @@
             const gameImage = document.getElementById('game-image');
             gameImage.src = currentCorrectItem.imageUri;
             gameImage.alt = currentCorrectItem.gloss || currentCorrectItem.lemma;
-
+	    gameImage.classList.remove('d-none'); // Show the image
+	    
             // Generate option buttons
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = '';
