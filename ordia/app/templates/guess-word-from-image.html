@@ -58,9 +58,12 @@
         // Fetch data from Wikidata
         async function fetchData() {
             const query = `
-            SELECT ?lexeme ?lemma ?gloss ?image_url WHERE {
+            SELECT
+              ?lexeme (GROUP_CONCAT(?lemma_; separator=" / ") AS ?lemma)
+              ?gloss ?image_url
+            WHERE {
               ?lexeme dct:language wd:${selectedLanguageQID} ;
-                      wikibase:lemma ?lemma ;
+                      wikibase:lemma ?lemma_ ;
                       ontolex:sense ?sense .
               OPTIONAL {
                 ?sense skos:definition ?gloss .
@@ -71,6 +74,7 @@
               BIND(REPLACE(STR(?image), "^http://", "https://") AS ?image_https)
               BIND(CONCAT(?image_https, "?width=300") AS ?image_url)
             }
+            GROUP BY ?lexeme ?gloss ?image_url
             LIMIT 1000
             `;
             const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
