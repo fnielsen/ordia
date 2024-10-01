@@ -33,31 +33,9 @@
         let currentCorrectItem = null;
         let questionsData = []; // To store data for the summary table
 
-        // Mapping of language codes to Wikidata Q-IDs
-        // Mapping of language codes to Wikidata Q-IDs
-        const languageCodeToQID = {
-            'da': 'Q9035',     // Danish
-            'de': 'Q188',      // German
-            'en': 'Q1860',     // English
-            'es': 'Q1321',     // Spanish
-            'fr': 'Q150',      // French
-            'it': 'Q652',      // Italian
-	    'nb': 'Q25167',    // Bokmal
-            'nl': 'Q7411',     // Dutch
-	    'sv': 'Q9027',     // Swedish
-	    'uk': 'Q8798',     // Ukrainian
-            // Add more languages and their Wikidata Q-IDs as needed
-        };
-
         // Start a new game
         function startNewGame() {
-            selectedLanguageCode = document.getElementById('language-selector').value;
-            selectedLanguageQID = languageCodeToQID[selectedLanguageCode];
-
-            if (!selectedLanguageQID) {
-                alert('Selected language is not supported.');
-                return;
-            }
+            selectedLanguageQID = document.getElementById('language-selector').value;
 
             // Reset game state
             dataItems = [];
@@ -252,7 +230,7 @@
                 // Result
                 const cellResult = document.createElement('td');
                 if (item.isCorrect) {
-                    cellResult.innerHTML = '<span class="text-success">✔️</span>';
+                    cellResult.innerHTML = '<span class="text-success">✔</span>';
                 } else {
                     cellResult.innerHTML = '<span class="text-danger">❌</span>';
                 }
@@ -277,17 +255,46 @@
 
 {% block page_content %}
 
-    <div class="container mt-5">
+     <div class="container mt-5">
         <h1 class="text-center mb-4">Guess Word from Image</h1>
         
         <!-- Language Selection -->
         <div id="language-selection" class="card p-4 mb-4">
             <label for="language-selector">Select Language:</label>
             <select class="form-control mb-3" id="language-selector">
-                <option value="da">Dansk - da - Danish</option>
-                <option value="de">Deutsch - de - German</option>
-                <option value="en">English - en - English</option>
-                <option value="fr">Français - fr - French</option>
+	      	<option value="Q9056">čeština - cs - Czech</option>
+                <option value="Q9035">Dansk - da - Danish</option>
+                <option value="Q32238">Dagbanli - dag - Dagbani</option>
+                <option value="Q188">Deutsch - de - German</option>
+		<option value="Q30005">Eʋegbe - ee - Ewe</option>
+		<option value="Q143">Esperanto - eo - Esperanto</option>
+                <option value="Q1321">Español - es - Spanish</option>
+                <option value="Q1860">English - en - English</option>
+		<option value="Q8752">euskara - eu - Basque</option>
+		<option value="Q9168">فارسی - fa - Persian</option>
+		<option value="Q33454">Fulfulde - ff - Fula</option>
+                <option value="Q150">Français - fr - French</option>
+		<option value="Q9240">bahasa Indonesia - id - Indonesian</option>
+		<option value="Q33578">Asụ̀sụ̀ Ìgbò - ig - Igbo</option>
+                <option value="Q652">Italiano - it - Italian</option>
+		<option value="Q5287">日本語 - ja - Japanese</option>
+		<option value="Q25355">Kalaallisut - kl - Greenlandic</option>
+		<option value="Q36236">മലയാളം - ml - Malayalam</option>
+		<option value="Q9237">bahasa Melayu - ms - Malay</option>
+		<option value="Q25167">Bokmål - nb - Bokmal</option>
+		<!-- option value="Q741">Nederlands - nl - Dutch</option -->
+                <option value="Q25164">nynorsk - nn - Nynorsk</option>
+		<option value="Q58635">ਪੰਜਾਬੀ - pa - Punjabi</option>
+		<option value="Q809">Język polski - pl - Polish</option>
+		<option value="Q5146">português - pt - Portuguese</option>
+		<option value="Q7737">русский - ru - Russian</option>
+		<option value="Q34002">Sunda - su - Sundanese</option>
+                <option value="Q9027">Svenska - sv - Swedish</option>
+		<option value="Q5885">தமிழ் - ta - Tamil</option>
+		<option value="Q256">Türkçe - tr - Turkish</option>
+		<option value="Q36850">Twi - tw - Twi</option>
+                <option value="Q8798">Українська - uk - Ukrainian</option>
+		
                 <!-- Add more languages as needed -->
             </select>
             <button class="btn btn-success" onclick="startNewGame()">New Game</button>
