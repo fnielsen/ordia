@@ -170,17 +170,43 @@
         birdElement.textContent = currentWord[0];
         birdElement.style.width = ''; // Reset width
         birdElement.style.minWidth = '80px'; // Ensure minimum width
-        document.addEventListener('keydown', handleSpacebar);
+	
+        // Remove previous event listeners to prevent multiple bindings
+        document.removeEventListener('keydown', handleKeyDown);
+        gameArea.removeEventListener('touchstart', handleTouch);
+        gameArea.removeEventListener('click', handleClick);
+
+        // Add event listeners for controls
+        document.addEventListener('keydown', handleKeyDown);
+        gameArea.addEventListener('touchstart', handleTouch);
+        gameArea.addEventListener('click', handleClick);
     }
 
-    // Handle spacebar press
-    function handleSpacebar(e) {
+    // Handle keydown events (Spacebar for desktop)
+    function handleKeyDown(e) {
         if (e.code === 'Space') {
-            birdPosition.y -= 50;
-            if (birdPosition.y < 0) birdPosition.y = 0;
-            birdElement.style.top = birdPosition.y + 'px';
+            moveBirdUp();
         }
     }
+
+    // Handle touch events (for mobile)
+    function handleTouch(e) {
+        e.preventDefault(); // Prevent default touch behavior
+        moveBirdUp();
+    }
+
+    // Handle click events (for desktop browsers)
+    function handleClick(e) {
+        moveBirdUp();
+    }
+
+    // Move the bird upwards
+    function moveBirdUp() {
+        birdPosition.y -= 50;
+        if (birdPosition.y < 0) birdPosition.y = 0;
+        birdElement.style.top = birdPosition.y + 'px';
+    }
+
 
     // Start gravity effect
     function startGravity() {
@@ -384,7 +410,10 @@
         document.getElementById('scoreboard').style.display = 'block';
         document.getElementById('language-selection').style.display = 'block';
     });
-  
+
+
+    // Reference to the game area for event listeners
+    const gameArea = document.getElementById('game-area');
 </script>
 
 {% endblock %}
