@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        .bird {
+            position: absolute;
+            /* Removed fixed width to allow dynamic resizing */
+            height: 30px;
+            background-color: #ffc107;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 15px;
+            padding: 0 10px; /* Added padding */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .syllable {
+            position: absolute;
+            width: 80px;
+            height: 30px;
+            background-color: #17a2b8;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 15px;
+            color: #fff;
+        }
+        #scoreboard {
+            margin-top: 20px;
+        }
+        #end-screen {
+            display: none;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script>
+
+    // Global variables
+    let languageCode = '';
+    let dataTrie = {};
+    let currentWord = [];
+    let currentNode = {};
+    let birdElement;
+    let birdPosition = { x: 0, y: 0 };
+    let gravityInterval;
+    let syllableInterval;
+    let score = 0;
+    let wordsBuilt = [];
+    let totalWords = 0;
+    let maxWords = 10; // Set to 10 or 20 as needed
+
+    // Language selection and game setup
+    document.getElementById('start-button').addEventListener('click', () => {
+        languageCode = document.getElementById('language-select').value;
+        document.getElementById('language-selection').style.display = 'none';
+        document.getElementById('game-setup').style.display = 'block';
+        fetchDataAndStartGame();
+    });
+
+    // Fetch data from Wikidata
+    async function fetchDataAndStartGame() {
+        try {
+            const query = `
+            SELECT ?lexeme ?syllable WHERE {
+                ?lexeme dct:language wd:${languageCode} ;
+                        ontolex:lexicalForm / wdt:P5279 ?syllable .
+            } 
+            `;
+            const url = 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(query) + '&format=json';
+            const response = await fetch(url);
+            const data = await response.json();
+            processData(data.results.bindings);
+            document.getElementById('game-setup').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            startGame();
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Process fetched data into a trie
+    function processData(bindings) {
+        bindings.forEach(binding => {
+            const lexemeId = binding.lexeme.value.split('/').pop();
+            const syllables = binding.syllable.value.split('‧');
+            insertWordIntoTrie(syllables, lexemeId);
+        });
+    }
+
+    // Insert word into trie
+    function insertWordIntoTrie(syllables, lexemeId) {
+        let node = dataTrie;
+        syllables.forEach((syllable) => {
+            if (!node[syllable]) {
+                node[syllable] = {};
+            }
+            node = node[syllable];
+        });
+        node['END'] = lexemeId; // Mark end of word with lexeme ID
+    }
+
+    // Start the game
+    function startGame() {
+        score = 0;
+        totalWords = 0;
+        wordsBuilt = [];
+        updateScore(0);
+        nextWord();
+    }
+
+    // Prepare the next word
+    function nextWord() {
+        if (totalWords >= maxWords) {
+            endGame();
+            return;
+        }
+        totalWords++;
+        currentWord = getRandomWord();
+        currentNode = dataTrie;
+        resetBird();
+        // Advance currentNode with the first syllable
+        if (currentNode[currentWord[0]]) {
+            currentNode = currentNode[currentWord[0]];
+        } else {
+            alert('Error: First syllable not found in trie');
+            nextWord();
+            return;
+        }
+        startGravity();
+        startSyllables();
+    }
+
+    // Get a random word from the trie
+    function getRandomWord() {
+        let node = dataTrie;
+        let word = [];
+        while (true) {
+            const keys = Object.keys(node).filter(k => k !== 'END');
+            if (keys.length === 0) break;
+            const randomSyllable = keys[Math.floor(Math.random() * keys.length)];
+            word.push(randomSyllable);
+            node = node[randomSyllable];
+            if (node['END']) break;
+        }
+        return word;
+    }
+
+    // Reset bird position and display the first syllable
+    function resetBird() {
+        birdElement = document.getElementById('bird');
+        birdElement.style.left = '15%'; // Adjusted position to be more to the left
+        birdElement.style.top = '200px';
+        birdPosition = { x: window.innerWidth * 0.15, y: 200 }; // Adjust x position
+        birdElement.textContent = currentWord[0];
+        birdElement.style.width = ''; // Reset width
+        birdElement.style.minWidth = '80px'; // Ensure minimum width
+        document.addEventListener('keydown', handleSpacebar);
+    }
+
+    // Handle spacebar press
+    function handleSpacebar(e) {
+        if (e.code === 'Space') {
+            birdPosition.y -= 50;
+            if (birdPosition.y < 0) birdPosition.y = 0;
+            birdElement.style.top = birdPosition.y + 'px';
+        }
+    }
+
+    // Start gravity effect
+    function startGravity() {
+        gravityInterval = setInterval(() => {
+            birdPosition.y += 2; // Adjust gravity as needed
+            if (birdPosition.y > 470) {
+                // Bird has reached the bottom of the screen
+                birdPosition.y = 470;
+                birdElement.style.top = birdPosition.y + 'px';
+            } else {
+                birdElement.style.top = birdPosition.y + 'px';
+            }
+        }, 20);
+    }
+
+    // Start generating syllables
+    function startSyllables() {
+        syllableInterval = setInterval(() => {
+            generateSyllable();
+        }, 2000);
+    }
+
+    // Generate moving syllables
+    function generateSyllable() {
+        const gameArea = document.getElementById('game-area');
+        const syllableElem = document.createElement('div');
+        syllableElem.classList.add('syllable');
+        syllableElem.style.top = Math.random() * 450 + 'px';
+        syllableElem.style.left = '100%';
+
+        // Decide whether to show a correct or incorrect syllable
+        const isCorrect = Math.random() < 0.5;
+        let syllableText = '';
+        if (isCorrect && currentNode) {
+            const keys = Object.keys(currentNode);
+            if (keys.length > 0) {
+                syllableText = keys[Math.floor(Math.random() * keys.length)];
+            } else {
+                // No continuations
+                return;
+            }
+        } else {
+            // Generate an incorrect syllable, i.e., a syllable not in currentNode
+            const allSyllables = getAllSyllables(dataTrie);
+            const invalidSyllables = allSyllables.filter(syl => !currentNode[syl]);
+            if (invalidSyllables.length > 0) {
+                syllableText = invalidSyllables[Math.floor(Math.random() * invalidSyllables.length)];
+            } else {
+                // Fallback: generate any syllable
+                syllableText = getRandomSyllable();
+            }
+        }
+
+        syllableElem.textContent = syllableText;
+        gameArea.appendChild(syllableElem);
+
+        // Move the syllable across the screen
+        let syllablePosition = window.innerWidth;
+        const moveInterval = setInterval(() => {
+            syllablePosition -= 3;
+            syllableElem.style.left = syllablePosition + 'px';
+
+            // Check for collision with the bird
+            const birdRect = birdElement.getBoundingClientRect();
+            const syllableRect = syllableElem.getBoundingClientRect();
+            if (isColliding(birdRect, syllableRect)) {
+                clearInterval(moveInterval);
+                gameArea.removeChild(syllableElem);
+                handleCollision(syllableText);
+            }
+
+            // Remove syllable if off screen
+            if (syllablePosition < -100) {
+                clearInterval(moveInterval);
+                gameArea.removeChild(syllableElem);
+            }
+        }, 20);
+    }
+
+    // Check for collision between two rectangles
+    function isColliding(rect1, rect2) {
+        return !(
+            rect1.top > rect2.bottom ||
+            rect1.bottom < rect2.top ||
+            rect1.left > rect2.right ||
+            rect1.right < rect2.left
+        );
+    }
+
+    // Handle collision with a syllable
+    function handleCollision(syllableText) {
+        if (syllableText === 'END' && currentNode['END']) {
+            // Word completed with end symbol
+            wordsBuilt.push({
+                lexemeId: currentNode['END'],
+                syllables: birdElement.textContent,
+                score: score
+            });
+            clearInterval(gravityInterval);
+            clearInterval(syllableInterval);
+            // alert('Word completed! Starting next word.');
+            nextWord();
+        } else if (currentNode[syllableText]) {
+            // Correct syllable
+            currentNode = currentNode[syllableText];
+            birdElement.textContent += syllableText;
+            updateScore(score + 2);
+            // Adjust bird width to fit new content
+            adjustBirdWidth();
+            if (Object.keys(currentNode).length === 1 && currentNode['END']) {
+                // No further continuations, word completed
+                wordsBuilt.push({
+                    lexemeId: currentNode['END'],
+                    syllables: birdElement.textContent,
+                    score: score
+                });
+                clearInterval(gravityInterval);
+                clearInterval(syllableInterval);
+                // alert('Word completed! Starting next word.');
+                nextWord();
+            }
+        } else {
+            // Incorrect syllable
+            updateScore(score - 1);
+        }
+    }
+
+    // Adjust bird width based on content
+    function adjustBirdWidth() {
+        // Temporarily set width to 'auto' to get the natural width
+        birdElement.style.width = 'auto';
+        // Get the new width
+        const newWidth = birdElement.offsetWidth;
+        // Set the bird's width to the new width
+        birdElement.style.width = newWidth + 'px';
+    }
+
+    // Update the score display
+    function updateScore(newScore) {
+        score = newScore;
+        document.getElementById('score').textContent = score;
+    }
+
+    // Get a random syllable from the trie
+    function getRandomSyllable() {
+        const syllables = getAllSyllables(dataTrie);
+        return syllables[Math.floor(Math.random() * syllables.length)];
+    }
+
+    // Recursively get all syllables from the trie
+    function getAllSyllables(node) {
+        let syllables = [];
+        for (const key in node) {
+            if (key !== 'END') {
+                syllables.push(key);
+                syllables = syllables.concat(getAllSyllables(node[key]));
+            }
+        }
+        return syllables;
+    }
+
+    // End the game
+    function endGame() {
+        document.getElementById('game-area').style.display = 'none';
+        document.getElementById('scoreboard').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        document.getElementById('total-score').textContent = score;
+        populateResultTable();
+    }
+
+    // Populate the result table at the end
+    function populateResultTable() {
+        const tableBody = document.getElementById('result-table');
+        tableBody.innerHTML = '';
+        wordsBuilt.forEach((word, index) => {
+	    const row = document.createElement('tr');
+
+            // Index
+            const cellIndex = document.createElement('td');
+            cellIndex.textContent = index + 1;
+            row.appendChild(cellIndex);
+	    
+            const syllableCell = document.createElement('td');
+	    const link = document.createElement('a');
+	    link.href = '/' + word.lexemeId;
+            link.textContent = word.syllables;
+	    syllableCell.appendChild(link);
+            row.appendChild(syllableCell);
+	    
+            const scoreCell = document.createElement('td');
+            scoreCell.textContent = word.score;
+            row.appendChild(scoreCell);
+	    
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Play again button handler
+    document.getElementById('play-again-button').addEventListener('click', () => {
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('scoreboard').style.display = 'block';
+        document.getElementById('language-selection').style.display = 'block';
+    });
+  
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+  <div class="container mt-5">
+
+    <h1 class="text-center mb-4">Flying Dehyphenator</h1>
+
+    <!-- Language Selection -->
+    <div id="language-selection">
+        <label for="language-selector">Select Language:</label>
+        <select id="language-select" class="form-control">
+	  <option value="Q33151">Banjar - bjn - Banjar</option>
+	  <option value="Q9056">čeština - cs - Czech</option>
+          <option value="Q9035">Dansk - da - Danish</option>
+          <option value="Q188">Deutsch - de - German</option>
+          <option value="Q5317225">Kadazandusun - dtp - Kadazandusun</option>
+	  <option value="Q143">Esperanto - eo - Esperanto</option>
+          <option value="Q1321">Español - es - Spanish</option>
+          <option value="Q9240">Bahasa Indonesia - id - Indonesian</option>
+          <option value="Q36163">Kurmancî - ku - Kurmanji</option>
+	  <option value="Q809">Język polski - pl - Polish</option>
+          <!-- Add more languages as needed -->
+        </select>
+        <button id="start-button" class="btn btn-primary mt-3">Start Game</button>
+    </div>
+
+    <!-- Game Setup Message -->
+    <div id="game-setup" class="text-center mt-5" style="display: none;">
+        <h3>Setting up the game, please wait...</h3>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area" style="display: none;">
+        <!-- Bird/Cursor -->
+        <div id="bird" class="bird"></div>
+    </div>
+
+    <!-- Scoreboard -->
+    <div id="scoreboard" class="mt-3">
+        <h4>Score: <span id="score">0</span></h4>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="text-center mt-5">
+        <h3>Your Total Score: <span id="total-score">0</span></h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Lexeme</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="result-table">
+                <!-- Results will be populated here -->
+            </tbody>
+        </table>
+        <button id="play-again-button" class="btn btn-success">Play Again</button>
+    </div>
+
+</div>
+
+{% endblock %}

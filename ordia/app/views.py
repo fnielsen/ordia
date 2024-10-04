@@ -163,6 +163,19 @@ def show_l(lexeme):
     return render_template("l.html", l=lexeme)
 
 
+@main.route("/flying-dehyphenator/")
+def show_flying_dehyphenator():
+    """Render webpage for Flying Dehyphenator.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("flying-dehyphenator.html")
+
+
 @main.route("/grammatical-feature/")
 def show_grammatical_feature_index():
     """Render webpage for grammatical feature index page."""
