@@ -246,9 +246,9 @@ ORDER BY ?order
 
 identifiersSparql = `
 SELECT 
+  (?identifierLabel AS ?identifier_) ?identifier_Url
+
   ?property_item ?property_itemLabel ?property_itemDescription
-  # ?identifier ?identifierLabel
-  ?identifier_url
 WHERE {
   wd:{{ l }} ?property ?identifier .
   ?property_item wikibase:directClaim ?property ;
@@ -257,7 +257,7 @@ WHERE {
     ?property_item wdt:P1630 ?url_pattern .
   }
   BIND(CONCAT(?identifier, "&nbsp;↗") AS ?identifierLabel)
-  BIND(IRI(REPLACE(?url_pattern, "\\\\$1", ENCODE_FOR_URI(STR(?identifier)))) AS ?identifier_url)
+  BIND(IRI(REPLACE(?url_pattern, "\\\\$1", ENCODE_FOR_URI(STR(?identifier)))) AS ?identifier_Url)
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }

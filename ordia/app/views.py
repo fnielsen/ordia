@@ -124,7 +124,7 @@ q2_pattern = r'<regex("Q[1-9]\d*"):q2>'
 l_pattern = r'<regex("L[1-9]\d*"):lexeme>'
 f_pattern = r'<regex("F[1-9]\d*"):f>'
 s_pattern = r'<regex("S[1-9]\d*"):s>'
-p_pattern = r'<regex("P[1-9]\d*"):p>'
+p_pattern = r'<regex("P[1-9]\d*"):pid>'
 iso_language_pattern = """\
 <regex(r"[a-z]{2,3}"):language>"""
 q_language_pattern = (r'<regex("(Q[1-9]\d*)|([a-z]{2,3}((-[a-z]{2})|'
@@ -161,6 +161,19 @@ def show_l(lexeme):
 
     """
     return render_template("l.html", l=lexeme)
+
+
+@main.route("/" + p_pattern)
+def redirect_p(pid):
+    """Redirect to property page.
+
+    Parameters
+    ----------
+    pid : str
+        Wikidata lexeme property identifier.
+
+    """
+    return redirect(url_for('app.show_property', pid=pid), code=302)
 
 
 @main.route("/flying-dehyphenator/")
@@ -365,16 +378,17 @@ def show_numeral_index():
 
 
 @main.route("/property/" + p_pattern)
-def show_property(p):
+def show_property(pid):
     """Render webpage for a property.
 
     Parameters
     ----------
-    p : str
-        Wikidata property.
+    pid : str
+        Wikidata property identifier
 
     """
-    return render_template("property.html", p=p)
+    print(pid)
+    return render_template("property.html", p=pid)
 
 
 @main.route("/property/")
