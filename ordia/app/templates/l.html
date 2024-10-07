@@ -271,21 +271,21 @@ SELECT
   ?lexeme ?lexemeLabel
   ?lexical_category ?lexical_categoryLabel
   ?other_compounds
-WHERE {
-  {
-    SELECT
-      ?lexeme
-      (GROUP_CONCAT(?compoundLabel; separator=" // ") AS ?other_compounds)
-    WHERE {
-      ?lexeme wdt:P5238+ wd:{{ l }} .
-      OPTIONAL {
-        ?lexeme wdt:P5238 ?compound .
-        ?compound wikibase:lemma ?compoundLabel .
-        FILTER (?compound != wd:{{ l }})
-      }
+WITH {
+  SELECT
+    ?lexeme
+    (GROUP_CONCAT(?compoundLabel; separator=" // ") AS ?other_compounds)
+  WHERE {
+    ?lexeme wdt:P5238 wd:{{ l }} .
+    OPTIONAL {
+      ?lexeme wdt:P5238 ?compound .
+      ?compound wikibase:lemma ?compoundLabel .
     }
-    GROUP BY ?lexeme
-  }    
+  }
+  GROUP BY ?lexeme
+} AS %lexemes
+WHERE {
+  INCLUDE %lexemes
   ?lexeme wikibase:lemma ?lexemeLabel .
   OPTIONAL {
     ?lexeme wikibase:lexicalCategory ?lexical_category .
