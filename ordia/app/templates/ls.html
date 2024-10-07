@@ -137,7 +137,8 @@ WHERE {
     BIND("../property/P5976" AS ?descriptionUrl)
     ?sense p:P5976 ?value_statement .
     ?value_statement ps:P5976 ?value .
-    ?value ^ontolex:sense / wikibase:lemma ?valueLabel 
+    ?value ^ontolex:sense / wikibase:lemma ?valueLabel_ 
+    BIND(CONCAT(?valueLabel_, " (", LANG(?valueLabel_), ")") AS ?valueLabel)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ .
       ?source_ rdfs:label ?source .
