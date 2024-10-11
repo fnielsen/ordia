@@ -398,12 +398,12 @@ def show_property_index():
 
 
 @main.route("/property/" + p_pattern + "/value/" + q_pattern)
-def show_property_value(p, q):
+def show_property_value(pid, q):
     """Render webpage for a property.
 
     Parameters
     ----------
-    p : str
+    pid : str
         Wikidata property
     q : str
         Wikidata item
@@ -414,7 +414,7 @@ def show_property_value(p, q):
         Rederende HTML for index page.
 
     """
-    return render_template("property_value.html", p=p, q=q)
+    return render_template("property_value.html", p=pid, q=q)
 
 
 @main.route("/" + q_pattern)
