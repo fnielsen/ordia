@@ -24,7 +24,7 @@ ALLOWED_LANGUAGES = [
     'ca', 'ca-x-q32641', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb', 'co',
     'cr', 'crh', 'crh-latn', 'crh-x-q38893333', 'crh-x-q39132363',
     'cs', 'cs-x-q28861', 'cs-x-q9995', 'csb', 'cu', 'cu-x-q145625',
-    'cu-x-q8209', 'cv', 'cy', 'da', 'de', 'de-x-q306626',
+    'cu-x-q8209', 'cv', 'cy', 'da', 'dag', 'de', 'de-x-q306626',
     'de-x-q35218', 'de-x-q837985', 'diq', 'dsb', 'dtp', 'dty', 'dv',
     'egl', 'el', 'en', 'en-ca', 'en-gb', 'en-x-q1337', 'en-x-q44679',
     'en-x-q7976', 'eo', 'eo-x-q3497763', 'eo-x-q3505590', 'es',
