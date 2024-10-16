@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script>
+    let quizData = [];
+    let currentQuestion = 0;
+    let score = 0;
+    const totalQuestions = 10;
+    const results = [];
+
+    // Fetch quiz data using SPARQL
+    async function fetchQuizData(languageCode) {
+        const sparqlQuery = `
+        SELECT ?lexeme ?form (GROUP_CONCAT(DISTINCT ?representation_; separator=" / ") AS ?representation) ?audio WHERE {
+            ?lexeme dct:language wd:${languageCode} ;
+                    wikibase:lemma ?lemma ;
+                    ontolex:lexicalForm ?form .
+            ?form ontolex:representation ?representation_ ;
+                  wdt:P443 ?audio .
+        } GROUP BY ?lexeme ?form ?audio LIMIT ${totalQuestions}`;
+
+        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.results.bindings.map(result => ({
+            lexeme: result.lexeme.value,
+            form: result.form.value,
+            representation: result.representation.value,
+            audio: result.audio.value,
+        }));
+    }
+
+    // Start the game by fetching data and showing the first question
+    async function startGame() {
+        const selectedLanguage = document.getElementById('language-select').value;
+        quizData = await fetchQuizData(selectedLanguage);
+        currentQuestion = 0;
+        score = 0;
+        results.length = 0; // Clear previous results
+
+        document.getElementById('language-selection').classList.add('d-none');
+        document.getElementById('quiz-section').classList.remove('d-none');
+        showNextQuestion();
+    }
+
+    // Display the next quiz question
+    function showNextQuestion() {
+        if (currentQuestion >= totalQuestions) {
+            showResults();
+            return;
+        }
+
+	document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
+        const question = quizData[currentQuestion];
+        const audio = new Audio(question.audio);
+        document.getElementById('audio-button').onclick = () => audio.play();
+
+        const correctAnswer = question.representation;
+        const answers = generateRandomAnswers(correctAnswer);
+
+        const answerButtons = document.getElementById('answer-buttons');
+        answerButtons.innerHTML = '';
+        answers.forEach(answer => {
+            const button = document.createElement('button');
+            button.classList.add('btn', 'btn-primary');
+            button.textContent = answer;
+            button.onclick = () => checkAnswer(answer, correctAnswer, question);
+            answerButtons.appendChild(button);
+        });
+    }
+
+    // Generate random answers, ensuring one is correct and two are incorrect
+    function generateRandomAnswers(correctAnswer) {
+        const wrongAnswers = quizData.filter(q => q.representation !== correctAnswer)
+              .map(q => q.representation);
+        const shuffledAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 2);
+        return [...shuffledAnswers, correctAnswer].sort(() => 0.5 - Math.random());
+    }
+
+    // Check the selected answer and move to the next question
+    function checkAnswer(selectedAnswer, correctAnswer, question) {
+        const feedback = document.getElementById('feedback');
+        const isCorrect = selectedAnswer === correctAnswer;
+        
+        if (isCorrect) {
+            score++;
+            feedback.textContent = 'Correct!';
+            feedback.classList.add('text-success');
+            feedback.classList.remove('text-danger');
+        } else {
+            feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}`;
+            feedback.classList.add('text-danger');
+            feedback.classList.remove('text-success');
+        }
+
+        // Store result
+        results.push({
+	    form: question.form,
+            representation: question.representation, 
+            audio: question.audio, 
+            isCorrect 
+        });
+
+        currentQuestion++;
+        setTimeout(showNextQuestion, 2000);  // Delay before next question
+    }
+
+    // Display the final results
+    function showResults() {
+        document.getElementById('quiz-section').classList.add('d-none');
+        document.getElementById('results-section').classList.remove('d-none');
+
+        document.getElementById('final-score').textContent = score;
+
+        const resultsTableBody = document.getElementById('results-table-body');
+        resultsTableBody.innerHTML = '';  // Clear previous results
+
+        results.forEach(result => {
+            const row = document.createElement('tr');
+
+            const wordCell = document.createElement('td');
+	    const link = document.createElement('a');
+	    const form = result.form.split('/').pop();
+	    link.href = 'http://ordia.toolforge.org/' + form;
+	    link.textContent = result.representation;
+            wordCell.appendChild(link);
+            row.appendChild(wordCell);
+
+            const audioCell = document.createElement('td');
+            const playButton = document.createElement('button');
+            playButton.classList.add('btn', 'btn-secondary');
+            playButton.textContent = 'Play Audio';
+            playButton.onclick = () => new Audio(result.audio).play();
+            audioCell.appendChild(playButton);
+            row.appendChild(audioCell);
+
+            const correctCell = document.createElement('td');
+            correctCell.textContent = result.isCorrect ? '✔' : '❌';
+            row.appendChild(correctCell);
+
+            resultsTableBody.appendChild(row);
+        });
+    }
+
+    // Reset the game and return to language selection
+    function resetGame() {
+        document.getElementById('results-section').classList.add('d-none');
+        document.getElementById('quiz-section').classList.add('d-none');
+        document.getElementById('language-selection').classList.remove('d-none');
+    }
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+  <div class="container text-center mt-5">
+
+    <h1>Guess Word From Pronunciation</h1>
+
+    <!-- Language Selection -->
+    <div id="language-selection" class="card p-4 mb-4">
+      <label for="language-select" class="form-label">Select Language:</label>
+      <select id="language-select" class="form-control mb-3">
+	<option value="Q13955">العربية - ar - Arabic</option>
+	<option value="Q29540">Boarisch - bar - Bavarian</option>
+	<option value="Q33284">Bikol Sentral - bcl - Central Bikol</option>
+	<option value="Q9091">беларуская мова - be - Belarusian</option>
+	<option value="Q7918">български език - bg - Bulgarian</option>
+	<option value="Q33151">Bahasa Banjar - bjn - Banjar</option>
+	<option value="Q9610">বাংলা - bn - Bangla</option>
+	<option value="Q12107">brezhoneg - br - Breton</option>
+	<option value="Q7026">català - ca - Catalan</option>
+	<option value="Q9056">čeština - cs - Czech</option>
+	<option value="Q9309">Cymraeg - cy - Welsh</option>
+	<option value="Q9035">dansk - da - Danish</option>
+	<option value="Q32238">Dagbanli - dag - Dagbani</option>
+	<option value="Q188">Deutsch - de - German</option>
+	<option value="Q5317225">boros Kadazandusun - dtp - Kadazandusun</option>
+	<option value="Q36510">νέα ελληνική γλώσσα - el - Modern Greek</option>
+	<option value="Q1860">English - en - English</option>
+	<option value="Q143">Esperanto - eo - Esperanto</option>
+	<option value="Q1321">español - es - Spanish</option>
+	<option value="Q9072">eesti keel - et - Estonian</option>
+	<option value="Q8752">euskara - eu - Basque</option>
+	<option value="Q9168">فارسی - fa - Persian</option>
+	<option value="Q1412">suomi - fi - Finnish</option>
+	<option value="Q150">français - fr - French</option>
+	<option value="Q3111668">gungbè - guw - Gun</option>
+	<option value="Q9288">עברית - he - Hebrew</option>
+	<option value="Q9067">magyar - hu - Hungarian</option>
+	<option value="Q8785">հայերեն - hy - Armenian</option>
+	<option value="Q9240">bahasa Indonesia - id - Indonesian</option>
+	<option value="Q33578">Asụ̀sụ̀ Ìgbò - ig - Igbo</option>
+	<option value="Q652">italiano - it - Italian</option>
+	<option value="Q5287">日本語 - ja - Japanese</option>
+	<option value="Q8108">ქართული ენა - ka - Georgian</option>
+	<option value="Q9176">한국어 - ko - Korean</option>
+	<option value="Q9051">Lëtzebuergesch - lb - Luxembourgish</option>
+	<option value="Q9078">latviešu valoda - lv - Latvian</option>
+	<option value="Q36236">മലയാളം - ml - Malayalam</option>
+	<option value="Q9237">bahasa Melayu - ms - Malay</option>
+	<option value="Q13330">mirandés - mwl - Mirandese</option>
+	<option value="Q25167">bokmål - nb - Bokmål</option>
+	<option value="Q7411">Nederlands - nl - Dutch</option>
+	<option value="Q33810">ଓଡ଼ିଆ - or - Odia</option>
+	<option value="Q809">język polski - pl - Polish</option>
+	<option value="Q5146">português - pt - Portuguese</option>
+	<option value="Q5218">Qichwa - qu - Quechua</option>
+	<option value="Q7913">limba română - ro - Romanian</option>
+	<option value="Q7737">русский язык - ru - Russian</option>
+	<option value="Q33965">ᱥᱟᱱᱛᱟᱲᱤ ᱯᱟᱹᱨᱥᱤ - sat - Santali</option>
+	<option value="Q9027">svenska - sv - Swedish</option>
+	<option value="Q7838">Kiswahili - sw - Swahili</option>
+	<option value="Q5885">தமிழ் - ta - Tamil</option>
+	<option value="Q8097">తెలుగు - te - Telugu</option>
+	<option value="Q36846">toki pona - tok - Toki Pona</option>
+	<option value="Q256">Türkçe - tr - Turkish</option>
+	<option value="Q8798">українська мова - uk - Ukrainian</option>
+	<option value="Q9199">tiếng Việt - vi - Vietnamese</option>
+      </select>
+      <button class="btn btn-primary" onclick="startGame()">Start Game</button>
+    </div>
+    
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="card p-4 d-none">
+      <button class="btn btn-secondary mb-3" id="audio-button">Play Audio</button>
+      <div id="answer-buttons" class="d-flex justify-content-around btn-group-row"></div>
+      <div id="feedback" class="mt-3"></div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="mt-4 d-none">
+      <h2>Final Score: <span id="final-score"></span>/10</h2>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Word Form</th>
+            <th>Audio</th>
+            <th>Correct?</th>
+          </tr>
+        </thead>
+        <tbody id="results-table-body"></tbody>
+      </table>
+      <button class="btn btn-success" onclick="resetGame()">Play Again</button>
+    </div>
+
+  </div>
+
+
+{% endblock %}
