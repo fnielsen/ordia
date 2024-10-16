@@ -247,6 +247,19 @@ def show_guess_word_from_pronunciation():
     return render_template("guess-word-from-pronunciation.html")
 
 
+@main.route("/guess-image-from-pronunciation/")
+def show_guess_image_from_pronunciation():
+    """Render webpage for Guess image from pronunciation.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("guess-image-from-pronunciation.html")
+
+
 @main.route("/hyphenation/")
 def show_hyphenation_index():
     """Render index webpage for hyphenation."""
