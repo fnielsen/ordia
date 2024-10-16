@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+
+<style>
+  .image-container {
+      width: 200px;  /* Fixed width for the container */
+      height: auto;  /* Flexible height */
+      margin: 10px;
+  }
+  .image-container img {
+      width: 100%;  /* The image will scale to the container width */
+      height: 100%; /* The image will scale while maintaining aspect ratio */
+      object-fit: contain;  /* Ensures the image is contained within the container */
+  }
+</style>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+  <script>
+    let quizData = [];
+    let currentQuestion = 0;
+    let score = 0;
+    const totalQuestions = 10;
+    const results = [];
+
+    // Function to fetch quiz data using SPARQL
+    async function fetchQuizData(languageCode) {
+        const sparqlQuery = `
+        SELECT ?lexeme (GROUP_CONCAT(?lemma_; separator=" / ") AS ?lemma) ?audio ?image
+        WITH {
+            SELECT
+                ?lexeme (SAMPLE(?audio_) AS ?audio) (SAMPLE(?image_) AS ?image)
+            WHERE {
+                ?lexeme dct:language wd:${languageCode} ;
+                        ontolex:lexicalForm / wdt:P443 ?audio_ ;
+                        ontolex:sense ?sense .
+                { ?sense wdt:P18 ?image_via_sense }
+                UNION
+                { ?sense wdt:P5137 / wdt:P18 ?image_via_q }
+                BIND(COALESCE(?image_via_sense, ?image_via_q) AS ?image_)
+            }
+            GROUP BY ?lexeme
+            LIMIT 100
+        } AS %lexemes
+        WHERE {
+            INCLUDE %lexemes
+            ?lexeme wikibase:lemma ?lemma_
+        }
+        GROUP BY ?lexeme ?audio ?image
+        LIMIT ${totalQuestions}`;
+
+        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.results.bindings.map(result => ({
+            lexeme: result.lexeme.value,
+            lemma: result.lemma.value,
+            audio: result.audio.value,
+            image: result.image.value,
+        }));
+    }
+
+    // Start game by hiding language selection and showing quiz section
+    async function startGame() {
+        const selectedLanguage = document.getElementById('language-select').value;
+        quizData = await fetchQuizData(selectedLanguage);
+        currentQuestion = 0;
+        score = 0;
+        results.length = 0; // Clear previous results
+
+        document.getElementById('language-selection').classList.add('d-none');
+        document.getElementById('quiz-section').classList.remove('d-none');
+        showNextQuestion();
+    }
+
+    // Display the next question in the quiz
+    function showNextQuestion() {
+	document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
+
+	if (currentQuestion >= totalQuestions) {
+            showResults();
+            return;
+        }
+
+        const question = quizData[currentQuestion];
+        const audio = new Audio(question.audio);
+        document.getElementById('audio-button').onclick = () => audio.play();
+
+        const correctImage = question.image;
+        const answers = generateRandomImages(correctImage);
+
+        const imageOptions = document.getElementById('image-options');
+        imageOptions.innerHTML = '';  // Clear previous images
+	answers.forEach(answer => {
+	    // Create a container div for the image
+	    const imageContainer = document.createElement('div');
+	    imageContainer.classList.add('image-container');
+	    
+	    // Create the image element
+	    const img = document.createElement('img');
+	    img.src = answer + '?width=200px';
+	    img.alt = 'Word image';
+	    img.onclick = () => checkAnswer(answer, correctImage, question);
+	    
+	    // Append the image to the container
+	    imageContainer.appendChild(img);
+	    
+	    // Append the container to the image options div
+	    imageOptions.appendChild(imageContainer);
+	});
+    }
+
+    // Generate random images, ensuring one is correct and two are incorrect
+    function generateRandomImages(correctImage) {
+        const wrongImages = quizData.filter(q => q.image !== correctImage)
+              .map(q => q.image);
+        const shuffledImages = wrongImages.sort(() => 0.5 - Math.random()).slice(0, 2);
+        return [...shuffledImages, correctImage].sort(() => 0.5 - Math.random());
+    }
+
+    // Check if the selected image is correct and move to the next question
+    function checkAnswer(selectedImage, correctImage, question) {
+        const feedback = document.getElementById('feedback');
+        const isCorrect = selectedImage === correctImage;
+
+        if (isCorrect) {
+            score++;
+            feedback.textContent = '✔ Correct!';
+            feedback.classList.add('text-success');
+            feedback.classList.remove('text-danger');
+        } else {
+            feedback.textContent = `❌ Incorrect.`;
+            feedback.classList.add('text-danger');
+            feedback.classList.remove('text-success');
+        }
+
+        // Store result
+        results.push({
+	    lexeme: question.lexeme,
+            lemma: question.lemma, 
+            audio: question.audio, 
+            image: question.image, 
+            isCorrect 
+        });
+
+        currentQuestion++;
+        setTimeout(showNextQuestion, 2000);  // Show next question after delay
+    }
+
+    // Display the final results
+    function showResults() {
+        document.getElementById('quiz-section').classList.add('d-none');
+        document.getElementById('results-section').classList.remove('d-none');
+
+        document.getElementById('final-score').textContent = score;
+
+        const resultsTableBody = document.getElementById('results-table-body');
+        resultsTableBody.innerHTML = '';  // Clear previous results
+
+        results.forEach(result => {
+            const row = document.createElement('tr');
+
+            const wordCell = document.createElement('td');
+	    const link = document.createElement('a');
+	    const lexeme = result.lexeme.split('/').pop()
+            link.href = '/' + lexeme;
+            link.textContent = result.lemma;
+            wordCell.appendChild(link);
+	    row.appendChild(wordCell);
+
+            const audioCell = document.createElement('td');
+            const playButton = document.createElement('button');
+            playButton.classList.add('btn', 'btn-secondary');
+            playButton.textContent = 'Play Audio';
+            playButton.onclick = () => new Audio(result.audio).play();
+            audioCell.appendChild(playButton);
+            row.appendChild(audioCell);
+
+            const imageCell = document.createElement('td');
+            const img = document.createElement('img');
+            img.src = result.image + '?width=100px';
+            img.alt = 'Word Image';
+            img.style.maxWidth = '100px';
+            imageCell.appendChild(img);
+            row.appendChild(imageCell);
+
+            const correctCell = document.createElement('td');
+            correctCell.innerHTML = result.isCorrect ?
+		'<span class="text-success">✔</span' :
+		'<span class="text-danger">❌</span>';
+            row.appendChild(correctCell);
+
+            resultsTableBody.appendChild(row);
+        });
+    }
+
+    // Reset the game and return to language selection
+    function resetGame() {
+        document.getElementById('results-section').classList.add('d-none');
+        document.getElementById('language-selection').classList.remove('d-none');
+    }
+
+    </script>
+
+
+{% endblock %}
+
+
+{% block page_content %}
+
+  <div class="container mt-5">
+
+    <h1 class="text-center">Guess Image from Pronunciation</h1>
+
+    <!-- Language Selection Section -->
+    <div id="language-selection" class="card p-4 mb-4">
+      <label for="language-select" class="form-label">Select Language:</label>
+      <select id="language-select" class="form-control mb-3">
+	<option value="Q13955">العربية - ar - Arabic</option>
+	<option value="Q29540">Boarisch - bar - Bavarian</option>
+	<option value="Q33151">Bahasa Banjar - bjn - Banjar</option>
+	<option value="Q9610">বাংলা - bn - Bangla</option>
+	<option value="Q7026">català - ca - Catalan</option>
+	<option value="Q9056">čeština - cs - Czech</option>
+	<option value="Q9035">dansk - da - Danish</option>
+	<option value="Q32238">Dagbanli - dag - Dagbani</option>
+	<option value="Q188">Deutsch - de - German</option>
+	<option value="Q5317225">boros Kadazandusun - dtp - Kadazandusun</option>
+	<option value="Q1860">English - en - English</option>
+	<option value="Q143">Esperanto - eo - Esperanto</option>
+	<option value="Q1321">español - es - Spanish</option>
+	<option value="Q8752">euskara - eu - Basque</option>
+	<option value="Q9168">فارسی - fa - Persian</option>
+	<option value="Q150">français - fr - French</option>
+	<option value="Q3111668">gungbè - guw - Gun</option>
+	<option value="Q9288">עברית - he - Hebrew</option>
+	<option value="Q652">italiano - it - Italian</option>
+	<option value="Q5287">日本語 - ja - Japanese</option>
+	<option value="Q36236">മലയാളം - ml - Malayalam</option>
+	<option value="Q9237">bahasa Melayu - ms - Malay</option>
+	<option value="Q25167">bokmål - nb - Bokmål</option>
+	<option value="Q7411">Nederlands - nl - Dutch</option>
+	<option value="Q809">język polski - pl - Polish</option>
+	<option value="Q5146">português - pt - Portuguese</option>
+	<option value="Q7737">русский язык - ru - Russian</option>
+	<option value="Q9027">svenska - sv - Swedish</option>
+	<option value="Q7838">Kiswahili - sw - Swahili</option>
+	<option value="Q5885">தமிழ் - ta - Tamil</option>
+	<option value="Q8097">తెలుగు - te - Telugu</option>
+	<option value="Q36846">toki pona - tok - Toki Pona</option>
+	<option value="Q8798">українська мова - uk - Ukrainian</option>
+      </select>
+      <button class="btn btn-success" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="text-center d-none">
+      <button class="btn btn-secondary mb-3" id="audio-button">Play Audio</button>
+      <div id="image-options" class="d-flex justify-content-around image-options"></div>
+      <div id="feedback" class="mt-3"></div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="d-none">
+      <h2>Final Score: <span id="final-score"></span>/10</h2>
+      <table class="table text-center table-bordered">
+        <thead>
+          <tr>
+            <th>Word</th>
+            <th>Audio</th>
+            <th>Image</th>
+            <th>Correct?</th>
+          </tr>
+        </thead>
+        <tbody id="results-table-body"></tbody>
+      </table>
+      <button class="btn btn-success" onclick="resetGame()">Play Again</button>
+    </div>
+
+  </div>
+
+
+{% endblock %}
