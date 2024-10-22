@@ -23,11 +23,12 @@
 {% block scripts %}
 {{super()}}
 
-  <script>
+<script>
+    const TOTAL_QUESTIONS = 10;
     let quizData = [];
     let currentQuestion = 0;
     let score = 0;
-    const totalQuestions = 10;
+
     const results = [];
 
     // Function to fetch quiz data using SPARQL
@@ -54,7 +55,7 @@
             ?lexeme wikibase:lemma ?lemma_
         }
         GROUP BY ?lexeme ?audio ?image
-        LIMIT ${totalQuestions}`;
+        LIMIT 100`;
 
         const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
         const response = await fetch(url);
@@ -67,11 +68,24 @@
         }));
     }
 
+    // Shuffle array
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    
     // Start game by hiding language selection and showing quiz section
     async function startGame() {
         const selectedLanguage = document.getElementById('language-select').value;
         quizData = await fetchQuizData(selectedLanguage);
-        currentQuestion = 0;
+
+	// Shuffle data
+	quizData = shuffleArray(quizData);  // .slice(0, TOTAL_QUESTIONS);
+
+	currentQuestion = 0;
         score = 0;
         results.length = 0; // Clear previous results
 
@@ -84,7 +98,7 @@
     function showNextQuestion() {
 	document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
 
-	if (currentQuestion >= totalQuestions) {
+	if (currentQuestion >= TOTAL_QUESTIONS) {
             showResults();
             return;
         }
