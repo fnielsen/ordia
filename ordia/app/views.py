@@ -189,6 +189,12 @@ def show_flying_dehyphenator():
     return render_template("flying-dehyphenator.html")
 
 
+@main.route("/game/")
+def show_game_index():
+    """Render webpage for games."""
+    return render_template("game_index.html")
+
+
 @main.route("/grammatical-feature/")
 def show_grammatical_feature_index():
     """Render webpage for grammatical feature index page."""
