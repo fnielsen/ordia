@@ -10,153 +10,167 @@
 {{super()}}
 
 <script>
-    let quizData = [];
-    let currentQuestion = 0;
-    let score = 0;
-    const totalQuestions = 10;
-    const results = [];
+  let quizData = [];
+  let currentQuestion = 0;
+  let score = 0;
+  const TOTAL_QUESTIONS = 10;
+  const results = [];
 
-    // Fetch quiz data using SPARQL
-    async function fetchQuizData(languageCode) {
-        const sparqlQuery = `
+  // Fetch quiz data using SPARQL
+  async function fetchQuizData(languageCode) {
+      const sparqlQuery = `
         SELECT ?lexeme ?form (GROUP_CONCAT(DISTINCT ?representation_; separator=" / ") AS ?representation) ?audio WHERE {
             ?lexeme dct:language wd:${languageCode} ;
                     wikibase:lemma ?lemma ;
                     ontolex:lexicalForm ?form .
             ?form ontolex:representation ?representation_ ;
                   wdt:P443 ?audio .
-        } GROUP BY ?lexeme ?form ?audio LIMIT ${totalQuestions}`;
-
-        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.results.bindings.map(result => ({
-            lexeme: result.lexeme.value,
-            form: result.form.value,
-            representation: result.representation.value,
-            audio: result.audio.value,
-        }));
-    }
-
-    // Start the game by fetching data and showing the first question
-    async function startGame() {
-        const selectedLanguage = document.getElementById('language-select').value;
-        quizData = await fetchQuizData(selectedLanguage);
-        currentQuestion = 0;
-        score = 0;
-        results.length = 0; // Clear previous results
-
-        document.getElementById('language-selection').classList.add('d-none');
-        document.getElementById('quiz-section').classList.remove('d-none');
-        showNextQuestion();
-    }
-
-    // Display the next quiz question
-    function showNextQuestion() {
-        if (currentQuestion >= totalQuestions) {
-            showResults();
-            return;
         }
+        GROUP BY ?lexeme ?form ?audio
+        LIMIT 500`;
 
-	document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
-        const question = quizData[currentQuestion];
-        const audio = new Audio(question.audio);
-        document.getElementById('audio-button').onclick = () => audio.play();
+      const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.results.bindings.map(result => ({
+          lexeme: result.lexeme.value,
+          form: result.form.value,
+          representation: result.representation.value,
+          audio: result.audio.value,
+      }));
+  }
 
-        const correctAnswer = question.representation;
-        const answers = generateRandomAnswers(correctAnswer);
+  // Shuffle array
+  function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+  }
+  
+  // Start the game by fetching data and showing the first question
+  async function startGame() {
+      const selectedLanguage = document.getElementById('language-select').value;
+      quizData = await fetchQuizData(selectedLanguage);
+      currentQuestion = 0;
+      score = 0;
+      results.length = 0; // Clear previous results
 
-        const answerButtons = document.getElementById('answer-buttons');
-        answerButtons.innerHTML = '';
-        answers.forEach(answer => {
-            const button = document.createElement('button');
-            button.classList.add('btn', 'btn-primary');
-            button.textContent = answer;
-            button.onclick = () => checkAnswer(answer, correctAnswer, question);
-            answerButtons.appendChild(button);
-        });
-    }
+      // Shuffle data
+      quizData = shuffleArray(quizData);  
 
-    // Generate random answers, ensuring one is correct and two are incorrect
-    function generateRandomAnswers(correctAnswer) {
-        const wrongAnswers = quizData.filter(q => q.representation !== correctAnswer)
-              .map(q => q.representation);
-        const shuffledAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 2);
-        return [...shuffledAnswers, correctAnswer].sort(() => 0.5 - Math.random());
-    }
+      document.getElementById('language-selection').classList.add('d-none');
+      document.getElementById('quiz-section').classList.remove('d-none');
+      showNextQuestion();
+  }
 
-    // Check the selected answer and move to the next question
-    function checkAnswer(selectedAnswer, correctAnswer, question) {
-        const feedback = document.getElementById('feedback');
-        const isCorrect = selectedAnswer === correctAnswer;
-        
-        if (isCorrect) {
-            score++;
-            feedback.textContent = 'Correct!';
-            feedback.classList.add('text-success');
-            feedback.classList.remove('text-danger');
-        } else {
-            feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}`;
-            feedback.classList.add('text-danger');
-            feedback.classList.remove('text-success');
-        }
+  // Display the next quiz question
+  function showNextQuestion() {
+      if (currentQuestion >= TOTAL_QUESTIONS) {
+          showResults();
+          return;
+      }
 
-        // Store result
-        results.push({
-	    form: question.form,
-            representation: question.representation, 
-            audio: question.audio, 
-            isCorrect 
-        });
+      document.getElementById('feedback').innerHTML = ''; // Clear previous feedback
+      const question = quizData[currentQuestion];
+      const audio = new Audio(question.audio);
+      document.getElementById('audio-button').onclick = () => audio.play();
 
-        currentQuestion++;
-        setTimeout(showNextQuestion, 2000);  // Delay before next question
-    }
+      const correctAnswer = question.representation;
+      const answers = generateRandomAnswers(correctAnswer);
 
-    // Display the final results
-    function showResults() {
-        document.getElementById('quiz-section').classList.add('d-none');
-        document.getElementById('results-section').classList.remove('d-none');
+      const answerButtons = document.getElementById('answer-buttons');
+      answerButtons.innerHTML = '';
+      answers.forEach(answer => {
+          const button = document.createElement('button');
+          button.classList.add('btn', 'btn-primary');
+          button.textContent = answer;
+          button.onclick = () => checkAnswer(answer, correctAnswer, question);
+          answerButtons.appendChild(button);
+      });
+  }
 
-        document.getElementById('final-score').textContent = score;
+  // Generate random answers, ensuring one is correct and two are incorrect
+  function generateRandomAnswers(correctAnswer) {
+      const wrongAnswers = quizData.filter(q => q.representation !== correctAnswer)
+            .map(q => q.representation);
+      const shuffledAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 2);
+      return [...shuffledAnswers, correctAnswer].sort(() => 0.5 - Math.random());
+  }
 
-        const resultsTableBody = document.getElementById('results-table-body');
-        resultsTableBody.innerHTML = '';  // Clear previous results
+  // Check the selected answer and move to the next question
+  function checkAnswer(selectedAnswer, correctAnswer, question) {
+      const feedback = document.getElementById('feedback');
+      const isCorrect = selectedAnswer === correctAnswer;
+      
+      if (isCorrect) {
+          score++;
+          feedback.textContent = 'Correct!';
+          feedback.classList.add('text-success');
+          feedback.classList.remove('text-danger');
+      } else {
+          feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}`;
+          feedback.classList.add('text-danger');
+          feedback.classList.remove('text-success');
+      }
 
-        results.forEach(result => {
-            const row = document.createElement('tr');
+      // Store result
+      results.push({
+	  form: question.form,
+          representation: question.representation, 
+          audio: question.audio, 
+          isCorrect 
+      });
 
-            const wordCell = document.createElement('td');
-	    const link = document.createElement('a');
-	    const form = result.form.split('/').pop();
-	    link.href = 'http://ordia.toolforge.org/' + form;
-	    link.textContent = result.representation;
-            wordCell.appendChild(link);
-            row.appendChild(wordCell);
+      currentQuestion++;
+      setTimeout(showNextQuestion, 2000);  // Delay before next question
+  }
 
-            const audioCell = document.createElement('td');
-            const playButton = document.createElement('button');
-            playButton.classList.add('btn', 'btn-secondary');
-            playButton.textContent = 'Play Audio';
-            playButton.onclick = () => new Audio(result.audio).play();
-            audioCell.appendChild(playButton);
-            row.appendChild(audioCell);
+  // Display the final results
+  function showResults() {
+      document.getElementById('quiz-section').classList.add('d-none');
+      document.getElementById('results-section').classList.remove('d-none');
 
-            const correctCell = document.createElement('td');
-            correctCell.textContent = result.isCorrect ? '✔' : '❌';
-            row.appendChild(correctCell);
+      document.getElementById('final-score').textContent = score;
 
-            resultsTableBody.appendChild(row);
-        });
-    }
+      const resultsTableBody = document.getElementById('results-table-body');
+      resultsTableBody.innerHTML = '';  // Clear previous results
 
-    // Reset the game and return to language selection
-    function resetGame() {
-        document.getElementById('results-section').classList.add('d-none');
-        document.getElementById('quiz-section').classList.add('d-none');
-        document.getElementById('language-selection').classList.remove('d-none');
-    }
+      results.forEach(result => {
+          const row = document.createElement('tr');
 
+          const wordCell = document.createElement('td');
+	  const link = document.createElement('a');
+	  const form = result.form.split('/').pop();
+	  link.href = 'http://ordia.toolforge.org/' + form;
+	  link.textContent = result.representation;
+          wordCell.appendChild(link);
+          row.appendChild(wordCell);
+
+          const audioCell = document.createElement('td');
+          const playButton = document.createElement('button');
+          playButton.classList.add('btn', 'btn-secondary');
+          playButton.textContent = 'Play Audio';
+          playButton.onclick = () => new Audio(result.audio).play();
+          audioCell.appendChild(playButton);
+          row.appendChild(audioCell);
+
+          const correctCell = document.createElement('td');
+          correctCell.textContent = result.isCorrect ? '✔' : '❌';
+          row.appendChild(correctCell);
+
+          resultsTableBody.appendChild(row);
+      });
+  }
+
+  // Reset the game and return to language selection
+  function resetGame() {
+      document.getElementById('results-section').classList.add('d-none');
+      document.getElementById('quiz-section').classList.add('d-none');
+      document.getElementById('language-selection').classList.remove('d-none');
+  }
+  
 </script>
 
 {% endblock %}
