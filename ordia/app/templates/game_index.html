@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+
+
+<div>
+  
+  <h1>Ordia games</h1>
+  
+  
+  <div class="container">
+    
+    <div class="row">
+      <div class="col-sm-6 col-md-4 mb-4">
+	<div class="card box-shadow">
+	  
+          <div class="card-header">
+	    <h4 class="my-0 font-weight-normal">Grammar</h4>
+          </div>
+          <div class="card-body">
+	    <dl>
+	      <dt><a href="/guess-the-gender">Guess the Gender</a></dt>
+	      <dd>
+		Guess the gender of nouns.
+		Inspired by Lea Lacroix's original DerDieDas game, but
+		works for multiple language.
+	      </dd>
+	      
+	    </dl>
+	    
+	    <dl>
+	      <dt><a href="/flying-dehyphenator">Flying Dehyphenator</a></dt>
+	      <dd>
+		Dehyphenate words.
+		Given the start part of a word use the spacebar
+		to move the word and hit the next part of the
+		word. Only hyphenations described with
+		the Unicode hyphenation character works.
+	      </dd>
+	      
+	    </dl>
+	    
+	  </div>
+	  
+	</div>
+
+      </div>
+      <div class="col-sm-6 col-md-4 mb-4">
+
+        <div class="card mb-4 box-shadow">
+	  <div class="card-header">
+	    <h4 class="my-0 font-weight-normal">Sense</h4>
+	  </div>
+	  <div class="card-body">
+	    <dl>
+	      <dt><a href="/guess-word-from-image">Guess Word from Image</a></dt>
+	      <dd>Guess the correct word out of three based on a image of the meaning of the word.</dd>
+	    </dl>
+	    
+	  </div>
+        </div>
+	
+      </div>
+      <div class="col-sm-6 col-md-4 mb-4">
+
+        <div class="card mb-4 box-shadow">
+	  <div class="card-header">
+	    <h4 class="my-0 font-weight-normal">Pronunciation</h4>
+	  </div>
+	  <div class="card-body">
+	    <dl>
+	      <dt><a href="/guess-word-from-pronunciation">Guess Word From Pronunciation</a></dt>
+	      <dd>Guess the the correct word from an audio
+		presentation of the pronunciation of the word.</dd>
+	    </dl>
+	    
+	  </div>
+        </div>
+
+      </div>
+      <div class="col-sm-6 col-md-4 mb-4">
+	
+        <div class="card mb-4 box-shadow">
+	  <div class="card-header">
+	    <h4 class="my-0 font-weight-normal">Pronunciation-Sense</h4>
+	  </div>
+	  <div class="card-body">
+	    <dl>
+	      <dt><a href="/guess-word-from-image">Guess Image from Pronunciation</a></dt>
+	      <dd>Guess the correct image representing a word
+		that is pronunced.</dd>
+	    </dl>
+	    
+	  </div>
+        </div>
+	
+      </div>
+    </div>
+  </div>    
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
