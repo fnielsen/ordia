@@ -12,6 +12,11 @@ Options:
 
 import requests
 
+try:
+    from functools import lru_cache
+except ImportError:
+    # For Python 2.
+    from functools32 import lru_cache
 
 HEADERS = {
     'User-Agent': 'Ordia',
@@ -78,6 +83,72 @@ def wb_get_entities(ids):
                 break
 
     return entities
+
+
+def wb_content_languages():
+    """Return content languages.
+
+    Return information about content languages in Wikidata.
+
+    Returns
+    -------
+    languages : dict of dict
+        Dictionary of dictionaries with ISO code as keys of upper dictionary
+        and values containing information about the language: code, autonym
+        and English name.
+
+    Example
+    -------
+    >>> languages = wb_content_languages()
+    >>> languages['da']['autonym']
+    'dansk'
+    >>> languages['da']['name']
+    'Danish'
+    >>> languages['da']['code']
+    'da'
+
+    """
+    params = {
+        'action': 'query',
+        'format': 'json',
+        'meta': 'wbcontentlanguages',
+        'wbclcontext': 'term-lexicographical',
+        'wbclprop': 'code|name|autonym',
+    }
+
+    response = requests.get(
+        'https://www.wikidata.org/w/api.php',
+        headers=HEADERS, params=params)
+
+    response_data = response.json()
+    return response_data['query']['wbcontentlanguages']
+
+
+@lru_cache(maxsize=None)
+def wb_content_languages_cached():
+    """Cache returned content language.
+
+    Return and cache information about content languages in Wikidata.
+
+    Returns
+    -------
+    languages : dict of dict
+        Dictionary of dictionaries with ISO code as keys of upper dictionary
+        and values containing information about the language: code, autonym
+        and English name.
+
+    Example
+    -------
+    >>> languages = wb_content_languages()
+    >>> languages['da']['autonym']
+    'dansk'
+    >>> languages['da']['name']
+    'Danish'
+    >>> languages['da']['code']
+    'da'
+
+    """
+    return wb_content_languages()
 
 
 def wb_search_lexeme_entities(query, language='en'):

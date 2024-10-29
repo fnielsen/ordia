@@ -8,79 +8,48 @@ from werkzeug.routing import BaseConverter
 
 from six import u
 
-from ..api import wb_search_lexeme_entities
+from ..api import wb_search_lexeme_entities, wb_content_languages_cached
 from ..query import (escape_string, form_to_representation_and_iso639,
                      get_wikidata_language_codes_cached, iso639_to_q)
 from ..text import (lowercase_first_sentence_letters, text_to_words,
                     word_list_to_everygrams)
 
 
-ALLOWED_LANGUAGES = [
-    'aa', 'ab', 'ady', 'af', 'am', 'an', 'ang', 'ar', 'ar-x-q775724',
-    'arc', 'arz', 'as', 'ase', 'ase-x-q22001375', 'ast', 'atj', 'av',
-    'ay', 'az', 'az-x-q1828555', 'az-x-q8209', 'ba', 'bar', 'bcl',
-    'be', 'be-tarask', 'bg', 'bho', 'bi', 'bjn', 'bm', 'bn', 'bo',
-    'br', 'br-x-q2924576', 'br-x-q54555486', 'br-x-q54555509', 'bxr',
-    'ca', 'ca-x-q32641', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb', 'co',
-    'cr', 'crh', 'crh-latn', 'crh-x-q38893333', 'crh-x-q39132363',
-    'cs', 'cs-x-q28861', 'cs-x-q9995', 'csb', 'cu', 'cu-x-q145625',
-    'cu-x-q8209', 'cv', 'cy', 'da', 'dag', 'de', 'de-x-q306626',
-    'de-x-q35218', 'de-x-q837985', 'diq', 'dsb', 'dtp', 'dty', 'dv',
-    'egl', 'el', 'en', 'en-ca', 'en-gb', 'en-x-q1337', 'en-x-q44679',
-    'en-x-q7976', 'eo', 'eo-x-q3497763', 'eo-x-q3505590', 'es',
-    'es-419', 'es-x-q2034', 'es-x-q957764', 'et', 'eu',
-    'eu-x-q3125314', 'eu-x-q749166', 'ext', 'fa', 'ff', 'fi', 'fo',
-    'fr', 'fr-x-q35222', 'fr-x-q39', 'fr-x-q535', 'frr', 'fur', 'fy',
-    'ga', 'gag', 'gd', 'gl', 'gn', 'gom-deva', 'gom-latn', 'got',
-    'grc', 'gsw', 'gu', 'gv', 'ha', 'haw', 'he', 'he-x-q21283070',
-    'he-x-q2975864', 'he-x-q67200702', 'hi', 'hif', 'hr', 'hsb', 'ht',
-    'hu', 'hy', 'ia', 'id', 'id-x-q57549853', 'ie', 'ig', 'ii', 'ilo',
-    'inh', 'io', 'is', 'it', 'it-x-q672147', 'iu', 'iu-x-q2479183',
-    'iu-x-q8229', 'ja', 'ja-x-q10997505', 'ja-x-q53979341',
-    'ja-x-q53979348', 'ja-x-q82772', 'ja-x-q82946', 'jam', 'jbo',
-    'jv', 'jv-x-q879704', 'ka', 'kaa', 'kaa-x-q8209', 'kab', 'kbp',
-    'kg', 'ki', 'kk', 'kk-x-q64362991', 'kk-x-q64362992',
-    'kk-x-q64362993', 'kl', 'km', 'kn', 'ko', 'ko-x-q485619', 'koi',
-    'krc', 'ku', 'kv', 'kw', 'ky', 'la', 'la-x-q179230', 'lad',
-    'lad-x-q33513', 'lad-x-q8229', 'lb', 'lbe', 'lez', 'lfn', 'lg',
-    'li', 'lij', 'liv', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'mdf',
-    'mg', 'mhr', 'mi', 'min', 'mis', 'mis-x-q149838',
-    'mis-x-q16315466', 'mis-x-q179230', 'mis-x-q181074',
-    'mis-x-q208503', 'mis-x-q21117', 'mis-x-q21146257',
-    'mis-x-q2270532', 'mis-x-q2482781', 'mis-x-q27567',
-    'mis-x-q27969', 'mis-x-q3199353', 'mis-x-q33060', 'mis-x-q33161',
-    'mis-x-q33170', 'mis-x-q33537', 'mis-x-q33624', 'mis-x-q33690',
-    'mis-x-q33759', 'mis-x-q35222', 'mis-x-q35228', 'mis-x-q35241',
-    'mis-x-q35505', 'mis-x-q35527', 'mis-x-q3558112', 'mis-x-q35668',
-    'mis-x-q35726', 'mis-x-q36155', 'mis-x-q36395', 'mis-x-q36730',
-    'mis-x-q36741', 'mis-x-q36790', 'mis-x-q36819', 'mis-x-q36822',
-    'mis-x-Q36846',
-    'mis-x-q37178', 'mis-x-q3938', 'mis-x-q401', 'mis-x-q44679',
-    'mis-x-q47091826', 'mis-x-q505674', 'mis-x-q50868',
-    'mis-x-q533109', 'mis-x-q56384', 'mis-x-q56430', 'mis-x-q56485',
-    'mis-x-q56627865', 'mis-x-q56743290', 'mis-x-q666027',
-    'mis-x-q7249970', 'mis-x-q7251862', 'mis-x-q747537',
-    'mis-x-q787610', 'mis-x-q837985', 'mk', 'ml', 'mn',
-    'mn-x-q1055705', 'mr', 'ms', 'ms-x-q83942', 'mt', 'mwl', 'my',
-    'myv', 'mzn', 'na', 'nah', 'nan', 'nap', 'nb', 'nds', 'ne', 'new',
-    'nl', 'nn', 'no', 'nv', 'nys', 'oc', 'om', 'or', 'os', 'ota',
-    'pa', 'pam', 'pap', 'pdc', 'pl', 'pl-x-q101244', 'pl-x-q180309',
-    'pl-x-q98912', 'pms', 'pnb', 'prg', 'ps', 'pt', 'pt-br', 'qu',
-    'rm', 'rm-sursilv', 'rm-sutsilv', 'rm-vallader', 'rmy', 'ro',
-    'ru', 'ru-x-q2442696', 'rue', 'sa', 'sah', 'sc', 'scn', 'sco',
-    'sd', 'se', 'se-x-q56681944', 'se-x-q56681946', 'sgs', 'sh',
-    'sh-x-q8229', 'shy-latn', 'si', 'sk', 'sl', 'sm', 'sma', 'smj',
-    'smn', 'sms', 'sn', 'so', 'sq', 'sr', 'sr-ec', 'sr-el', 'srn',
-    'st', 'st-x-q1013', 'st-x-q258', 'stq', 'su', 'sv', 'sw', 'szl',
-    'ta', 'tcy', 'te', 'tet', 'tg', 'th', 'tk', 'tk-x-q8209',
-    'tk-x-q8229', 'tl', 'tly-x-q8209', 'tly-x-q8229', 'tr', 'ts',
-    'tt', 'tw', 'tyv', 'udm', 'ug', 'ug-latn', 'ug-x-q11084133',
-    'ug-x-q6672247', 'ug-x-q986283', 'uk', 'ur', 'uz',
-    'uz-x-q64363006', 'uz-x-q64363007', 'vec', 'vep', 'vi', 'vls',
-    'vo', 'vo-x-q12712', 'vot', 'vro', 'wa', 'war', 'wo', 'xal', 'xh',
-    'xmf', 'yi', 'yi-x-q188725', 'yo', 'yue', 'za', 'za-x-q58349204',
-    'zh', 'zh-cn', 'zh-hans', 'zh-hant', 'zh-tw', 'zh-x-q178528',
-    'zu']
+ALLOWED_LANGUAGES = list(wb_content_languages_cached()) + [
+    'ar-x-q775724', 'ase-x-q22001375', 'az-x-q1828555', 'az-x-q8209',
+    'br-x-q2924576', 'br-x-q54555486', 'br-x-q54555509', 'ca-x-q32641',
+    'crh-x-q38893333', 'crh-x-q39132363', 'cs-x-q28861', 'cs-x-q9995',
+    'cu-x-q145625', 'cu-x-q8209', 'de-x-q306626', 'de-x-q35218',
+    'de-x-q837985', 'en-x-q1337', 'en-x-q44679', 'en-x-q7976',
+    'eo-x-q3497763', 'eo-x-q3505590', 'es-x-q2034', 'es-x-q957764',
+    'eu-x-q3125314', 'eu-x-q749166', 'fr-x-q35222', 'fr-x-q39',
+    'fr-x-q535', 'he-x-q21283070', 'he-x-q2975864', 'he-x-q67200702',
+    'id-x-q57549853', 'it-x-q672147', 'iu-x-q2479183', 'iu-x-q8229',
+    'ja-x-q10997505', 'ja-x-q53979341', 'ja-x-q53979348', 'ja-x-q82772',
+    'ja-x-q82946', 'jv-x-q879704', 'kaa-x-q8209', 'kk-x-q64362991',
+    'kk-x-q64362992', 'kk-x-q64362993', 'ko-x-q485619', 'la-x-q179230',
+    'lad-x-q33513', 'lad-x-q8229', 'mis-x-q149838', 'mis-x-q16315466',
+    'mis-x-q179230', 'mis-x-q181074', 'mis-x-q208503', 'mis-x-q21117',
+    'mis-x-q21146257', 'mis-x-q2270532', 'mis-x-q2482781',
+    'mis-x-q27567', 'mis-x-q27969', 'mis-x-q3199353', 'mis-x-q33060',
+    'mis-x-q33161', 'mis-x-q33170', 'mis-x-q33537', 'mis-x-q33624',
+    'mis-x-q33690', 'mis-x-q33759', 'mis-x-q35222', 'mis-x-q35228',
+    'mis-x-q35241', 'mis-x-q35505', 'mis-x-q35527', 'mis-x-q3558112',
+    'mis-x-q35668', 'mis-x-q35726', 'mis-x-q36155', 'mis-x-q36395',
+    'mis-x-q36730', 'mis-x-q36741', 'mis-x-q36790', 'mis-x-q36819',
+    'mis-x-q36822', 'mis-x-Q36846', 'mis-x-q37178', 'mis-x-q3938',
+    'mis-x-q401', 'mis-x-q44679', 'mis-x-q47091826', 'mis-x-q505674',
+    'mis-x-q50868', 'mis-x-q533109', 'mis-x-q56384', 'mis-x-q56430',
+    'mis-x-q56485', 'mis-x-q56627865', 'mis-x-q56743290',
+    'mis-x-q666027', 'mis-x-q7249970', 'mis-x-q7251862',
+    'mis-x-q747537', 'mis-x-q787610', 'mis-x-q837985',
+    'mn-x-q1055705', 'ms-x-q83942', 'pl-x-q101244', 'pl-x-q180309',
+    'pl-x-q98912', 'ru-x-q2442696', 'se-x-q56681944', 'se-x-q56681946',
+    'sh-x-q8229', 'st-x-q1013', 'st-x-q258', 'tk-x-q8209',
+    'tk-x-q8229', 'tly-x-q8209', 'tly-x-q8229', 'ug-x-q11084133',
+    'ug-x-q6672247', 'ug-x-q986283', 'uz-x-q64363006',
+    'uz-x-q64363007', 'vo-x-q12712', 'yi-x-q188725', 'za-x-q58349204',
+    'zh-x-q178528']
 
 
 class RegexConverter(BaseConverter):
@@ -661,11 +630,14 @@ def show_text_to_lexemes():
     # Currently confined to between 1 and 3
     max_n_gram = min(3, max(1, max_n_gram))
 
+    languages = wb_content_languages_cached()
+
     if not text:
         return render_template('text_to_lexemes.html',
                                text_language=text_language,
                                casing=casing,
-                               max_n_gram=max_n_gram)
+                               max_n_gram=max_n_gram,
+                               languages=languages)
 
     # Casing processing
     cased_text = text.strip()
@@ -701,4 +673,5 @@ def show_text_to_lexemes():
 
     return render_template('text_to_lexemes.html', text=text, words=words,
                            text_language=text_language, casing=casing,
-                           max_n_gram=max_n_gram)
+                           max_n_gram=max_n_gram,
+                           languages=languages)
