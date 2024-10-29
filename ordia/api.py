@@ -86,6 +86,28 @@ def wb_get_entities(ids):
 
 
 def wb_content_languages():
+    """Return content languages.
+
+    Return information about content languages in Wikidata.
+
+    Returns
+    -------
+    languages : dict of dict
+        Dictionary of dictionaries with ISO code as keys of upper dictionary
+        and values containing information about the language: code, autonym
+        and English name.
+
+    Example
+    -------
+    >>> languages = wb_content_languages()
+    >>> languages['da']['autonym']
+    'dansk'
+    >>> languages['da']['name']
+    'Danish'
+    >>> languages['da']['code']
+    'da'
+
+    """
     params = {
         'action': 'query',
         'format': 'json',
@@ -104,7 +126,29 @@ def wb_content_languages():
 
 @lru_cache(maxsize=None)
 def wb_content_languages_cached():
-	return wb_content_languages()
+    """Cache returned content language.
+
+    Return and cache information about content languages in Wikidata.
+
+    Returns
+    -------
+    languages : dict of dict
+        Dictionary of dictionaries with ISO code as keys of upper dictionary
+        and values containing information about the language: code, autonym
+        and English name.
+
+    Example
+    -------
+    >>> languages = wb_content_languages()
+    >>> languages['da']['autonym']
+    'dansk'
+    >>> languages['da']['name']
+    'Danish'
+    >>> languages['da']['code']
+    'da'
+
+    """
+    return wb_content_languages()
 
 
 def wb_search_lexeme_entities(query, language='en'):

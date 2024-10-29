@@ -18,7 +18,7 @@ from ..text import (lowercase_first_sentence_letters, text_to_words,
 ALLOWED_LANGUAGES = list(wb_content_languages_cached()) + [
     'ar-x-q775724', 'ase-x-q22001375', 'az-x-q1828555', 'az-x-q8209',
     'br-x-q2924576', 'br-x-q54555486', 'br-x-q54555509', 'ca-x-q32641',
-    'crh-x-q38893333', 'crh-x-q39132363','cs-x-q28861', 'cs-x-q9995',
+    'crh-x-q38893333', 'crh-x-q39132363', 'cs-x-q28861', 'cs-x-q9995',
     'cu-x-q145625', 'cu-x-q8209', 'de-x-q306626', 'de-x-q35218',
     'de-x-q837985', 'en-x-q1337', 'en-x-q44679', 'en-x-q7976',
     'eo-x-q3497763', 'eo-x-q3505590', 'es-x-q2034', 'es-x-q957764',
@@ -675,4 +675,3 @@ def show_text_to_lexemes():
                            text_language=text_language, casing=casing,
                            max_n_gram=max_n_gram,
                            languages=languages)
-
