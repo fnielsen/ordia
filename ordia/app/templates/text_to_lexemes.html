@@ -19,6 +19,8 @@ WHERE {
   VALUES ?word { {{ words | safe }} }
   OPTIONAL {
     ?form ontolex:representation ?word . 
+    BIND(?word AS ?formLabel)
+
     OPTIONAL {
       ?form wikibase:grammaticalFeature ?feature .
       BIND(STR(?feature) AS ?default_featureLabel)
@@ -39,7 +41,6 @@ WHERE {
 	 ?lexical_categoryLabel)
       
     ?lexeme ontolex:lexicalForm ?form .
-    ?form ontolex:representation ?formLabel .
 	  
     ?lexeme wikibase:lemma ?lexemeLabel .
 
