@@ -75,7 +75,7 @@
               BIND(CONCAT(?image_https, "?width=300") AS ?image_url)
             }
             GROUP BY ?lexeme ?gloss ?image_url
-            LIMIT 1000
+            LIMIT 10000
             `;
             const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
 
