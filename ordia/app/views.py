@@ -183,6 +183,19 @@ def show_grammatical_feature(q):
     return render_template("grammatical_feature.html", q=q)
 
 
+@main.route("/guess-form-from-text/")
+def show_guess_form_from_text():
+    """Render webpage for Guess form from text.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template("guess-form-from-text.html")
+
+
 @main.route("/guess-the-gender/")
 def show_guess_the_gender():
     """Render webpage for Guess the Gender.
