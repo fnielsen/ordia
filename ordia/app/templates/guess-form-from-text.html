@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+
+{% block styles %}
+{{super()}}
+    <style>
+        .option-button {
+            margin: 5px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script>
+  const MAX_QUESTIONS = 10;
+  let allQuizData = [];
+  let quizData = [];
+  let currentQuestion = 0;
+  let score = 0;
+  let availableQuestions = 0;
+  const results = [];
+
+    // Function to fetch quiz data from Wikidata via SPARQL
+    async function fetchQuizData(languageCode) {
+        const sparqlQuery = `
+        SELECT
+          ?lexeme
+          (GROUP_CONCAT(DISTINCT ?lemma_; separator="/") AS ?lemma)
+          ?usage_example ?representation
+          (COUNT(DISTINCT ?all_representation) AS ?number_of_forms)
+          (GROUP_CONCAT(DISTINCT ?all_representation; separator=" // ") AS ?all_representations)
+        WHERE {
+            ?lexeme dct:language wd:${languageCode} ;
+                    wikibase:lemma ?lemma_ ;
+                    ontolex:lexicalForm ?form ;
+                    ontolex:lexicalForm / ontolex:representation ?all_representation ;
+                    p:P5831 ?usage_example_statement .
+            ?form ontolex:representation ?representation .
+            ?usage_example_statement ps:P5831 ?usage_example ;
+                                    pq:P5830 ?form .
+            MINUS { ?form wdt:P8530 [] }
+            FILTER (LANG(?usage_example) = LANG(?representation))
+            FILTER (LANG(?usage_example) = LANG(?all_representation))
+        }
+        GROUP BY ?lexeme ?usage_example ?representation
+        HAVING (?number_of_forms > 1)
+        LIMIT 1000`;  
+
+        document.getElementById('loading-indicator').classList.remove('d-none');  // Show loading message
+
+        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        document.getElementById('loading-indicator').classList.add('d-none');  // Hide loading message
+
+        allQuizData = data.results.bindings.map(result => ({
+            lexeme: result.lexeme.value,
+            lemma: result.lemma.value,
+            sentence: result.usage_example.value,
+            correctAnswer: result.representation.value,
+            allAnswers: result.all_representations.value.split(" // ")
+        }));
+
+        // Shuffle items
+        allQuizData.sort(() => 0.5 - Math.random());
+
+	// Ensure we don't request more questions than available
+	availableQuestions = Math.min(MAX_QUESTIONS, allQuizData.length);
+	console.log(availableQuestions);
+
+	
+        document.getElementById('total-questions-result').textContent = availableQuestions;
+	
+	return allQuizData.slice(0, availableQuestions);
+    }
+
+    // Start game by hiding language selection and showing quiz section
+    async function startGame() {
+        const selectedLanguage = document.getElementById('language-selector').value;
+        quizData = await fetchQuizData(selectedLanguage);
+        currentQuestion = 0;
+        score = 0;
+        results.length = 0; // Clear previous results
+
+        document.getElementById('language-selection').classList.add('d-none');
+        document.getElementById('quiz-section').classList.remove('d-none');
+        showNextQuestion();
+    }
+
+    // Display the next quiz question
+    function showNextQuestion() {
+        if (currentQuestion >= availableQuestions) {
+            showResults();
+            return;
+        }
+
+        const question = quizData[currentQuestion];
+        let sentence = question.sentence;
+
+        // Try to replace the correct word, otherwise insert placeholder at random position
+        if (sentence.includes(question.correctAnswer)) {
+	    // Escape special characters in correctAnswer for safe regex use
+	    function escapeRegExp(str) {
+		return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"); // Escapes special regex chars
+	    }
+	    
+	    let escapedAnswer = escapeRegExp(question.correctAnswer);
+	    
+	    // Replace word boundaries \b with a more flexible approach
+	    let regex = new RegExp(`(^|\\s|[.,;!?()])${escapedAnswer}($|\\s|[.,;:«!?()])`);
+	    sentence = sentence.replace(regex, "$1?????$2");
+        } else {
+	    // If the word is NOT found, prepend a message to the sentence
+	    sentence = `Form not found: ${sentence}`;
+	}
+
+        document.getElementById('sentence').textContent = sentence;
+
+        const answerButtons = document.getElementById('answer-buttons');
+        answerButtons.innerHTML = '';  // Clear previous options
+
+        const answers = [...question.allAnswers].sort(); 
+
+        answers.forEach(answer => {
+            const button = document.createElement('button');
+            button.classList.add('btn', 'btn-primary', 'option-button');
+            button.textContent = answer;
+            button.onclick = () => checkAnswer(answer, question.correctAnswer, question);
+            answerButtons.appendChild(button);
+        });
+    }
+
+    // Check the user's answer and proceed to the next question
+    function checkAnswer(selectedAnswer, correctAnswer, question) {
+        const feedback = document.getElementById('feedback');
+
+        if (selectedAnswer === correctAnswer) {
+            score++;
+            feedback.textContent = "✔ Correct!";
+            feedback.classList.add('text-success');
+            feedback.classList.remove('text-danger');
+        } else {
+            feedback.textContent = `❌ Incorrect. The correct answer was ${correctAnswer}`;
+            feedback.classList.add('text-danger');
+            feedback.classList.remove('text-success');
+        }
+
+        results.push({ lexeme: question.lexeme, lemma: question.lemma,
+		       sentence: question.sentence, isCorrect: selectedAnswer === correctAnswer });
+
+        setTimeout(() => {
+            feedback.textContent = "";  // Hide feedback after 2s
+            currentQuestion++;
+            showNextQuestion();
+        }, 2000);
+    }
+
+    // Display final results
+    function showResults() {
+        document.getElementById('quiz-section').classList.add('d-none');
+        document.getElementById('results-section').classList.remove('d-none');
+
+        document.getElementById('final-score').textContent = score;
+
+        const summaryTableBody = document.getElementById('summary-table-body');
+        summaryTableBody.innerHTML = ''; // Clear previous content
+	
+        results.forEach((item, index) => {
+            const row = document.createElement('tr');
+	    
+            // Index
+            const cellIndex = document.createElement('td');
+            cellIndex.textContent = index + 1;
+            row.appendChild(cellIndex);
+	    
+            // Correct Lemma
+            const cellLexeme = document.createElement('td');
+            const link = document.createElement('a');
+	    const lexeme = item.lexeme.split('/').pop()
+            link.href = '/' + lexeme;
+            link.textContent = item.lemma;
+            cellLexeme.appendChild(link);
+	    row.appendChild(cellLexeme);
+	    
+            // Sentence
+            const cellSentence = document.createElement('td');
+            cellSentence.textContent = item.sentence;
+            row.appendChild(cellSentence);
+
+            // Result
+            const cellResult = document.createElement('td');
+            if (item.isCorrect) {
+                cellResult.innerHTML = '<span class="text-success">✔</span>';
+            } else {
+                cellResult.innerHTML = '<span class="text-danger">❌</span>';
+            }
+            row.appendChild(cellResult);
+	    
+            summaryTableBody.appendChild(row);
+        });
+    }
+
+    function resetGame() {
+        document.getElementById('results-section').classList.add('d-none');
+        document.getElementById('language-selection').classList.remove('d-none');
+    }
+
+</script>
+
+  
+{% endblock %}
+
+
+{% block page_content %}
+
+<div class="container text-center mt-5">
+
+  <h1>Guess Form from Text</h1>
+
+  
+    <!-- Language Selection -->
+    <div id="language-selection" class="card p-4 mb-4">
+        <label for="language-selector" class="form-label">Select Language:</label>
+        <select class="form-control mb-3" id="language-selector">
+ <option value="Q29919">اللغه المصريه الحديثه - arz - Egyptian Arabic</option>
+<option value="Q9610">বাংলা ভাষা - bn - Bangla</option>
+<option value="Q9056">čeština - cs - Czech</option>
+<option value="Q9035">dansk - da - Danish</option>
+<option value="Q188">Deutsch - de - German</option>
+<option value="Q1860">English - en - English</option>
+<option value="Q143">Esperanto - eo - Esperanto</option>
+<option value="Q1321">español - es - Spanish</option>
+<option value="Q9168">فارسی - fa - Persian</option>
+<option value="Q1412">suomi - fi - Finnish</option>
+<option value="Q150">français - fr - French</option>
+<option value="Q56475">Hausa - ha - Hausa</option>
+<option value="Q9240">bahasa Indonesia - id - Indonesian</option>
+<option value="Q652">italiano - it - Italian</option>
+<!- option value="Q5287">日本語 - ja - Japanese</option -->
+<option value="Q9078">latviešu valoda - lv - Latvian</option>
+<option value="Q36236">മലയാളം - ml - Malayalam</option>
+<option value="Q9237">bahasa Melayu - ms - Malay</option>
+<option value="Q36495">Bân-lâm-gú - nan - Southern Min</option>
+<option value="Q25167">bokmål - nb - Bokmål</option>
+<option value="Q809">język polski - pl - Polish</option>
+<option value="Q5146">português - pt - Portuguese</option>
+<option value="Q7737">русский язык - ru - Russian</option>
+<option value="Q11059">संस्कृतम् - sa - Sanskrit</option>
+<option value="Q33965">ᱥᱟᱱᱛᱟᱲᱤ ᱯᱟᱹᱨᱥᱤ - sat - Santali</option>
+<option value="Q13271">nuõrttsääʹmǩiõll - sms - Skolt Sami</option>
+<!-- option value="Q13275">Af-Soomaali - so - Somali</option -->
+<option value="Q9027">svenska - sv - Swedish</option>
+<option value="Q5885">தமிழ் - ta - Tamil</option>
+<option value="Q256">Türkçe - tr - Turkish</option>
+<option value="Q8798">українська мова - uk - Ukrainian</option>
+        </select>
+        <button class="btn btn-primary" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="d-none">
+        <p class="loading">Fetching data from Wikidata... Please wait.</p>
+    </div>
+
+    <!-- Quiz Section -->
+    <div id="quiz-section" class="d-none">
+        <p id="sentence" class="sentence"></p>
+        <div id="answer-buttons" class="d-flex justify-content-center flex-wrap options"></div>
+        <p id="feedback" class="mt-3"></p>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="mt-4 d-none">
+      <div class="alert alert-info">
+        You scored <span id="final-score"></span> out of <span id="total-questions-result"></span>!
+      </div>
+      
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+		    <th>#</th>
+                    <th>Lexeme</th>
+                    <th>Sentence</th>
+                    <th>Correct?</th>
+                </tr>
+            </thead>
+            <tbody id="summary-table-body"></tbody>
+        </table>
+        <button class="btn btn-success" onclick="resetGame()">Play Again</button>
+    </div>
+
+</div>
+
+
+{% endblock %}
