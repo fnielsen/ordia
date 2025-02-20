@@ -66,7 +66,7 @@
 	    const query = `
               SELECT
                 ?lexeme
-                (GROUP_CONCAT(?lemma_; separator="/") AS ?lemma)
+                (GROUP_CONCAT(?lemma_; separator=" / ") AS ?lemma)
                 (SAMPLE(?gender_) AS ?gender) 
               WITH {
                 SELECT ?lexeme ?gender_ WHERE {
@@ -81,7 +81,7 @@
                 INCLUDE %lexemes
                 ?lexeme wikibase:lemma ?lemma_ .
               }
-              GROUP BY ?lexeme ?lemma_ ?gender_
+              GROUP BY ?lexeme ?gender_
               HAVING (COUNT(DISTINCT ?gender_) = 1)
               LIMIT 100
             `
