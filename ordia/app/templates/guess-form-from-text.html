@@ -81,7 +81,23 @@
     // Start game by hiding language selection and showing quiz section
     async function startGame() {
         const selectedLanguage = document.getElementById('language-selector').value;
+
+	// Hide any previous warning if data is available
+	document.getElementById('no-data-warning').classList.add('d-none');
+	
         quizData = await fetchQuizData(selectedLanguage);
+
+	// Show warning message if no data found
+	if (quizData.length === 0) {
+	    document.getElementById('no-data-warning').classList.remove('d-none');
+	    return;
+	}
+
+	if (quizData.length === 0) {
+            alert("Not enough data available for this language. Please select another.");
+            return;  // Stop execution if no data is found
+	}
+	
         currentQuestion = 0;
         score = 0;
         results.length = 0; // Clear previous results
@@ -111,7 +127,7 @@
 	    let escapedAnswer = escapeRegExp(question.correctAnswer);
 	    
 	    // Replace word boundaries \b with a more flexible approach
-	    let regex = new RegExp(`(^|\\s|[.,;!?()])${escapedAnswer}($|\\s|[.,;:«!?()])`);
+	    let regex = new RegExp(`(^|\\s|[.,;!?()'’])${escapedAnswer}($|\\s|[.,;:«!?()])`);
 	    sentence = sentence.replace(regex, "$1?????$2");
         } else {
 	    // If the word is NOT found, prepend a message to the sentence
@@ -218,53 +234,62 @@
 {% block page_content %}
 
 <div class="container text-center mt-5">
-
-  <h1>Guess Form from Text</h1>
-
   
-    <!-- Language Selection -->
-    <div id="language-selection" class="card p-4 mb-4">
-        <label for="language-selector" class="form-label">Select Language:</label>
-        <select class="form-control mb-3" id="language-selector">
- <option value="Q29919">اللغه المصريه الحديثه - arz - Egyptian Arabic</option>
-<option value="Q9610">বাংলা ভাষা - bn - Bangla</option>
-<option value="Q9056">čeština - cs - Czech</option>
-<option value="Q9035">dansk - da - Danish</option>
-<option value="Q188">Deutsch - de - German</option>
-<option value="Q1860">English - en - English</option>
-<option value="Q143">Esperanto - eo - Esperanto</option>
-<option value="Q1321">español - es - Spanish</option>
-<option value="Q9168">فارسی - fa - Persian</option>
-<option value="Q1412">suomi - fi - Finnish</option>
-<option value="Q150">français - fr - French</option>
-<option value="Q56475">Hausa - ha - Hausa</option>
-<option value="Q9240">bahasa Indonesia - id - Indonesian</option>
-<option value="Q652">italiano - it - Italian</option>
-<!- option value="Q5287">日本語 - ja - Japanese</option -->
-<option value="Q9078">latviešu valoda - lv - Latvian</option>
-<option value="Q36236">മലയാളം - ml - Malayalam</option>
-<option value="Q9237">bahasa Melayu - ms - Malay</option>
-<option value="Q36495">Bân-lâm-gú - nan - Southern Min</option>
-<option value="Q25167">bokmål - nb - Bokmål</option>
-<option value="Q809">język polski - pl - Polish</option>
-<option value="Q5146">português - pt - Portuguese</option>
-<option value="Q7737">русский язык - ru - Russian</option>
-<option value="Q11059">संस्कृतम् - sa - Sanskrit</option>
-<option value="Q33965">ᱥᱟᱱᱛᱟᱲᱤ ᱯᱟᱹᱨᱥᱤ - sat - Santali</option>
-<option value="Q13271">nuõrttsääʹmǩiõll - sms - Skolt Sami</option>
-<!-- option value="Q13275">Af-Soomaali - so - Somali</option -->
-<option value="Q9027">svenska - sv - Swedish</option>
-<option value="Q5885">தமிழ் - ta - Tamil</option>
-<option value="Q256">Türkçe - tr - Turkish</option>
-<option value="Q8798">українська мова - uk - Ukrainian</option>
-        </select>
-        <button class="btn btn-primary" onclick="startGame()">Start Game</button>
-    </div>
+  <h1>Guess Form from Text</h1>
+  
+  
+  <!-- Language Selection -->
+  <div id="language-selection" class="card p-4 mb-4">
+    <label for="language-selector" class="form-label">Select Language:</label>
+    <select class="form-control mb-3" id="language-selector">
+      <option value="Q29919">اللغه المصريه الحديثه - arz - Egyptian Arabic</option>
+      <option value="Q9610">বাংলা ভাষা - bn - Bangla</option>
+      <option value="Q9056">čeština - cs - Czech</option>
+      <option value="Q9035">dansk - da - Danish</option>
+      <option value="Q32238">Dagbanli - dag - Dagbani</option>
+      <option value="Q188">Deutsch - de - German</option>
+      <option value="Q1860">English - en - English</option>
+      <option value="Q143">Esperanto - eo - Esperanto</option>
+      <option value="Q1321">español - es - Spanish</option>
+      <option value="Q8752">euskara - eu - Basque</option>
+      <option value="Q9168">فارسی - fa - Persian</option>
+      <option value="Q1412">suomi - fi - Finnish</option>
+      <option value="Q150">français - fr - French</option>
+      <option value="Q56475">Hausa - ha - Hausa</option>
+      <option value="Q9240">bahasa Indonesia - id - Indonesian</option>
+      <option value="Q652">italiano - it - Italian</option>
+      <!-- option value="Q5287">日本語 - ja - Japanese</option -->
+      <option value="Q25355">Kalaallisut - kl - Greenlandic</option>
+      <option value="Q9078">latviešu valoda - lv - Latvian</option>
+      <option value="Q36236">മലയാളം - ml - Malayalam</option>
+      <option value="Q9237">bahasa Melayu - ms - Malay</option>
+      <option value="Q36495">Bân-lâm-gú - nan - Southern Min</option>
+      <option value="Q25167">bokmål - nb - Bokmål</option>
+      <option value="Q809">język polski - pl - Polish</option>
+      <option value="Q5146">português - pt - Portuguese</option>
+      <option value="Q7737">русский язык - ru - Russian</option>
+      <option value="Q11059">संस्कृतम् - sa - Sanskrit</option>
+      <option value="Q33965">ᱥᱟᱱᱛᱟᱲᱤ ᱯᱟᱹᱨᱥᱤ - sat - Santali</option>
+      <option value="Q13271">nuõrttsääʹmǩiõll - sms - Skolt Sami</option>
+      <!-- option value="Q13275">Af-Soomaali - so - Somali</option -->
+      <option value="Q9027">svenska - sv - Swedish</option>
+      <option value="Q5885">தமிழ் - ta - Tamil</option>
+      <option value="Q256">Türkçe - tr - Turkish</option>
+      <option value="Q8798">українська мова - uk - Ukrainian</option>
+    </select>
+  <button class="btn btn-primary" onclick="startGame()">Start Game</button>
+</div>
 
     <!-- Loading Indicator -->
     <div id="loading-indicator" class="d-none">
         <p class="loading">Fetching data from Wikidata... Please wait.</p>
     </div>
+
+    <!-- Warning message (Initially hidden with d-none) -->
+    <div id="no-data-warning" class="alert alert-warning d-none" role="alert">
+      No data available for this language. Please try another.
+    </div>
+
 
     <!-- Quiz Section -->
     <div id="quiz-section" class="d-none">
