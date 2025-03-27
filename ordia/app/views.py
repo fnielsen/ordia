@@ -484,7 +484,11 @@ def show_search():
     or search string and `language` as the ISO language code.
 
     """
-    query = request.args.get('q', '').strip()
+    # Remove end punctuation
+    # For full stop see https://query.wikidata.org/#%23%20Lexemes%20in%20English%20that%20match%20an%20expression%0ASELECT%20%3FlexemeId%20%3Flemma%20WHERE%20%7B%0A%20%20%3FlexemeId%20dct%3Alanguage%20wd%3AQ1860%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Alemma%20%3Flemma.%0A%20%20FILTER%20%28regex%28%3Flemma%2C%20%27.%2a%5C%5C.%24%27%29%29%0A%7D
+    # For comma see https://query.wikidata.org/#%23%20Lexemes%20in%20English%20that%20match%20an%20expression%0ASELECT%20%3FlexemeId%20%3Flemma%20WHERE%20%7B%0A%20%20%3FlexemeId%20dct%3Alanguage%20wd%3AQ1860%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Alemma%20%3Flemma.%0A%20%20FILTER%20%28regex%28%3Flemma%2C%20%27.%2a%2C%24%27%29%29%0A%7D
+    # We don't remove question marks because they are used in some idioms like this https://www.wikidata.org/wiki/Lexeme:L1221121
+    query = request.args.get('q', '').strip().replace(".", "").replace(",", "")
     language = request.args.get('language', '').strip()
 
     if len(query) == 0:
