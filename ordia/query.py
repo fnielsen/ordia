@@ -171,7 +171,7 @@ def get_wikidata_language_codes(min_count=0):
 
     query += "\nORDER BY DESC(?count)"
 
-    url = 'https://query.wikidata.org/sparql'
+    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -242,7 +242,7 @@ def iso639_to_q(iso639):
     query = 'SELECT ?code WHERE {{ ?code {property} "{iso639}" }}'.format(
         property=property, iso639=escape_string(iso639))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -316,7 +316,7 @@ def spacy_token_to_lexemes(token):
     }}'''.format(language=language, lexical_category=lexical_category,
                  representation=representation, iso639=iso639)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()

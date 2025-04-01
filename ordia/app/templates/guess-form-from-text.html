@@ -51,7 +51,7 @@
 
         document.getElementById('loading-indicator').classList.remove('d-none');  // Show loading message
 
-        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        const url = `https://query-main.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
         const response = await fetch(url);
         const data = await response.json();
 

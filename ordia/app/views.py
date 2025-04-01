@@ -444,7 +444,7 @@ def show_q(q):
     return render_template("q.html", q=q)
 
 
-@main.route("/reference")
+@main.route("/reference/")
 def show_reference_index():
     """Render webpage for reference index page."""
     return render_template("reference_index.html")
