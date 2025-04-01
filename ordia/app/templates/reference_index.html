@@ -21,7 +21,7 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?count)
 `
@@ -32,35 +32,38 @@ ORDER BY DESC(?count)
    ?count 
    ?reference ?referenceLabel ?referenceDescription
  WITH {
-     SELECT 
+   SELECT 
      (COUNT(*) AS ?count)
      ?reference
-     WHERE {
-	 [] dct:language [] ; wdt:P1343 ?reference .
-     }
-     GROUP BY ?reference
-     ORDER BY DESC(?count)
-     LIMIT 1000
+   WHERE {
+     [] dct:language [] ; wdt:P1343 ?reference .
+   }
+   GROUP BY ?reference
+   ORDER BY DESC(?count)
+   LIMIT 1000
  } AS %results
  WHERE {
-     INCLUDE %results
-     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+   INCLUDE %results
+   { 
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". } 
+   }
+   UNION
+   {
+     SERVICE <https://query-scholarly.wikidata.org/sparql> {
+        BIND(?reference AS ?reference)
+        BIND(?referenceLabel AS ?referenceLabel)
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+      }
+   }
+   FILTER (?referenceLabel != SUBSTR(STR(?reference), 32))
  }
  ORDER BY DESC(?count)
  `;
 
  
  $(document).ready(function() {
-     sparqlToDataTable(listOfReferencesSparql, "#list-of-references",
-		       options={
-			   'linkPrefixes': {
-			       'reference': 'reference/'
-			   }});
-     sparqlToDataTable(descriptionsSparql, "#descriptions-table",
-		       options={
-			   'linkPrefixes': {
-			       'reference': 'reference/'
-			   }});
+     sparqlToDataTable(listOfReferencesSparql, "#list-of-references");
+     sparqlToDataTable(descriptionsSparql, "#descriptions-table");
  });
  
 </script>
