@@ -22,17 +22,18 @@
 
         // Mapping of language codes to Wikidata Q-IDs
         const languageCodeToQID = {
+            'br': 'Q12107',    // Breton
             'da': 'Q9035',     // Danish
             'de': 'Q188',      // German
             'en': 'Q1860',     // English
             'es': 'Q1321',     // Spanish
             'fr': 'Q150',      // French
             'it': 'Q652',      // Italian
-	    'nb': 'Q25167',    // Bokmal
+	          'nb': 'Q25167',    // Bokmal
             'nl': 'Q7411',     // Dutch
-	    'sv': 'Q9027',     // Swedish
-	    'uk': 'Q8798',     // Ukrainian
-	    'pa': 'Q58635',     // Punjabi
+	          'sv': 'Q9027',     // Swedish
+	          'uk': 'Q8798',     // Ukrainian
+	          'pa': 'Q58635',     // Punjabi
             // Add more languages and their Wikidata Q-IDs as needed
         };
 
@@ -239,6 +240,7 @@
         <div id="language-selection" class="card p-4 mb-4">
             <label for="language-selector">Select Language:</label>
             <select class="form-control mb-3" id="language-selector">
+                <option value="br">brezhoneg - br - Breton</option>
                 <option value="da">Dansk - da - Danish</option>
                 <option value="de">Deutsch - de - German</option>
                 <option value="es">Español - es - Spanish</option>
