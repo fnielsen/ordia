@@ -82,7 +82,7 @@
                 INCLUDE %lexemes
                 ?lexeme wikibase:lemma ?lemma_ .
               }
-              GROUP BY ?lexeme ?gender_
+              GROUP BY ?lexeme
               HAVING (COUNT(DISTINCT ?gender_) = 1)
               LIMIT 100
             `
