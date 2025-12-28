@@ -25,7 +25,7 @@ WHERE {
     BIND("Language" AS ?description)
     ?lexeme dct:language ?value .
     ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'mul')
+    FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("language/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
@@ -34,7 +34,7 @@ WHERE {
     BIND("Lexical category" AS ?description)
     ?lexeme wikibase:lexicalCategory ?value .
     ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'mul')
+    FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("lexical-category/", SUBSTR(STR(?value), 32))  AS ?value_Url)
   }
   UNION 
@@ -44,12 +44,15 @@ WHERE {
     ?lexeme p:P31 ?value_statement .
     ?value_statement ps:P31 ?value .
     ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'mul')
+    FILTER (LANG(?valueLabel) = 'en')
     BIND(CONCAT("property/P31/value/", SUBSTR(STR(?value), 32))  AS ?value_Url)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P248 ?source_ .
-      ?source_ rdfs:label ?source .
-      FILTER (LANG(?source) = 'mul')
+      OPTIONAL {
+        ?source_ rdfs:label ?sourceEn .
+        FILTER (LANG(?sourceEn) = 'en')
+      }
+      BIND(COALESCE(?sourceEn, SUBSTR(STR(?source_), 32)) AS ?source)
       BIND(CONCAT("reference/", SUBSTR(STR(?source_), 32))  AS ?sourceUrl)
     }
   }
@@ -68,7 +71,7 @@ WHERE {
     BIND("Grammatical gender" AS ?description)
     ?lexeme wdt:P5185 ?value .
     ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'mul')
+    FILTER (LANG(?valueLabel) = 'en')
   }
   UNION 
   {
@@ -105,10 +108,10 @@ WHERE {
     BIND(14 AS ?order)
     BIND("Derived from" AS ?description)
     OPTIONAL {
-     ?lexeme wdt:P5191 ?value .
-     ?value wikibase:lemma ?valueLabel .	  
+      ?lexeme wdt:P5191 ?value .
+      ?value wikibase:lemma ?valueLabel .
+      BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
     }
-    BIND(SUBSTR(STR(?value), 32)  AS ?value_Url)
   }
   UNION 
   {
@@ -133,8 +136,11 @@ WHERE {
     BIND("Described in" AS ?description)
     ?lexeme ontolex:lexicalForm? / p:P1343 ?value_statement .
     ?value_statement ps:P1343 ?value .
-    ?value rdfs:label ?valueLabel .
-    FILTER (LANG(?valueLabel) = 'mul')
+    OPTIONAL {
+      ?value rdfs:label ?valueLabelEn .
+      FILTER (LANG(?valueLabel) = 'en')
+    }
+    BIND(COALESCE(?valueLabelEn, SUBSTR(STR(?valueLabelEn), 32)) AS ?valueLabel)
     BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
@@ -290,7 +296,7 @@ WHERE {
   OPTIONAL {
     ?lexeme wikibase:lexicalCategory ?lexical_category .
     ?lexical_category rdfs:label ?lexical_categoryLabel .
-    FILTER (LANG(?lexical_categoryLabel) = 'mul')
+    FILTER (LANG(?lexical_categoryLabel) = 'en')
   }
 }
 `
