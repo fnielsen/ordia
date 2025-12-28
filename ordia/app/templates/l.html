@@ -138,9 +138,13 @@ WHERE {
     ?value_statement ps:P1343 ?value .
     OPTIONAL {
       ?value rdfs:label ?valueLabelEn .
-      FILTER (LANG(?valueLabel) = 'en')
+      FILTER (LANG(?valueLabelEn) = 'en')
     }
-    BIND(COALESCE(?valueLabelEn, SUBSTR(STR(?valueLabelEn), 32)) AS ?valueLabel)
+    OPTIONAL {
+      ?value rdfs:label ?valueLabelMul .
+      FILTER (LANG(?valueLabelMul) = 'mul')
+    }
+    BIND(COALESCE(?valueLabelEn, ?valueLabelMul, SUBSTR(STR(?value), 32)) AS ?valueLabel)
     BIND(CONCAT("reference/", SUBSTR(STR(?value), 32))  AS ?value_Url)
     OPTIONAL {
       ?value_statement prov:wasDerivedFrom / pr:P854 ?sourceUrl .
