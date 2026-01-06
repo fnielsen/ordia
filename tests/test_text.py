@@ -14,3 +14,4 @@ def test_text_to_sentences():
 
 def test_text_to_words():
     assert text_to_words('e-mail to send') == ['e-mail', 'to', 'send']
+    assert text_to_words("war-c’houlenn", language="Q12107") == ['war-c’houlenn']

@@ -666,7 +666,7 @@ def show_text_to_lexemes():
         cased_text = cased_text.title()
     else:
         assert False
-    list_of_words = text_to_words(cased_text)
+    list_of_words = text_to_words(cased_text, language=text_language)
 
     if max_n_gram > 1:
         list_of_words = word_list_to_everygrams(list_of_words,

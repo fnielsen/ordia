@@ -5,12 +5,18 @@
 import regex
 
 
-sentence_split_pattern = regex.compile(
+SENTENCE_SPLIT_PATTERN = regex.compile(
     r"(?<=[\.!?:])\s",
-    flags=regex.UNICODE | regex.DOTALL)
-word_pattern = regex.compile(
-    r"((?:\p{L}\p{M}*)+(?:-(?:\p{L}\p{M}*)+)*)",
-    flags=regex.UNICODE)
+    flags=regex.DOTALL)
+
+
+LETTER = r"(?:\p{L}\p{M}*)"
+BRETON_CH = r"(?:[cC][’']h)"
+UNIT_BR = rf"(?:{BRETON_CH}|{LETTER})"
+
+WORD_PATTERN_DEFAULT = regex.compile(rf"{LETTER}+(?:-{LETTER}+)*")
+
+WORD_PATTERN_BR = regex.compile(rf"({UNIT_BR}+(?:-{UNIT_BR}+)*)")
 
 
 def lowercase_first_sentence_letters(text):
@@ -73,20 +79,28 @@ def text_to_sentences(text):
     3
 
     """
-    sentences = sentence_split_pattern.split(text)
+    sentences = SENTENCE_SPLIT_PATTERN.split(text)
     return sentences
 
 
-def text_to_words(text):
-    """Split text to words.
+def text_to_words(text: str, language=None) -> list[str]:
+    r"""Split text to words.
 
-    Split a text into words with a word defined as a sequence of letters and
-    markings followed by one or more groups of dash and letter and markings.
+    Split a text into words, where a word is defined as a sequence of Unicode
+    letters and combining marks, optionally followed by one or more groups
+    consisting of a dash `-` and another such sequence.
 
     Parameters
     ----------
     text : str
         Text to be tokenized.
+    language : str or None, optional
+        Language code or Wikidata Q-identifier controlling language-specific
+        tokenization rules. If `None` (default), language-agnostic rules are
+        used. Currently supported values are:
+
+        - `"br"` or `"Q12107"`: Breton, where `c'h` / `c’h` is treated as
+          part of a word.
 
     Result
     ------
@@ -95,9 +109,17 @@ def text_to_words(text):
 
     Notes
     -----
-    Words are defined as Unicode letters and markings followed by zero or more
-    groups, each consisting of a dash `-` and one or more letters and markings.
-    Markings are added to accommodate, e.g., Hindi words.
+    Words are primarily defined as Unicode letters (`\p{L}`) and combining
+    marks (`\p{M}`). Combining marks are included to support scripts such as
+    Devanagari.
+
+    For some languages, the definition of what constitutes a word can be
+    extended. Currently, Breton supports treating the digraph `c'h` (including
+    the typographic variant `c’h`) as an internal part of a word.
+
+    The function does not perform automatic language detection; the caller is
+    responsible for supplying the appropriate language identifier when
+    language-specific behavior is desired.
 
     Examples
     --------
@@ -108,13 +130,22 @@ def text_to_words(text):
     >>> words[1] == 'there'
     True
 
+    With a dash:
+
     >>> text = "Scholia creates on-the-fly profiles"
     >>> len(text_to_words(text))
     4
 
+    With Breton's c'h:
+
+    >>> text_to_words("c'hwezhioù bras", language="br")
+    ["c'hwezhioù", 'bras']
+
     """
-    words = word_pattern.findall(text)
-    return words
+    if language in {"br", "Q12107"}:
+        # Breton
+        return WORD_PATTERN_BR.findall(text)
+    return WORD_PATTERN_DEFAULT.findall(text)
 
 
 def word_list_to_everygrams(word_list, max_n_gram=3):
