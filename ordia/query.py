@@ -177,7 +177,8 @@ def get_wikidata_language_codes(min_count=0):
     query += "\nORDER BY DESC(?count)"
 
     params = {'query': query, 'format': 'json'}
-    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
+    response = requests.get(
+        SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
@@ -247,7 +248,8 @@ def iso639_to_q(iso639):
         property=property, iso639=escape_string(iso639))
 
     params = {'query': query, 'format': 'json'}
-    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
+    response = requests.get(
+        SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
@@ -320,7 +322,8 @@ def spacy_token_to_lexemes(token):
                  representation=representation, iso639=iso639)
 
     params = {'query': query, 'format': 'json'}
-    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
+    response = requests.get(
+        SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
