@@ -1,3 +1,5 @@
+const SPARQL_ENDPOINT_URL = "https://query.wikidata.org/sparql";
+
 // http://stackoverflow.com/questions/1026069/
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -110,10 +112,9 @@ function sparqlToDataTable(sparql, element, options={}) {
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     
-    var post_url = "https://query-main.wikidata.org/sparql";
     var post_data = "query=" + encodeURIComponent(sparql) + '&format=json'
     
-    $.post(post_url, post_data, function(response) {
+    $.post(SPARQL_ENDPOINT_URL, post_data, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);
 
 	convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes);
@@ -138,9 +139,9 @@ function sparqlToDataTable(sparql, element, options={}) {
 	});
 
 	$(element).append(
-	    '<caption><a href="https://query-main.wikidata.org/#' + 
+	    '<caption><a href="https://query.wikidata.org/#' + 
 		encodeURIComponent(sparql) +	
-		'">Edit on query-main.Wikidata.org</a></caption>');
+		'">Edit on query.Wikidata.org</a></caption>');
     }, "json");
 }
 

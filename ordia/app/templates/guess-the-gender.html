@@ -4,7 +4,7 @@
 {{super()}}
 
 <script>
-  const SPARQL_ENDPOINT = 'https://query-main.wikidata.org/sparql';
+  const SPARQL_ENDPOINT_URL = 'https://query.wikidata.org/sparql';
   const MAX_QUESTIONS = 10;
   let nouns = [];
   let currentQuestion = 0;
@@ -69,7 +69,7 @@
               HAVING (COUNT(DISTINCT ?gender_) = 1)
               LIMIT 100
             `
-    const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
+    const url = SPARQL_ENDPOINT_URL + '?query=' + encodeURIComponent(query);
     const response = await fetch(url, {
       headers: { 'Accept': 'application/sparql-results+json' }
     });

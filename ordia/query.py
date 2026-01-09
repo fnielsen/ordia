@@ -36,11 +36,16 @@ except ImportError:
 import requests
 
 
-USER_AGENT = 'Ordia'
+USER_AGENT = 'Ordia/1.0 (https://ordia.toolforge.org/; mailto:faan@dtu.dk)'
 
-HEADERS = {'User-Agent': USER_AGENT}
+HEADERS = {
+    'User-Agent': USER_AGENT,
+    "X-Requested-With": "Ordia",
+}
 
 FORM_PATTERN = compile(r'L[1-9]\d*-F[1-9]\d*')
+
+SPARQL_ENDPOINT_URL = "https://query.wikidata.org/sparql"
 
 
 def escape_string(string):
@@ -171,9 +176,8 @@ def get_wikidata_language_codes(min_count=0):
 
     query += "\nORDER BY DESC(?count)"
 
-    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
@@ -242,9 +246,8 @@ def iso639_to_q(iso639):
     query = 'SELECT ?code WHERE {{ ?code {property} "{iso639}" }}'.format(
         property=property, iso639=escape_string(iso639))
 
-    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
@@ -316,9 +319,8 @@ def spacy_token_to_lexemes(token):
     }}'''.format(language=language, lexical_category=lexical_category,
                  representation=representation, iso639=iso639)
 
-    url = 'https://query-main.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = requests.get(SPARQL_ENDPOINT_URL, params=params, headers=HEADERS)
     data = response.json()
 
     bindings = data['results']['bindings']
