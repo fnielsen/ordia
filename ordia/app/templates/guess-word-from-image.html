@@ -23,7 +23,7 @@
 {{super()}}
 
 <script>
-        const SPARQL_ENDPOINT = 'https://query-main.wikidata.org/sparql';
+        const SPARQL_ENDPOINT_URL = 'https://query.wikidata.org/sparql';
         const MAX_QUESTIONS = 10;
         let dataItems = [];
         let currentQuestion = 0;
@@ -77,7 +77,7 @@
             GROUP BY ?lexeme ?gloss ?image_url
             LIMIT 10000
             `;
-            const url = SPARQL_ENDPOINT + '?query=' + encodeURIComponent(query);
+            const url = SPARQL_ENDPOINT_URL + '?query=' + encodeURIComponent(query);
 
             try {
                 const response = await fetch(url, {

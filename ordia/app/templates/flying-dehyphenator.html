@@ -82,7 +82,7 @@
                         ontolex:lexicalForm / wdt:P5279 ?syllable .
             } 
             `;
-            const url = 'https://query-main.wikidata.org/sparql?query=' + encodeURIComponent(query) + '&format=json';
+            const url = 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(query) + '&format=json';
             const response = await fetch(url);
             const data = await response.json();
             processData(data.results.bindings);
